@@ -1,12 +1,15 @@
 // /script.js
-const STORAGE_KEY = 'asd_school_rpg_v4';
+const STORAGE_KEY = 'asd_school_rpg_v5';
 
 const badgeState = {
   start: false,
   refuse: false,
   conflict: false,
   respond: false,
-  groupwork: false
+  groupwork: false,
+  help: false,
+  lunch: false,
+  homework: false
 };
 
 const badgeMeta = {
@@ -14,7 +17,10 @@ const badgeMeta = {
   refuse: { icon: '🙅', name: '禮貌拒絕者' },
   conflict: { icon: '🧩', name: '冷靜調解員' },
   respond: { icon: '💬', name: '暖心回應者' },
-  groupwork: { icon: '🤝', name: '合作參與者' }
+  groupwork: { icon: '🤝', name: '合作參與者' },
+  help: { icon: '🙋', name: '主動求助者' },
+  lunch: { icon: '🍱', name: '午飯同伴' },
+  homework: { icon: '📚', name: '確認達人' }
 };
 
 const appState = {
@@ -336,7 +342,7 @@ const asdGames = {
   help: {
     title: '課堂中：向老師求助',
     intro: '情境：上課時你聽不明白老師剛才說的內容，但你不太確定應不應該舉手問。',
-    avatar: '🙋‍♂️',
+    avatar: '🙋',
     role: '課堂求助情境',
     mission: '在合適的時候，清楚表達你需要幫助。',
     location: '課堂中',
@@ -453,66 +459,6 @@ const asdGames = {
     ]
   },
 
-  assembly: {
-    title: '禮堂／集會：遵守排隊和座位安排',
-    intro: '情境：全級到禮堂集合，大家正在排隊進場。你不喜歡人多和混亂，但仍然需要跟著班級安排。',
-    avatar: '🏫',
-    role: '集會情境',
-    mission: '在混亂環境中保持冷靜，並跟隨簡單指示。',
-    location: '禮堂／排隊時',
-    socialGoal: '跟從指示 + 保持穩定',
-    supportTip: '先找清楚自己的班級位置，再跟著前面同學。',
-    hint: '環境很亂時，可以先專注一件事，例如：跟著班牌或老師指示。',
-    calmPrompt: '先深呼吸，心裡默念：「我只要跟住前面一個人就得。」',
-    steps: [
-      {
-        prompt: '第 1 題：到了禮堂外面，第一步最好做什麼？',
-        options: [
-          { text: '先找自己的班級隊伍在哪裡', score: 2, note: '先確認位置很重要。' },
-          { text: '先看看老師或班牌在哪裡', score: 2, note: '這樣能幫你找到方向。' },
-          { text: '隨便站進任何一條隊', score: 0, note: '這樣容易站錯位置。' },
-          { text: '因為緊張而離開隊伍', score: 0, note: '這樣更難跟上安排。' }
-        ]
-      },
-      {
-        prompt: '第 2 題：如果附近很多人、很吵，你可以怎樣讓自己穩定一點？',
-        options: [
-          { text: '先看著前面同學，慢慢跟著走', score: 2, note: '把注意力放在一個明確目標上很有幫助。' },
-          { text: '在心裡數呼吸：吸氣、呼氣', score: 2, note: '這樣能幫助你穩定自己。' },
-          { text: '開始推前面的人', score: 0, note: '這樣會令情況更混亂。' },
-          { text: '大聲喊「好嘈啊」', score: 0, note: '這樣未必能幫到自己，也會影響別人。' }
-        ]
-      },
-      {
-        prompt: '第 3 題：老師說要一個一個進場，你應該怎樣做？',
-        options: [
-          { text: '跟住隊伍順序慢慢進場', score: 2, note: '這樣很合適。' },
-          { text: '保持和前面同學一點距離，慢慢跟上', score: 2, note: '這樣安全又穩定。' },
-          { text: '想快點完成，所以直接衝進去', score: 0, note: '這樣容易打亂秩序。' },
-          { text: '停在原地不動，也不理老師指示', score: 0, note: '這樣會讓後面的人不知道怎樣走。' }
-        ]
-      },
-      {
-        prompt: '第 4 題：進到禮堂後，你不確定坐哪裡，最好怎樣做？',
-        options: [
-          { text: '看老師指示或跟著同班同學坐', score: 2, note: '這樣最容易找到位置。' },
-          { text: '如果不清楚，就小聲問老師或同學', score: 2, note: '求助是很合適的做法。' },
-          { text: '隨便坐在任何位置', score: 0, note: '這樣可能坐錯。' },
-          { text: '因為不確定就站著不動很久', score: 0, note: '這樣會令自己更緊張。' }
-        ]
-      },
-      {
-        prompt: '第 5 題：整個安排完成後，你怎樣算是做得好？',
-        options: [
-          { text: '跟著班級完成排隊和入座', score: 2, note: '你已經很好地完成任務。' },
-          { text: '即使緊張，也有用冷靜方法讓自己穩定', score: 2, note: '這是很重要的能力。' },
-          { text: '全程都只顧著生氣', score: 0, note: '這樣會讓自己更難受。' },
-          { text: '中途離開，也不告訴任何人', score: 0, note: '這樣不安全，也不方便老師安排。' }
-        ]
-      }
-    ]
-  },
-
   homework: {
     title: '放學後：和同學確認功課',
     intro: '情境：放學前你不太確定今天的功課內容，但又擔心問同學會不會麻煩到對方。',
@@ -573,6 +519,7 @@ const asdGames = {
     ]
   }
 };
+
 let currentAsdGame = null;
 let currentAsdStep = 0;
 let currentAsdScore = 0;
@@ -599,6 +546,8 @@ function showToast(message, type = 'success') {
 
 function renderBadges() {
   const grid = document.getElementById('badgeGrid');
+  if (!grid) return;
+
   grid.innerHTML = '';
 
   Object.keys(badgeMeta).forEach((key) => {
@@ -617,12 +566,14 @@ function renderBadges() {
 
 function updateAchievementRow() {
   const row = document.getElementById('achievementRow');
+  if (!row) return;
+
   const unlocked = Object.values(badgeState).filter(Boolean).length;
   const pills = ['<div class="achievement-pill">我的練習模式</div>'];
 
   if (unlocked >= 1) pills.push('<div class="achievement-pill">得到第一枚徽章</div>');
-  if (unlocked >= 3) pills.push('<div class="achievement-pill">持續練習中</div>');
-  if (unlocked === 5) pills.push('<div class="achievement-pill">完成所有情境</div>');
+  if (unlocked >= 4) pills.push('<div class="achievement-pill">持續練習中</div>');
+  if (unlocked === 8) pills.push('<div class="achievement-pill">完成所有情境</div>');
 
   row.innerHTML = pills.join('');
 }
@@ -630,29 +581,51 @@ function updateAchievementRow() {
 function updateGameStatusText() {
   const completed = Object.values(badgeState).filter(Boolean).length;
   appState.completedCount = completed;
-  document.getElementById('gameStatusText').textContent =
-    `已完成情境：${completed} / 5｜使用提示：${appState.hintCount} 次｜使用冷靜模式：${appState.calmCount} 次`;
+
+  const el = document.getElementById('gameStatusText');
+  if (el) {
+    el.textContent =
+      `已完成情境：${completed} / 8｜使用提示：${appState.hintCount} 次｜使用冷靜模式：${appState.calmCount} 次`;
+  }
+
   updateAchievementRow();
 }
 
 function setScreen(screen) {
   appState.currentScreen = screen;
-  document.getElementById('coverScreen').classList.remove('active');
-  document.getElementById('settingsScreen').classList.remove('active');
-  document.getElementById('situationScreen').classList.remove('active');
-  document.getElementById('gameScreen').classList.remove('active');
 
-  if (screen === 'cover') document.getElementById('coverScreen').classList.add('active');
-  if (screen === 'settings') document.getElementById('settingsScreen').classList.add('active');
-  if (screen === 'situation') document.getElementById('situationScreen').classList.add('active');
-  if (screen === 'game') document.getElementById('gameScreen').classList.add('active');
+  const screens = ['coverScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
+  screens.forEach((id) => {
+    const node = document.getElementById(id);
+    if (node) node.classList.remove('active');
+  });
+
+  const mapping = {
+    cover: 'coverScreen',
+    settings: 'settingsScreen',
+    situation: 'situationScreen',
+    game: 'gameScreen'
+  };
+
+  const target = document.getElementById(mapping[screen]);
+  if (target) target.classList.add('active');
 
   saveProgress();
 }
 
-function showCoverScreen() { setScreen('cover'); }
-function showSettingsScreen() { setScreen('settings'); syncSettingControls(); }
-function showSituationScreen() { setScreen('situation'); }
+function showCoverScreen() {
+  setScreen('cover');
+}
+
+function showSettingsScreen() {
+  setScreen('settings');
+  syncSettingControls();
+}
+
+function showSituationScreen() {
+  setScreen('situation');
+}
+
 function showGameScreen() {
   setScreen('game');
   renderBadges();
@@ -660,7 +633,7 @@ function showGameScreen() {
 }
 
 function getStars(score, maxScore) {
-  const ratio = score / maxScore;
+  const ratio = maxScore === 0 ? 0 : score / maxScore;
   if (ratio >= 0.8) return 3;
   if (ratio >= 0.5) return 2;
   if (ratio > 0) return 1;
@@ -669,7 +642,7 @@ function getStars(score, maxScore) {
 
 function renderStars(count) {
   let html = '';
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 3; i += 1) {
     html += i <= count ? '<span class="star-filled">★</span>' : '<span class="star-empty">★</span>';
   }
   return html;
@@ -677,6 +650,8 @@ function renderStars(count) {
 
 function renderSceneMeta(game) {
   const el = document.getElementById('sceneMeta');
+  if (!el) return;
+
   if (!game) {
     el.classList.add('hidden');
     el.innerHTML = '';
@@ -693,6 +668,8 @@ function renderSceneMeta(game) {
 
 function updateReviewList() {
   const list = document.getElementById('reviewList');
+  if (!list) return;
+
   if (appState.reviewHistory.length === 0) {
     list.innerHTML = '<div class="review-item">你還未開始練習。</div>';
     return;
@@ -712,7 +689,9 @@ function updateReviewList() {
 
 function pushReview(title, step, choice) {
   appState.reviewHistory.push({ title, step, choice });
-  if (appState.reviewHistory.length > 20) appState.reviewHistory = appState.reviewHistory.slice(-20);
+  if (appState.reviewHistory.length > 20) {
+    appState.reviewHistory = appState.reviewHistory.slice(-20);
+  }
   updateReviewList();
   saveProgress();
 }
@@ -726,22 +705,29 @@ function updateQuickNotes(customNotes = []) {
   ];
 
   const merged = [...customNotes, ...notes].slice(0, 4);
-  document.getElementById('quickNotesList').innerHTML =
-    merged.map((item) => `<div class="quick-note">${item}</div>`).join('');
+  const list = document.getElementById('quickNotesList');
+  if (!list) return;
+
+  list.innerHTML = merged.map((item) => `<div class="quick-note">${item}</div>`).join('');
 }
 
 function updateProgressBar() {
   const game = asdGames[currentAsdGame];
+  const bar = document.getElementById('asdProgressBar');
+  if (!bar) return;
+
   if (!game) {
-    document.getElementById('asdProgressBar').style.width = '0%';
+    bar.style.width = '0%';
     return;
   }
 
   const percent = (currentAsdStep / game.steps.length) * 100;
-  document.getElementById('asdProgressBar').style.width = `${percent}%`;
+  bar.style.width = `${percent}%`;
 }
 
 function startAsdGame(type) {
+  if (!asdGames[type]) return;
+
   currentAsdGame = type;
   currentAsdStep = 0;
   currentAsdScore = 0;
@@ -750,10 +736,15 @@ function startAsdGame(type) {
   currentChoiceNotes = [];
 
   const game = asdGames[type];
-  document.getElementById('characterAvatar').textContent = game.avatar;
-  document.getElementById('characterName').textContent = '我';
-  document.getElementById('characterRole').textContent = '學生';
-  document.getElementById('characterInfo').innerHTML = `<strong>現在要做的事：</strong><br>${game.mission}`;
+  const avatar = document.getElementById('characterAvatar');
+  const name = document.getElementById('characterName');
+  const role = document.getElementById('characterRole');
+  const info = document.getElementById('characterInfo');
+
+  if (avatar) avatar.textContent = game.avatar;
+  if (name) name.textContent = '我';
+  if (role) role.textContent = '學生';
+  if (info) info.innerHTML = `<strong>現在要做的事：</strong><br>${game.mission}`;
 
   hideHint();
   hideCalmMode();
@@ -775,7 +766,12 @@ function renderAsdStep() {
   const choices = document.getElementById('asdChoices');
   const step = game.steps[currentAsdStep];
 
-  progress.textContent = `情境：${game.title}｜第 ${currentAsdStep + 1} / ${game.steps.length} 題`;
+  if (!step || !box || !choices) return;
+
+  if (progress) {
+    progress.textContent = `情境：${game.title}｜第 ${currentAsdStep + 1} / ${game.steps.length} 題`;
+  }
+
   box.innerHTML = `
     <div class="scene-badge">${game.title}</div>
     <strong>${game.intro}</strong><br><br>
@@ -800,28 +796,41 @@ function renderAsdStep() {
 
 function chooseAsdOption(option) {
   const game = asdGames[currentAsdGame];
+  if (!game) return;
 
   currentAsdScore += option.score;
   currentChoiceNotes.push(option.note);
 
-  if (option.score === 2) currentAsdStrengths.push(option.text);
-  else currentAsdImprovements.push(option.text);
+  if (option.score === 2) {
+    currentAsdStrengths.push(option.text);
+  } else {
+    currentAsdImprovements.push(option.text);
+  }
 
   pushReview(game.title, currentAsdStep + 1, option.text);
   showInlineReview(option.note);
   currentAsdStep += 1;
 
-  if (currentAsdStep >= game.steps.length) showAsdResult();
-  else renderAsdStep();
+  if (currentAsdStep >= game.steps.length) {
+    showAsdResult();
+  } else {
+    renderAsdStep();
+  }
 }
 
 function showAsdResult() {
   const game = asdGames[currentAsdGame];
+  if (!game) return;
+
   const maxScore = game.steps.length * 2;
   const starCount = getStars(currentAsdScore, maxScore);
   const box = document.getElementById('asdBox');
   const choices = document.getElementById('asdChoices');
   const progress = document.getElementById('asdProgressText');
+  const info = document.getElementById('characterInfo');
+  const bar = document.getElementById('asdProgressBar');
+
+  if (!box || !choices) return;
 
   let level = '';
   let overall = '';
@@ -859,10 +868,12 @@ function showAsdResult() {
   badgeState[currentAsdGame] = true;
   renderBadges();
   updateGameStatusText();
-  progress.textContent = `完成：${game.title}`;
-  document.getElementById('asdProgressBar').style.width = '100%';
-  document.getElementById('characterInfo').innerHTML =
-    `<strong>完成的練習：</strong><br>你已完成「${game.title}」，並得到一枚徽章。`;
+
+  if (progress) progress.textContent = `完成：${game.title}`;
+  if (bar) bar.style.width = '100%';
+  if (info) {
+    info.innerHTML = `<strong>完成的練習：</strong><br>你已完成「${game.title}」，並得到一枚徽章。`;
+  }
 
   box.innerHTML = `
     <div class="scene-badge">練習結果</div>
@@ -893,7 +904,7 @@ function showHint() {
   const game = asdGames[currentAsdGame];
   const box = document.getElementById('hintBox');
 
-  if (!game) {
+  if (!game || !box) {
     showToast('請先選擇一個情境。', 'warning');
     return;
   }
@@ -907,6 +918,7 @@ function showHint() {
 
 function hideHint() {
   const box = document.getElementById('hintBox');
+  if (!box) return;
   box.classList.add('hidden');
   box.innerHTML = '';
 }
@@ -914,6 +926,7 @@ function hideHint() {
 function showCalmMode() {
   const game = asdGames[currentAsdGame];
   const box = document.getElementById('calmBox');
+  if (!box) return;
 
   appState.calmCount += 1;
   box.classList.remove('hidden');
@@ -927,26 +940,30 @@ function showCalmMode() {
 
 function hideCalmMode() {
   const box = document.getElementById('calmBox');
+  if (!box) return;
   box.classList.add('hidden');
   box.innerHTML = '';
 }
 
 function showInlineReview(text) {
   const box = document.getElementById('reviewBoxInline');
+  if (!box) return;
   box.classList.remove('hidden');
   box.innerHTML = `<strong>即時提醒：</strong><br>${text}`;
 }
 
 function hideInlineReview() {
   const box = document.getElementById('reviewBoxInline');
+  if (!box) return;
   box.classList.add('hidden');
   box.innerHTML = '';
 }
 
 function copyResultSummary() {
   const box = document.getElementById('asdBox');
-  const text = box.innerText.trim();
+  if (!box) return;
 
+  const text = box.innerText.trim();
   if (!text) {
     showToast('目前沒有可複製的內容。', 'warning');
     return;
@@ -959,6 +976,8 @@ function copyResultSummary() {
 
 function saveJournal() {
   const input = document.getElementById('journalInput');
+  if (!input) return;
+
   appState.lastJournal = input.value.trim();
   saveProgress();
 
@@ -972,6 +991,7 @@ function saveJournal() {
 
 function loadJournalToBox() {
   const box = document.getElementById('asdBox');
+  if (!box) return;
 
   if (!appState.lastJournal) {
     box.innerHTML = `
@@ -1015,6 +1035,8 @@ function applyReducedMotion() {
 
 function handleSpeechToggle() {
   const toggle = document.getElementById('speechToggle');
+  if (!toggle) return;
+
   appState.speechEnabled = toggle.checked;
   saveProgress();
   showToast(appState.speechEnabled ? '已開啟朗讀' : '已關閉朗讀', 'success');
@@ -1023,6 +1045,8 @@ function handleSpeechToggle() {
 
 function handleContrastToggle() {
   const toggle = document.getElementById('contrastToggle');
+  if (!toggle) return;
+
   appState.highContrast = toggle.checked;
   applyContrastMode();
   saveProgress();
@@ -1031,6 +1055,8 @@ function handleContrastToggle() {
 
 function handleMotionToggle() {
   const toggle = document.getElementById('motionToggle');
+  if (!toggle) return;
+
   appState.reducedMotion = toggle.checked;
   applyReducedMotion();
   saveProgress();
@@ -1056,7 +1082,9 @@ function syncSettingControls() {
 }
 
 function stopSpeech() {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
   currentSpeechUtterance = null;
 }
 
@@ -1074,8 +1102,9 @@ function maybeSpeak(text) {
 
 function repeatCurrentText() {
   const box = document.getElementById('asdBox');
-  const text = box.innerText.trim();
+  if (!box) return;
 
+  const text = box.innerText.trim();
   if (!text) {
     showToast('目前沒有可朗讀的內容。', 'warning');
     return;
@@ -1128,7 +1157,9 @@ function loadProgress() {
       });
     }
 
-    if (data.appState) Object.assign(appState, data.appState);
+    if (data.appState) {
+      Object.assign(appState, data.appState);
+    }
 
     currentAsdGame = data.currentAsdGame ?? null;
     currentAsdStep = Number.isInteger(data.currentAsdStep) ? data.currentAsdStep : 0;
@@ -1146,8 +1177,9 @@ function loadProgress() {
     applyContrastMode();
     applyReducedMotion();
 
-    if (appState.lastJournal) {
-      document.getElementById('journalInput').value = appState.lastJournal;
+    const journal = document.getElementById('journalInput');
+    if (appState.lastJournal && journal) {
+      journal.value = appState.lastJournal;
     }
 
     if (appState.currentScreen === 'settings') showSettingsScreen();
@@ -1157,18 +1189,25 @@ function loadProgress() {
 
     if (currentAsdGame && asdGames[currentAsdGame]) {
       const game = asdGames[currentAsdGame];
-      document.getElementById('characterAvatar').textContent = game.avatar;
-      document.getElementById('characterName').textContent = '我';
-      document.getElementById('characterRole').textContent = '學生';
+      const avatar = document.getElementById('characterAvatar');
+      const name = document.getElementById('characterName');
+      const role = document.getElementById('characterRole');
+      const info = document.getElementById('characterInfo');
+
+      if (avatar) avatar.textContent = game.avatar;
+      if (name) name.textContent = '我';
+      if (role) role.textContent = '學生';
 
       if (currentAsdStep >= game.steps.length) {
-        document.getElementById('characterInfo').innerHTML =
-          `<strong>完成的練習：</strong><br>你已完成「${game.title}」，並得到一枚徽章。`;
+        if (info) {
+          info.innerHTML = `<strong>完成的練習：</strong><br>你已完成「${game.title}」，並得到一枚徽章。`;
+        }
         renderSceneMeta(game);
         showAsdResult();
       } else {
-        document.getElementById('characterInfo').innerHTML =
-          `<strong>現在要做的事：</strong><br>${game.mission}`;
+        if (info) {
+          info.innerHTML = `<strong>現在要做的事：</strong><br>${game.mission}`;
+        }
         renderSceneMeta(game);
         if (appState.currentScreen === 'game') renderAsdStep();
       }
@@ -1208,16 +1247,25 @@ function resetAllData() {
   currentAsdImprovements = [];
   currentChoiceNotes = [];
 
-  document.getElementById('journalInput').value = '';
-  document.getElementById('characterAvatar').textContent = '🧑';
-  document.getElementById('characterName').textContent = '我';
-  document.getElementById('characterRole').textContent = '學生';
-  document.getElementById('characterInfo').innerHTML =
-    '<strong>現在要做的事：</strong><br>先從情境選擇頁開始你的社交練習。';
-  document.getElementById('asdBox').innerHTML = '這裡會顯示情境故事、問題和結果。';
-  document.getElementById('asdChoices').innerHTML = '';
-  document.getElementById('asdProgressText').textContent = '請先選擇一個情境開始練習。';
-  document.getElementById('asdProgressBar').style.width = '0%';
+  const journal = document.getElementById('journalInput');
+  const avatar = document.getElementById('characterAvatar');
+  const name = document.getElementById('characterName');
+  const role = document.getElementById('characterRole');
+  const info = document.getElementById('characterInfo');
+  const box = document.getElementById('asdBox');
+  const choices = document.getElementById('asdChoices');
+  const progress = document.getElementById('asdProgressText');
+  const bar = document.getElementById('asdProgressBar');
+
+  if (journal) journal.value = '';
+  if (avatar) avatar.textContent = '🧑';
+  if (name) name.textContent = '我';
+  if (role) role.textContent = '學生';
+  if (info) info.innerHTML = '<strong>現在要做的事：</strong><br>先從情境選擇頁開始你的社交練習。';
+  if (box) box.innerHTML = '這裡會顯示情境故事、問題和結果。';
+  if (choices) choices.innerHTML = '';
+  if (progress) progress.textContent = '請先選擇一個情境開始練習。';
+  if (bar) bar.style.width = '0%';
 
   hideHint();
   hideCalmMode();
