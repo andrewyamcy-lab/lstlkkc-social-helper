@@ -22,7 +22,7 @@
           <div class="tag">開始頁</div>
           <div class="hero-avatar">🎮</div>
           <h2>歡迎使用校園社交練習</h2>
-          <p>你可以透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人和小組合作。</p>
+          <p>你可以透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人、小組合作、向老師求助、加入同學，以及確認功課。</p>
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
@@ -85,42 +85,63 @@
           <div class="tag">情境選擇</div>
           <div class="hero-avatar">🏫</div>
           <h2>選擇你想練習的情境</h2>
-          <p>每個情境有 5 題，完成後可以看到結果和鼓勵。</p>
+          <p>每個情境有 5 題，每題有 4 個選項。完成後可以看到結果和鼓勵。</p>
 
           <div class="scenario-select-grid">
             <div class="scenario-card">
               <div class="emoji">🗣️</div>
               <strong>課室：發起對話</strong>
-              <div class="small">早上第一節課前，主動和較少接觸的新同學說話。</div>
+              <div class="small">主動和同學打招呼，開始簡單對話。</div>
               <button onclick="startAsdGame('start')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">🙅</div>
               <strong>小息：禮貌拒絕</strong>
-              <div class="small">小息時被同學邀請玩遊戲，但你想休息。</div>
+              <div class="small">被同學邀請玩遊戲時，清楚而友善地拒絕。</div>
               <button onclick="startAsdGame('refuse')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">🧩</div>
               <strong>借文具：處理衝突</strong>
-              <div class="small">上課前發現同學未經同意拿了你的筆。</div>
+              <div class="small">同學未經同意拿了你的筆，學習平靜表達界線。</div>
               <button onclick="startAsdGame('conflict')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">💬</div>
               <strong>放學前：作出回應</strong>
-              <div class="small">同學分享今天默書拿高分，想和你說話。</div>
+              <div class="small">同學開心分享事情時，學習聆聽和回應。</div>
               <button onclick="startAsdGame('respond')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">🤝</div>
               <strong>小組：加入合作</strong>
-              <div class="small">分組活動時，學習怎樣加入討論和合作。</div>
+              <div class="small">在分組活動裡，找到時機加入和表達想法。</div>
               <button onclick="startAsdGame('groupwork')">開始這個情境</button>
+            </div>
+
+            <div class="scenario-card">
+              <div class="emoji">🙋</div>
+              <strong>課堂中：向老師求助</strong>
+              <div class="small">聽不明白時，練習用清楚方式向老師求助。</div>
+              <button onclick="startAsdGame('help')">開始這個情境</button>
+            </div>
+
+            <div class="scenario-card">
+              <div class="emoji">🍱</div>
+              <strong>午飯時間：加入同學</strong>
+              <div class="small">想加入同學一起吃飯時，學習自然地開口。</div>
+              <button onclick="startAsdGame('lunch')">開始這個情境</button>
+            </div>
+
+            <div class="scenario-card">
+              <div class="emoji">📚</div>
+              <strong>放學後：確認功課</strong>
+              <div class="small">不確定功課內容時，學習向同學清楚確認。</div>
+              <button onclick="startAsdGame('homework')">開始這個情境</button>
             </div>
           </div>
 
@@ -153,7 +174,7 @@
 
           <div class="status-box">
             <div class="status-title">我的表現</div>
-            <div id="gameStatusText" class="small">已完成情境：0 / 5｜使用提示：0 次｜使用冷靜模式：0 次</div>
+            <div id="gameStatusText" class="small">已完成情境：0 / 8｜使用提示：0 次｜使用冷靜模式：0 次</div>
             <div class="achievement-row" id="achievementRow">
               <div class="achievement-pill">我的練習模式</div>
             </div>
