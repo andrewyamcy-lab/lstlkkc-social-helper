@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>社交小幫手</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --primary: #4f7cff;
+      --primary-dark: #3559c7;
+      --accent: #eef3ff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --success: #1f9d55;
+      --warning: #d97706;
+      --border: #dbe3f0;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #4f7cff, #7ea1ff);
+      color: white;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2, .card h3 {
+      margin-top: 0;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--accent);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      font-size: 0.88rem;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      margin: 6px 6px 0 0;
+    }
+
+    button:hover { background: var(--primary-dark); }
+
+    .secondary {
+      background: #eef2ff;
+      color: var(--primary-dark);
+    }
+
+    .secondary:hover {
+      background: #dfe8ff;
+    }
+
+    .steps {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+
+    .dialogue-box, .feedback-box, .story-box, .log-box {
+      background: #f9fbff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+      min-height: 96px;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .choice {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s ease;
+    }
+
+    .choice:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .progress-wrap {
+      margin-top: 12px;
+      background: #e5ecff;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 16px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4f7cff, #7ea1ff);
+      transition: width 0.3s ease;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .good { color: var(--success); font-weight: bold; }
+    .warn { color: var(--warning); font-weight: bold; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 10px 16px 30px;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.6rem; }
+      .card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>社交小幫手</h1>
+    <p>幫助自閉學生以低壓力方式練習打招呼、輪流說話、理解情緒與加入對話</p>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <section class="card">
+        <div class="tag">今日目標</div>
+        <h2>主動打招呼</h2>
+        <p>今天我們會練習一個小目標：見到同學時，說一句簡單招呼。</p>
+        <ol class="steps">
+          <li>行近對方</li>
+          <li>看一看對方</li>
+          <li>說：「早晨！」或「你好！」</li>
+          <li>等對方回應</li>
+        </ol>
+        <button onclick="completeGoal()">我完成了 1 次</button>
+        <button class="secondary" onclick="resetGoal()">重新計算</button>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="goalBar"></div>
+        </div>
+        <p id="goalText" class="small">今日進度：0 / 3 次</p>
+      </section>
+
+      <section class="card">
+        <div class="tag">社交故事</div>
+        <h2>小息時如何加入同學</h2>
+        <div class="story-box" id="storyBox">
+          1. 我看到同學在玩。<br>
+          2. 我可以先走近一點。<br>
+          3. 我可以說：「我可以一起玩嗎？」<br>
+          4. 如果同學說可以，我就加入。<br>
+          5. 如果同學說等一下，我可以先等一會。<br>
+          6. 我有禮貌地說話，就是好表現。
+        </div>
+        <button onclick="readStory()">朗讀故事</button>
+        <button class="secondary" onclick="swapStory()">切換情境</button>
+      </section>
+
+      <section class="card">
+        <div class="tag">對話練習</div>
+        <h2>情境角色扮演</h2>
+        <p>按一下按鈕，試試不同情境。</p>
+        <button onclick="setDialogue('greeting')">打招呼</button>
+        <button onclick="setDialogue('join')">加入遊戲</button>
+        <button onclick="setDialogue('turn')">輪流說話</button>
+        <div class="dialogue-box" id="dialogueBox">請先選擇一個情境。</div>
+      </section>
+
+      <section class="card">
+        <div class="tag">情緒辨識</div>
+        <h2>他現在感覺如何？</h2>
+        <p>看提示，再選擇最合適的情緒。</p>
+        <div class="story-box" id="emotionPrompt">提示：同學微笑，聲音輕鬆，願意和你說話。</div>
+        <div class="choice-grid">
+          <div class="choice" onclick="checkEmotion('happy')">😊 開心</div>
+          <div class="choice" onclick="checkEmotion('sad')">😢 傷心</div>
+          <div class="choice" onclick="checkEmotion('angry')">😠 生氣</div>
+          <div class="choice" onclick="checkEmotion('nervous')">😰 緊張</div>
+        </div>
+        <div class="feedback-box" id="emotionFeedback">請選一個答案。</div>
+      </section>
+
+      <section class="card">
+        <div class="tag">即時回饋</div>
+        <h2>老師／家長觀察</h2>
+        <p>完成練習後，可記錄學生今日表現。</p>
+        <label><input type="checkbox" id="c1"> 有主動打招呼</label><br>
+        <label><input type="checkbox" id="c2"> 有等待別人講完</label><br>
+        <label><input type="checkbox" id="c3"> 有作出相關回應</label><br>
+        <button onclick="generateFeedback()">生成回饋</button>
+        <div class="feedback-box" id="teacherFeedback">按下按鈕後會顯示今日回饋。</div>
+      </section>
+
+      <section class="card">
+        <div class="tag">進度記錄</div>
+        <h2>本日練習摘要</h2>
+        <div class="log-box" id="logBox">
+          尚未有記錄。完成活動後，這裡會顯示簡單摘要。
+        </div>
+        <button onclick="saveLog()">更新摘要</button>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    Prototype for GitHub Pages．可後續加入 AI 對話、更多情境、語音功能及學生個人化內容。
+  </footer>
+
+  <script>
+    let goalCount = 0;
+    const goalTarget = 3;
+
+    const stories = [
+      `1. 我看到同學在玩。<br>2. 我可以先走近一點。<br>3. 我可以說：「我可以一起玩嗎？」<br>4. 如果同學說可以，我就加入。<br>5. 如果同學說等一下，我可以先等一會。<br>6. 我有禮貌地說話，就是好表現。`,
+      `1. 上課前，我看到老師。<br>2. 我可以先看向老師。<br>3. 我可以說：「老師早晨。」<br>4. 我等老師回應。<br>5. 我做到主動打招呼，就是進步。`,
+      `1. 我想和同學聊天。<br>2. 我先聽同學說完。<br>3. 我可以回應一句和主題有關的話。<br>4. 我不打斷別人，就是好表現。`
+    ];
+
+    const dialogues = {
+      greeting: `同學：早晨！<br><br>你可以回答：<br><strong>早晨！很高興見到你。</strong>`,
+      join: `同學們正在玩遊戲。<br><br>你可以說：<br><strong>我可以一起玩嗎？</strong>`,
+      turn: `同學正在說昨天的事情。<br><br>你可以先等他說完，再回答：<br><strong>原來如此，之後發生了什麼事？</strong>`
+    };
+
+    function completeGoal() {
+      if (goalCount < goalTarget) goalCount++;
+      updateGoal();
+    }
+
+    function resetGoal() {
+      goalCount = 0;
+      updateGoal();
+    }
+
+    function updateGoal() {
+      const percent = (goalCount / goalTarget) * 100;
+      document.getElementById('goalBar').style.width = percent + '%';
+      document.getElementById('goalText').textContent = `今日進度：${goalCount} / ${goalTarget} 次`;
+    }
+
+    function readStory() {
+      const text = document.getElementById('storyBox').innerText;
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-HK';
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      } else {
+        alert('此瀏覽器不支援語音朗讀功能。');
+      }
+    }
+
+    function swapStory() {
+      const current = document.getElementById('storyBox').innerHTML;
+      const next = stories[(stories.indexOf(current) + 1) % stories.length] || stories[1];
+      document.getElementById('storyBox').innerHTML = next;
+    }
+
+    function setDialogue(type) {
+      document.getElementById('dialogueBox').innerHTML = dialogues[type];
+    }
+
+    function checkEmotion(choice) {
+      const box = document.getElementById('emotionFeedback');
+      if (choice === 'happy') {
+        box.innerHTML = '<span class="good">答對了！</span> 因為對方微笑，而且願意和你說話，這通常代表他現在比較開心。';
+      } else {
+        box.innerHTML = '<span class="warn">再想一想。</span> 對方微笑、語氣輕鬆，通常不是生氣或傷心。';
+      }
+    }
+
+    function generateFeedback() {
+      const c1 = document.getElementById('c1').checked;
+      const c2 = document.getElementById('c2').checked;
+      const c3 = document.getElementById('c3').checked;
+      let feedback = '今日回饋：';
+
+      if (c1 || c2 || c3) {
+        feedback += '學生今天有';
+        const items = [];
+        if (c1) items.push('主動打招呼');
+        if (c2) items.push('等待別人講完');
+        if (c3) items.push('作出相關回應');
+        feedback += items.join('、') + '。';
+
+        if (items.length === 3) {
+          feedback += ' 表現很好，可以下次增加情境難度。';
+        } else if (items.length === 2) {
+          feedback += ' 已有明顯進步，建議下次集中再練最後一項。';
+        } else {
+          feedback += ' 有初步進步，建議保持簡單練習和即時鼓勵。';
+        }
+      } else {
+        feedback += '今天仍未觀察到明顯表現，建議先由示範和一句固定句型開始。';
+      }
+
+      document.getElementById('teacherFeedback').textContent = feedback;
+    }
+
+    function saveLog() {
+      const dialogue = document.getElementById('dialogueBox').innerText || '未有對話練習';
+      const feedback = document.getElementById('teacherFeedback').innerText;
+      document.getElementById('logBox').innerHTML = `
+        <strong>今日目標完成：</strong> ${goalCount} / ${goalTarget}<br>
+        <strong>最近對話練習：</strong> ${dialogue}<br>
+        <strong>老師／家長回饋：</strong> ${feedback}
+      `;
+    }
+
+    updateGoal();
+  </script>
+</body>
+</html>
