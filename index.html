@@ -166,6 +166,13 @@
     .good { color: var(--success); font-weight: bold; }
     .warn { color: var(--warning); font-weight: bold; }
 
+    .scenario-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
     footer {
       text-align: center;
       color: var(--muted);
@@ -182,7 +189,7 @@
 <body>
   <header>
     <h1>社交小幫手</h1>
-    <p>幫助自閉學生以低壓力方式練習打招呼、輪流說話、理解情緒與加入對話</p>
+    <p>幫助自閉學生以低壓力方式練習打招呼、輪流說話、理解情緒與模擬社交溝通</p>
   </header>
 
   <div class="container">
@@ -222,12 +229,25 @@
 
       <section class="card">
         <div class="tag">對話練習</div>
-        <h2>情境角色扮演</h2>
+        <h2>基本情境角色扮演</h2>
         <p>按一下按鈕，試試不同情境。</p>
         <button onclick="setDialogue('greeting')">打招呼</button>
         <button onclick="setDialogue('join')">加入遊戲</button>
         <button onclick="setDialogue('turn')">輪流說話</button>
         <div class="dialogue-box" id="dialogueBox">請先選擇一個情境。</div>
+      </section>
+
+      <section class="card">
+        <div class="tag">ASD 目標</div>
+        <h2>模擬社交溝通</h2>
+        <p>利用 AI 聊天機器人概念進行社交劇本練習，幫助學生學習發起對話、禮貌拒絕、處理衝突和作出合適回應。</p>
+        <div class="scenario-buttons">
+          <button onclick="setAsdScenario('start')">發起對話</button>
+          <button onclick="setAsdScenario('refuse')">禮貌拒絕</button>
+          <button onclick="setAsdScenario('conflict')">處理衝突</button>
+          <button onclick="setAsdScenario('respond')">作出回應</button>
+        </div>
+        <div class="dialogue-box" id="asdBox">請先選擇一個情境。</div>
       </section>
 
       <section class="card">
@@ -267,7 +287,7 @@
   </div>
 
   <footer>
-    Prototype for GitHub Pages．可後續加入 AI 對話、更多情境、語音功能及學生個人化內容。
+    Prototype for GitHub Pages．可後續加入真 AI 對話、語音輸入、學生個人化設定及資料儲存功能。
   </footer>
 
   <script>
@@ -284,6 +304,41 @@
       greeting: `同學：早晨！<br><br>你可以回答：<br><strong>早晨！很高興見到你。</strong>`,
       join: `同學們正在玩遊戲。<br><br>你可以說：<br><strong>我可以一起玩嗎？</strong>`,
       turn: `同學正在說昨天的事情。<br><br>你可以先等他說完，再回答：<br><strong>原來如此，之後發生了什麼事？</strong>`
+    };
+
+    const asdScenarios = {
+      start: `
+        <strong>情境：你想同新同學講話</strong><br><br>
+        你可以說：<br>
+        1. 你好，我叫阿明。<br>
+        2. 我可以同你一起坐嗎？<br>
+        3. 你今天過得怎樣？<br><br>
+        <strong>練習重點：</strong>先打招呼，再講一句簡單說話。
+      `,
+      refuse: `
+        <strong>情境：同學叫你玩，但你不想</strong><br><br>
+        你可以說：<br>
+        1. 多謝你邀請我，但我現在想自己休息一下。<br>
+        2. 我今天不想玩，不過下次可以。<br>
+        3. 唔該，但我而家想做自己嘅事。<br><br>
+        <strong>練習重點：</strong>拒絕時保持禮貌，不需要發脾氣。
+      `,
+      conflict: `
+        <strong>情境：同學搶了你的東西</strong><br><br>
+        你可以說：<br>
+        1. 我不喜歡你這樣做，請還給我。<br>
+        2. 我現在有點不開心，我想你先停一停。<br>
+        3. 如果有需要，我會請老師幫忙。<br><br>
+        <strong>練習重點：</strong>先表達感受，再清楚說出需要。
+      `,
+      respond: `
+        <strong>情境：同學說他今天很開心</strong><br><br>
+        你可以說：<br>
+        1. 真係呀？發生咩事？<br>
+        2. 聽落好好喎。<br>
+        3. 太好了，我替你開心。<br><br>
+        <strong>練習重點：</strong>回應別人的感受，表示你有在聆聽。
+      `
     };
 
     function completeGoal() {
@@ -316,12 +371,17 @@
 
     function swapStory() {
       const current = document.getElementById('storyBox').innerHTML;
-      const next = stories[(stories.indexOf(current) + 1) % stories.length] || stories[1];
-      document.getElementById('storyBox').innerHTML = next;
+      const currentIndex = stories.indexOf(current);
+      const nextIndex = currentIndex === -1 ? 1 : (currentIndex + 1) % stories.length;
+      document.getElementById('storyBox').innerHTML = stories[nextIndex];
     }
 
     function setDialogue(type) {
       document.getElementById('dialogueBox').innerHTML = dialogues[type];
+    }
+
+    function setAsdScenario(type) {
+      document.getElementById('asdBox').innerHTML = asdScenarios[type];
     }
 
     function checkEmotion(choice) {
@@ -362,11 +422,13 @@
     }
 
     function saveLog() {
-      const dialogue = document.getElementById('dialogueBox').innerText || '未有對話練習';
+      const dialogue = document.getElementById('dialogueBox').innerText || '未有基本對話練習';
+      const asd = document.getElementById('asdBox').innerText || '未有 ASD 情境練習';
       const feedback = document.getElementById('teacherFeedback').innerText;
       document.getElementById('logBox').innerHTML = `
         <strong>今日目標完成：</strong> ${goalCount} / ${goalTarget}<br>
-        <strong>最近對話練習：</strong> ${dialogue}<br>
+        <strong>最近基本對話練習：</strong> ${dialogue}<br>
+        <strong>最近 ASD 情境練習：</strong> ${asd}<br>
         <strong>老師／家長回饋：</strong> ${feedback}
       `;
     }
