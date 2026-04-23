@@ -67,15 +67,15 @@
               <h3>資料管理</h3>
               <p class="small">你可以儲存目前進度，或重新開始。</p>
               <div class="settings-buttons">
-                <button class="secondary" onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
+                <button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
                 <button class="secondary" onclick="resetAllData()">重新開始</button>
               </div>
             </div>
           </div>
 
           <div class="welcome-actions">
-            <button onclick="showCoverScreen()">返回開始頁</button>
-            <button class="secondary" onclick="showSituationScreen()">前往情境選擇</button>
+            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
+            <button onclick="showSituationScreen()">前往情境選擇</button>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@
           </div>
 
           <div class="welcome-actions">
-            <button onclick="showCoverScreen()">返回開始頁</button>
+            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -137,7 +137,7 @@
         <p>完成這個情境後，你可以再選另一個情境繼續練習。</p>
 
         <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
-          <button class="secondary" onclick="showSituationScreen()">選擇其他情境</button>
+          <button onclick="showSituationScreen()">選擇其他情境</button>
           <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
         </div>
@@ -196,7 +196,7 @@
               <button class="secondary" onclick="showHint()">看看提示</button>
               <button class="secondary" onclick="showCalmMode()">先冷靜一下</button>
               <button class="secondary" onclick="repeatCurrentText()">再讀一次題目</button>
-              <button class="secondary" onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
+              <button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
             </div>
           </div>
 
@@ -225,7 +225,7 @@
               <p class="small">完成情境後，可以寫下：你最想記住什麼？下次想怎樣做得更好？</p>
               <textarea id="journalInput" placeholder="例如：下次我想先深呼吸，再慢慢說出自己的想法。"></textarea>
               <div class="journal-actions">
-                <button class="secondary" onclick="saveJournal()">儲存反思</button>
+                <button onclick="saveJournal()">儲存反思</button>
                 <button class="secondary" onclick="loadJournalToBox()">查看最近反思</button>
               </div>
             </div>
