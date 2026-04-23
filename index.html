@@ -3,73 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>社交小幫手</title>
+  <title>ASD 校園社交 RPG</title>
   <style>
     :root {
-      --bg: #f6f8fb;
-      --card: #ffffff;
+      --bg: #eef4ff;
+      --card: rgba(255, 255, 255, 0.94);
       --primary: #4f7cff;
       --primary-dark: #3559c7;
       --accent: #eef3ff;
       --text: #1f2937;
       --muted: #6b7280;
-      --success: #1f9d55;
+      --success: #16a34a;
       --warning: #d97706;
+      --danger: #dc2626;
       --border: #dbe3f0;
-      --shadow: 0 10px 30px rgba(0,0,0,0.08);
-      --radius: 18px;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      --radius: 22px;
+      --gold: #f5b301;
+      --panel: rgba(249, 251, 255, 0.96);
+      --soft-blue: #dbe7ff;
+      --soft-green: #effcf4;
+      --soft-orange: #fff8ed;
+      --soft-purple: #f4f3ff;
+      --font-scale: 1;
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.65;
+      min-height: 100vh;
+      font-size: calc(16px * var(--font-scale));
+      background:
+        radial-gradient(circle at 15% 20%, rgba(126, 161, 255, 0.22), transparent 18%),
+        radial-gradient(circle at 85% 18%, rgba(79, 124, 255, 0.18), transparent 20%),
+        radial-gradient(circle at 70% 80%, rgba(180, 208, 255, 0.3), transparent 20%),
+        linear-gradient(180deg, #ecf3ff 0%, #f9fbff 100%);
+      background-attachment: fixed;
+    }
+
+    body.high-contrast {
+      --card: rgba(255,255,255,0.98);
+      --panel: rgba(255,255,255,0.98);
+      --primary: #1546d8;
+      --primary-dark: #0e2f8f;
+      --border: #9cb6ff;
+      --text: #0b1220;
+      --muted: #374151;
+      background: #eef3ff;
+    }
+
+    body.reduced-motion * {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
     }
 
     header {
-      background: linear-gradient(135deg, #4f7cff, #7ea1ff);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(79,124,255,0.95), rgba(126,161,255,0.95));
       color: white;
-      padding: 28px 20px;
+      padding: 36px 20px;
       text-align: center;
+      box-shadow: var(--shadow);
     }
 
-    header h1 {
-      margin: 0 0 8px;
-      font-size: 2rem;
+    header::before,
+    header::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      pointer-events: none;
     }
 
-    header p {
-      margin: 0;
-      font-size: 1rem;
-      opacity: 0.95;
-    }
+    header::before { width: 240px; height: 240px; top: -90px; left: -60px; }
+    header::after { width: 320px; height: 320px; right: -100px; bottom: -180px; }
+
+    header h1, header p { position: relative; z-index: 1; }
+    header h1 { margin: 0 0 8px; font-size: 2rem; }
+    header p { margin: 0; opacity: 0.96; }
 
     .container {
-      max-width: 1100px;
-      margin: 24px auto 40px;
+      max-width: 1220px;
+      margin: 28px auto 42px;
       padding: 0 16px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 18px;
     }
 
     .card {
       background: var(--card);
-      border: 1px solid var(--border);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(219, 227, 240, 0.95);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 24px;
       box-shadow: var(--shadow);
-    }
-
-    .card h2, .card h3 {
-      margin-top: 0;
     }
 
     .tag {
@@ -83,94 +115,532 @@
       font-weight: bold;
     }
 
+    h2, h3, h4 { margin-top: 0; }
+
     button {
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 10px 16px;
-      font-size: 0.95rem;
+      border-radius: 14px;
+      padding: 11px 16px;
+      font-size: 0.96rem;
       cursor: pointer;
       transition: 0.2s ease;
-      margin: 6px 6px 0 0;
+      box-shadow: 0 6px 14px rgba(79, 124, 255, 0.18);
     }
 
-    button:hover { background: var(--primary-dark); }
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
 
     .secondary {
       background: #eef2ff;
       color: var(--primary-dark);
+      box-shadow: none;
+      border: 1px solid #dfe8ff;
     }
 
-    .secondary:hover {
-      background: #dfe8ff;
+    .secondary:hover { background: #dfe8ff; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .welcome-screen {
+      text-align: center;
+      padding: 8px 0 6px;
     }
 
-    .steps {
-      padding-left: 20px;
-      margin-bottom: 0;
-    }
-
-    .dialogue-box, .feedback-box, .story-box, .log-box {
-      background: #f9fbff;
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(244,248,255,0.97));
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 12px;
-      min-height: 96px;
+      border-radius: 24px;
+      padding: 28px 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
     }
 
-    .choice-grid {
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(126,161,255,0.18), transparent 24%),
+        radial-gradient(circle at 80% 18%, rgba(79,124,255,0.10), transparent 24%),
+        radial-gradient(circle at 50% 90%, rgba(180,208,255,0.16), transparent 25%);
+      pointer-events: none;
+    }
+
+    .hero-card > * { position: relative; z-index: 1; }
+
+    .hero-avatar {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #eef3ff, #dbe7ff);
+      border: 4px solid #d4e1ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      margin: 0 auto 14px;
+      box-shadow: 0 10px 18px rgba(79,124,255,0.14);
+    }
+
+    .hero-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    .mini-box {
+      background: rgba(249, 251, 255, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 0.93rem;
+    }
+
+    .welcome-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .menu-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 320px;
+      margin: 24px auto 0;
+    }
+
+    .scenario-select-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    .scenario-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.04);
+      display: grid;
+      gap: 10px;
+    }
+
+    .scenario-card .emoji {
+      font-size: 2rem;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    .settings-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(249,251,255,0.92);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      margin-top: 10px;
+    }
+
+    .toggle-row input[type="checkbox"] { transform: scale(1.2); }
+
+    .settings-buttons {
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       margin-top: 12px;
     }
 
-    .choice {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      text-align: center;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: 0.2s ease;
+    .top-status {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
-    .choice:hover {
-      border-color: var(--primary);
-      transform: translateY(-2px);
+    .status-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .status-title {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: bold;
     }
 
     .progress-wrap {
-      margin-top: 12px;
-      background: #e5ecff;
+      background: #e6edff;
       border-radius: 999px;
       overflow: hidden;
       height: 16px;
+      margin-top: 10px;
     }
 
     .progress-bar {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, #4f7cff, #7ea1ff);
-      transition: width 0.3s ease;
+      transition: width 0.35s ease;
     }
 
-    .small {
-      color: var(--muted);
+    .small { font-size: 0.92rem; color: var(--muted); }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr 280px;
+      gap: 18px;
+      align-items: start;
+      margin-top: 12px;
+    }
+
+    .side-column { display: grid; gap: 14px; }
+
+    .avatar-panel,
+    .badge-panel,
+    .review-panel,
+    .journal-panel,
+    .help-panel {
+      background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+    }
+
+    .avatar-panel::before,
+    .badge-panel::before,
+    .review-panel::before,
+    .journal-panel::before,
+    .help-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(126,161,255,0.2), transparent 28%),
+        radial-gradient(circle at 80% 12%, rgba(79,124,255,0.12), transparent 28%);
+      pointer-events: none;
+    }
+
+    .character-card-badge,
+    .panel-badge {
+      position: relative;
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #eef3ff;
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      z-index: 1;
+    }
+
+    .avatar {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, #eef3ff, #dbe7ff);
+      border: 4px solid #d4e1ff;
+      box-shadow: 0 10px 18px rgba(79,124,255,0.14);
+      z-index: 1;
+    }
+
+    .avatar-name,
+    .avatar-role,
+    .character-info,
+    .badge-panel h3,
+    .badge-panel p,
+    .badge-grid,
+    .review-panel *,
+    .journal-panel *,
+    .help-panel * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar-name { font-weight: bold; font-size: 1rem; text-align: center; }
+    .avatar-role { font-size: 0.88rem; color: var(--muted); text-align: center; margin-bottom: 12px; }
+
+    .character-info {
+      text-align: left;
+      background: rgba(249, 251, 255, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
       font-size: 0.92rem;
     }
 
-    .good { color: var(--success); font-weight: bold; }
-    .warn { color: var(--warning); font-weight: bold; }
+    .badge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
-    .scenario-buttons {
+    .badge {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 8px;
+      text-align: center;
+      background: rgba(255,255,255,0.9);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .badge-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 6px;
+      filter: grayscale(1);
+      opacity: 0.5;
+    }
+
+    .badge.unlocked {
+      color: var(--text);
+      border-color: #cfe0ff;
+      background: linear-gradient(180deg, #ffffff, #f4f9ff);
+      box-shadow: 0 8px 16px rgba(79,124,255,0.08);
+    }
+
+    .badge.unlocked .badge-icon { filter: none; opacity: 1; }
+    .badge-name { font-weight: bold; display: block; }
+
+    .dialogue-area { display: grid; gap: 14px; }
+
+    .dialogue-box {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,250,255,0.96));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.04);
+    }
+
+    .dialogue-box::before {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(79,124,255,0.06);
+      pointer-events: none;
+    }
+
+    .scene-badge {
+      display: inline-block;
+      font-size: 0.82rem;
+      background: #eef3ff;
+      color: var(--primary-dark);
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .scene-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .meta-box {
+      background: rgba(249,251,255,0.96);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .choice-button {
+      width: 100%;
+      text-align: left;
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 14px;
+      font-size: 0.96rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.03);
+    }
+
+    .choice-button:hover {
+      background: #f4f7ff;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .hint-box,
+    .calm-box,
+    .review-box,
+    .summary-box,
+    .toast {
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .hint-box { background: var(--soft-orange); border-color: #fcd9a8; }
+    .calm-box { background: var(--soft-green); border-color: #bfe8c9; }
+    .review-box { background: var(--soft-purple); border-color: #ddd6fe; }
+    .summary-box { background: #f7faff; }
+
+    .stars { font-size: 1.7rem; letter-spacing: 4px; margin-top: 8px; }
+    .star-filled { color: var(--gold); }
+    .star-empty { color: #d1d5db; }
+
+    .result-good {
+      background: #effcf4;
+      border-left: 5px solid var(--success);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .result-improve {
+      background: #fff8ed;
+      border-left: 5px solid var(--warning);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .action-row {
       display: flex;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .review-list,
+    .quick-notes-list,
+    .timeline-list {
+      display: grid;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 10px;
+    }
+
+    .review-item,
+    .quick-note,
+    .timeline-item {
+      background: rgba(249,251,255,0.94);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+
+    .journal-panel textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 12px;
+      font-size: 0.94rem;
+      font-family: inherit;
+      background: rgba(255,255,255,0.95);
+    }
+
+    .journal-actions,
+    .achievement-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .achievement-pill {
+      background: #eef3ff;
+      color: var(--primary-dark);
+      border: 1px solid #d7e4ff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      font-weight: bold;
+    }
+
+    .toast-wrap {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      display: grid;
+      gap: 10px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 250px;
+      box-shadow: var(--shadow);
+      background: white;
+      border-left: 6px solid var(--primary);
+      pointer-events: auto;
+    }
+
+    .toast.success-toast { border-left-color: var(--success); }
+    .toast.warning-toast { border-left-color: var(--warning); }
+
+    .hidden { display: none !important; }
+    .animate-in { animation: slideFade 0.35s ease; }
+
+    @keyframes slideFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     footer {
@@ -180,260 +650,972 @@
       font-size: 0.92rem;
     }
 
-    @media (max-width: 640px) {
-      header h1 { font-size: 1.6rem; }
-      .card { padding: 16px; }
+    @media (max-width: 1120px) {
+      .game-layout { grid-template-columns: 280px 1fr; }
+      .right-column { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 920px) {
+      .game-layout { grid-template-columns: 1fr; }
+      .top-status { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .scenario-buttons,
+      .welcome-actions,
+      .menu-actions,
+      .action-row { flex-direction: column; }
+      .scenario-buttons button,
+      .welcome-actions button,
+      .menu-actions button,
+      .action-row button { width: 100%; }
+      .badge-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
+  <div class="toast-wrap" id="toastWrap"></div>
+
   <header>
-    <h1>社交小幫手</h1>
-    <p>幫助自閉學生以低壓力方式練習打招呼、輪流說話、理解情緒與模擬社交溝通</p>
+    <h1>ASD 校園社交 RPG</h1>
+    <p>封面頁 → 設定頁／開始遊戲 → 情境選擇 → 正式遊玩</p>
   </header>
 
   <div class="container">
-    <div class="grid">
-      <section class="card">
-        <div class="tag">今日目標</div>
-        <h2>主動打招呼</h2>
-        <p>今天我們會練習一個小目標：見到同學時，說一句簡單招呼。</p>
-        <ol class="steps">
-          <li>行近對方</li>
-          <li>看一看對方</li>
-          <li>說：「早晨！」或「你好！」</li>
-          <li>等對方回應</li>
-        </ol>
-        <button onclick="completeGoal()">我完成了 1 次</button>
-        <button class="secondary" onclick="resetGoal()">重新計算</button>
-        <div class="progress-wrap">
-          <div class="progress-bar" id="goalBar"></div>
+    <section class="card">
+      <div id="coverScreen" class="screen active welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">Cover Page</div>
+          <div class="hero-avatar">🎮</div>
+          <h2>校園社交任務</h2>
+          <p>透過真實學校生活情境，練習發起對話、禮貌拒絕、處理衝突、回應他人，以及小組合作。</p>
+          <div class="menu-actions">
+            <button onclick="showSituationScreen()">Start Game</button>
+            <button class="secondary" onclick="showSettingsScreen()">Settings</button>
+          </div>
         </div>
-        <p id="goalText" class="small">今日進度：0 / 3 次</p>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="tag">社交故事</div>
-        <h2>小息時如何加入同學</h2>
-        <div class="story-box" id="storyBox">
-          1. 我看到同學在玩。<br>
-          2. 我可以先走近一點。<br>
-          3. 我可以說：「我可以一起玩嗎？」<br>
-          4. 如果同學說可以，我就加入。<br>
-          5. 如果同學說等一下，我可以先等一會。<br>
-          6. 我有禮貌地說話，就是好表現。
+      <div id="settingsScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">Settings</div>
+          <div class="hero-avatar">⚙️</div>
+          <h2>設定</h2>
+          <p>你可以在這裡調整視覺、語音和輔助功能。所有設定都會自動保存。</p>
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3>輔助功能</h3>
+              <div class="toggle-row">
+                <span>語音朗讀題目</span>
+                <input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" />
+              </div>
+              <div class="toggle-row">
+                <span>高對比模式</span>
+                <input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" />
+              </div>
+              <div class="toggle-row">
+                <span>減少動畫</span>
+                <input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" />
+              </div>
+            </div>
+            <div class="settings-card">
+              <h3>顯示設定</h3>
+              <p class="small">按下面按鈕調整字體大小，方便閱讀。</p>
+              <div class="settings-buttons">
+                <button class="secondary" onclick="cycleFontSize()">字體大小</button>
+                <button class="secondary" onclick="toggleSpeech()">切換語音</button>
+              </div>
+            </div>
+            <div class="settings-card">
+              <h3>資料管理</h3>
+              <p class="small">你可以手動儲存資料，或者清除全部遊戲紀錄。</p>
+              <div class="settings-buttons">
+                <button class="secondary" onclick="saveProgress(); showToast('已手動儲存', 'success');">Save</button>
+                <button class="secondary" onclick="resetAllData()">Clear All Data</button>
+              </div>
+            </div>
+          </div>
+          <div class="welcome-actions">
+            <button onclick="showCoverScreen()">Back</button>
+            <button class="secondary" onclick="showSituationScreen()">Go to Situation Select</button>
+          </div>
         </div>
-        <button onclick="readStory()">朗讀故事</button>
-        <button class="secondary" onclick="swapStory()">切換情境</button>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="tag">對話練習</div>
-        <h2>基本情境角色扮演</h2>
-        <p>按一下按鈕，試試不同情境。</p>
-        <button onclick="setDialogue('greeting')">打招呼</button>
-        <button onclick="setDialogue('join')">加入遊戲</button>
-        <button onclick="setDialogue('turn')">輪流說話</button>
-        <div class="dialogue-box" id="dialogueBox">請先選擇一個情境。</div>
-      </section>
-
-      <section class="card">
-        <div class="tag">ASD 目標</div>
-        <h2>模擬社交溝通</h2>
-        <p>利用 AI 聊天機器人概念進行社交劇本練習，幫助學生學習發起對話、禮貌拒絕、處理衝突和作出合適回應。</p>
-        <div class="scenario-buttons">
-          <button onclick="setAsdScenario('start')">發起對話</button>
-          <button onclick="setAsdScenario('refuse')">禮貌拒絕</button>
-          <button onclick="setAsdScenario('conflict')">處理衝突</button>
-          <button onclick="setAsdScenario('respond')">作出回應</button>
+      <div id="situationScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">Situation Select</div>
+          <div class="hero-avatar">🏫</div>
+          <h2>選擇情境</h2>
+          <p>按一個情境開始。每個情境有 5 步，完成後會顯示總結與徽章。</p>
+          <div class="scenario-select-grid">
+            <div class="scenario-card">
+              <div class="emoji">🗣️</div>
+              <strong>課室：發起對話</strong>
+              <div class="small">早上第一節課前，主動和較少接觸的新同學說話。</div>
+              <button onclick="startAsdGame('start')">Start</button>
+            </div>
+            <div class="scenario-card">
+              <div class="emoji">🙅</div>
+              <strong>小息：禮貌拒絕</strong>
+              <div class="small">小息時被同學邀請玩遊戲，但你想休息。</div>
+              <button onclick="startAsdGame('refuse')">Start</button>
+            </div>
+            <div class="scenario-card">
+              <div class="emoji">🧩</div>
+              <strong>借文具：處理衝突</strong>
+              <div class="small">上課前發現同學未經同意拿了你的筆。</div>
+              <button onclick="startAsdGame('conflict')">Start</button>
+            </div>
+            <div class="scenario-card">
+              <div class="emoji">💬</div>
+              <strong>放學前：作出回應</strong>
+              <div class="small">同學分享今天默書拿高分，想和你說話。</div>
+              <button onclick="startAsdGame('respond')">Start</button>
+            </div>
+            <div class="scenario-card">
+              <div class="emoji">🤝</div>
+              <strong>小組：加入合作</strong>
+              <div class="small">分組活動時，學習怎樣加入討論和合作。</div>
+              <button onclick="startAsdGame('groupwork')">Start</button>
+            </div>
+          </div>
+          <div class="welcome-actions">
+            <button onclick="showCoverScreen()">Back</button>
+            <button class="secondary" onclick="showSettingsScreen()">Settings</button>
+          </div>
         </div>
-        <div class="dialogue-box" id="asdBox">請先選擇一個情境。</div>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="tag">情緒辨識</div>
-        <h2>他現在感覺如何？</h2>
-        <p>看提示，再選擇最合適的情緒。</p>
-        <div class="story-box" id="emotionPrompt">提示：同學微笑，聲音輕鬆，願意和你說話。</div>
-        <div class="choice-grid">
-          <div class="choice" onclick="checkEmotion('happy')">😊 開心</div>
-          <div class="choice" onclick="checkEmotion('sad')">😢 傷心</div>
-          <div class="choice" onclick="checkEmotion('angry')">😠 生氣</div>
-          <div class="choice" onclick="checkEmotion('nervous')">😰 緊張</div>
+      <div id="gameScreen" class="screen">
+        <div class="tag">ASD 社交訓練遊戲</div>
+        <h2>正在遊玩</h2>
+        <p>完成當前情境後，你可以返回情境選擇頁再揀另一個。</p>
+
+        <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
+          <button class="secondary" onclick="showSituationScreen()">Situation Select</button>
+          <button class="secondary" onclick="showSettingsScreen()">Settings</button>
+          <button class="secondary" onclick="showCoverScreen()">Cover Page</button>
         </div>
-        <div class="feedback-box" id="emotionFeedback">請選一個答案。</div>
-      </section>
 
-      <section class="card">
-        <div class="tag">即時回饋</div>
-        <h2>老師／家長觀察</h2>
-        <p>完成練習後，可記錄學生今日表現。</p>
-        <label><input type="checkbox" id="c1"> 有主動打招呼</label><br>
-        <label><input type="checkbox" id="c2"> 有等待別人講完</label><br>
-        <label><input type="checkbox" id="c3"> 有作出相關回應</label><br>
-        <button onclick="generateFeedback()">生成回饋</button>
-        <div class="feedback-box" id="teacherFeedback">按下按鈕後會顯示今日回饋。</div>
-      </section>
-
-      <section class="card">
-        <div class="tag">進度記錄</div>
-        <h2>本日練習摘要</h2>
-        <div class="log-box" id="logBox">
-          尚未有記錄。完成活動後，這裡會顯示簡單摘要。
+        <div class="top-status">
+          <div class="status-box">
+            <div class="status-title">步驟進度</div>
+            <div id="asdProgressText" class="small">請先從情境選擇頁開始一個情境。</div>
+            <div class="progress-wrap">
+              <div class="progress-bar" id="asdProgressBar"></div>
+            </div>
+          </div>
+          <div class="status-box">
+            <div class="status-title">遊戲概況</div>
+            <div id="gameStatusText" class="small">已完成情境：0 / 5｜提示使用：0 次｜冷靜模式：0 次</div>
+            <div class="achievement-row" id="achievementRow">
+              <div class="achievement-pill">校園任務模式</div>
+            </div>
+          </div>
         </div>
-        <button onclick="saveLog()">更新摘要</button>
-      </section>
-    </div>
+
+        <div class="game-layout">
+          <div class="side-column left-column">
+            <div class="avatar-panel animate-in">
+              <div class="character-card-badge">角色卡</div>
+              <div class="avatar" id="characterAvatar">🧑</div>
+              <div class="avatar-name" id="characterName">學生</div>
+              <div class="avatar-role" id="characterRole">主角</div>
+              <div class="character-info" id="characterInfo">
+                <strong>目前任務：</strong><br>
+                先從情境選擇頁開始你的校園社交挑戰。
+              </div>
+            </div>
+
+            <div class="badge-panel animate-in">
+              <div class="panel-badge">徽章系統</div>
+              <h3>已解鎖徽章</h3>
+              <p class="small">完成情境後會自動解鎖對應徽章。</p>
+              <div class="badge-grid" id="badgeGrid"></div>
+            </div>
+          </div>
+
+          <div class="dialogue-area center-column">
+            <div class="dialogue-box animate-in" id="asdBox">
+              這裡會顯示故事背景、題目和最後結果。
+            </div>
+            <div id="sceneMeta" class="scene-meta hidden"></div>
+            <div id="hintBox" class="hint-box hidden"></div>
+            <div id="calmBox" class="calm-box hidden"></div>
+            <div id="reviewBoxInline" class="review-box hidden"></div>
+            <div class="choice-grid" id="asdChoices"></div>
+            <div class="action-row">
+              <button class="secondary" onclick="showHint()">提示</button>
+              <button class="secondary" onclick="showCalmMode()">冷靜模式</button>
+              <button class="secondary" onclick="repeatCurrentText()">重讀題目</button>
+              <button class="secondary" onclick="saveProgress(); showToast('已手動儲存', 'success');">Save</button>
+            </div>
+          </div>
+
+          <div class="side-column right-column">
+            <div class="review-panel animate-in">
+              <div class="panel-badge">即時回顧</div>
+              <h3>最近選擇</h3>
+              <p class="small">這裡會記錄你最近幾步做了什麼選擇。</p>
+              <div class="review-list" id="reviewList">
+                <div class="review-item">尚未開始遊戲。</div>
+              </div>
+            </div>
+
+            <div class="help-panel animate-in">
+              <div class="panel-badge">社交小貼士</div>
+              <div class="quick-notes-list" id="quickNotesList">
+                <div class="quick-note">先聽清楚別人說什麼，再回應。</div>
+                <div class="quick-note">唔想做某件事，可以清楚而有禮貌咁講。</div>
+                <div class="quick-note">緊張時可以先停一停，深呼吸。</div>
+                <div class="quick-note">表達感受時，可用「我覺得……」開頭。</div>
+              </div>
+            </div>
+
+            <div class="journal-panel animate-in">
+              <div class="panel-badge">反思日誌</div>
+              <p class="small">完成情境後，可以寫低：你最想記住哪一句？或者下次想改進什麼？</p>
+              <textarea id="journalInput" placeholder="例如：下次如果同學借我文具，我想先冷靜再開口。"></textarea>
+              <div class="journal-actions">
+                <button class="secondary" onclick="saveJournal()">儲存日誌</button>
+                <button class="secondary" onclick="loadJournalToBox()">查看最近日誌</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <footer>
-    Prototype for GitHub Pages．可後續加入真 AI 對話、語音輸入、學生個人化設定及資料儲存功能。
+    GitHub Pages Prototype · Cover Page + Separate Settings Page + Situation Select Flow
   </footer>
 
   <script>
-    let goalCount = 0;
-    const goalTarget = 3;
+    const STORAGE_KEY = 'asd_school_rpg_v4';
 
-    const stories = [
-      `1. 我看到同學在玩。<br>2. 我可以先走近一點。<br>3. 我可以說：「我可以一起玩嗎？」<br>4. 如果同學說可以，我就加入。<br>5. 如果同學說等一下，我可以先等一會。<br>6. 我有禮貌地說話，就是好表現。`,
-      `1. 上課前，我看到老師。<br>2. 我可以先看向老師。<br>3. 我可以說：「老師早晨。」<br>4. 我等老師回應。<br>5. 我做到主動打招呼，就是進步。`,
-      `1. 我想和同學聊天。<br>2. 我先聽同學說完。<br>3. 我可以回應一句和主題有關的話。<br>4. 我不打斷別人，就是好表現。`
-    ];
-
-    const dialogues = {
-      greeting: `同學：早晨！<br><br>你可以回答：<br><strong>早晨！很高興見到你。</strong>`,
-      join: `同學們正在玩遊戲。<br><br>你可以說：<br><strong>我可以一起玩嗎？</strong>`,
-      turn: `同學正在說昨天的事情。<br><br>你可以先等他說完，再回答：<br><strong>原來如此，之後發生了什麼事？</strong>`
+    const badgeState = {
+      start: false,
+      refuse: false,
+      conflict: false,
+      respond: false,
+      groupwork: false
     };
 
-    const asdScenarios = {
-      start: `
-        <strong>情境：你想同新同學講話</strong><br><br>
-        你可以說：<br>
-        1. 你好，我叫阿明。<br>
-        2. 我可以同你一起坐嗎？<br>
-        3. 你今天過得怎樣？<br><br>
-        <strong>練習重點：</strong>先打招呼，再講一句簡單說話。
-      `,
-      refuse: `
-        <strong>情境：同學叫你玩，但你不想</strong><br><br>
-        你可以說：<br>
-        1. 多謝你邀請我，但我現在想自己休息一下。<br>
-        2. 我今天不想玩，不過下次可以。<br>
-        3. 唔該，但我而家想做自己嘅事。<br><br>
-        <strong>練習重點：</strong>拒絕時保持禮貌，不需要發脾氣。
-      `,
-      conflict: `
-        <strong>情境：同學搶了你的東西</strong><br><br>
-        你可以說：<br>
-        1. 我不喜歡你這樣做，請還給我。<br>
-        2. 我現在有點不開心，我想你先停一停。<br>
-        3. 如果有需要，我會請老師幫忙。<br><br>
-        <strong>練習重點：</strong>先表達感受，再清楚說出需要。
-      `,
-      respond: `
-        <strong>情境：同學說他今天很開心</strong><br><br>
-        你可以說：<br>
-        1. 真係呀？發生咩事？<br>
-        2. 聽落好好喎。<br>
-        3. 太好了，我替你開心。<br><br>
-        <strong>練習重點：</strong>回應別人的感受，表示你有在聆聽。
-      `
+    const badgeMeta = {
+      start: { icon: '🗣️', name: '開口勇士' },
+      refuse: { icon: '🙅', name: '禮貌拒絕者' },
+      conflict: { icon: '🧩', name: '冷靜調解員' },
+      respond: { icon: '💬', name: '暖心回應者' },
+      groupwork: { icon: '🤝', name: '合作參與者' }
     };
 
-    function completeGoal() {
-      if (goalCount < goalTarget) goalCount++;
-      updateGoal();
-    }
+    const appState = {
+      speechEnabled: false,
+      highContrast: false,
+      reducedMotion: false,
+      fontModeIndex: 0,
+      completedCount: 0,
+      hintCount: 0,
+      calmCount: 0,
+      reviewHistory: [],
+      lastJournal: '',
+      currentScreen: 'cover'
+    };
 
-    function resetGoal() {
-      goalCount = 0;
-      updateGoal();
-    }
+    const fontScales = [1, 1.08, 1.16];
 
-    function updateGoal() {
-      const percent = (goalCount / goalTarget) * 100;
-      document.getElementById('goalBar').style.width = percent + '%';
-      document.getElementById('goalText').textContent = `今日進度：${goalCount} / ${goalTarget} 次`;
-    }
-
-    function readStory() {
-      const text = document.getElementById('storyBox').innerText;
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'zh-HK';
-        speechSynthesis.cancel();
-        speechSynthesis.speak(utterance);
-      } else {
-        alert('此瀏覽器不支援語音朗讀功能。');
+    const asdGames = {
+      start: {
+        title: '課室發起對話',
+        intro: '情境：早上第一節課前，你進入課室，看到一位平時較少接觸的新同學一個人坐在後排整理書本。老師還未正式開始上課，你想嘗試主動打開話題。',
+        avatar: '👦',
+        role: '課室情境',
+        mission: '在不打擾對方的情況下，主動打招呼，並自然地開始一段簡單對話。',
+        location: '課室',
+        socialGoal: '主動開口 + 延續兩句對話',
+        supportTip: '由簡單問題開始，例如問書本、課堂或座位。',
+        hint: '先想一想：如果對方未準備好長談，最安全的方法是先輕聲打招呼，再講一句很簡單的話。',
+        calmPrompt: '如果你覺得主動開口很難，可以先在心裡默念一句固定句子，例如：「你好，我係阿明。」',
+        steps: [
+          { prompt: '第 1 步：你剛走到座位附近，第一個行動怎樣比較自然？', options: [
+            { text: '先行近一點，再輕聲說「早晨」', score: 2, note: '這樣比較自然，也不會太突然。' },
+            { text: '突然大聲叫「喂！」想吸引對方注意', score: 1, note: '你有嘗試開口，但語氣和音量可能令對方嚇到。' },
+            { text: '直接坐低，一句都唔講', score: 0, note: '這很像很多 ASD 學生會因緊張而選的做法，但對方未必知道你想認識他。' }
+          ]},
+          { prompt: '第 2 步：對方望向你了，你第一句說話可以是？', options: [
+            { text: '你好，我係阿明，我哋同班。', score: 2, note: '清楚、簡單，對方容易回應。' },
+            { text: '你平時點解咁靜？', score: 1, note: '你有開話題，但內容太直接，可能令對方尷尬。' },
+            { text: '一直望住對方，等佢先講', score: 0, note: '這種沉默等待很常見，但容易令對話停住。' }
+          ]},
+          { prompt: '第 3 步：對方微笑點頭，你可以怎樣延續？', options: [
+            { text: '你今日帶咗邊本書返嚟？', score: 2, note: '跟課室情境有關，容易接下去。' },
+            { text: '我而家坐你隔離，你唔介意啦。', score: 1, note: '你有想靠近對方，但好像沒有先問清楚。' },
+            { text: '即刻開始只講自己嘅事', score: 0, note: '有些 ASD 學生會太快轉去自己熟悉的主題，忽略了雙向對話。' }
+          ]},
+          { prompt: '第 4 步：對方簡單回答後，最佳回應是？', options: [
+            { text: '原來係咁，多謝你同我講。', score: 2, note: '這表示你有聽對方說話。' },
+            { text: '哦。', score: 1, note: '有回應，但比較短，對話可能很快停。' },
+            { text: '唔再理佢，轉身做自己嘢', score: 0, note: '這會令對方以為你不想再說話。' }
+          ]},
+          { prompt: '第 5 步：上堂鐘聲快響，最自然的結尾是？', options: [
+            { text: '等陣小息再傾，好高興認識你。', score: 2, note: '簡單、有禮貌，還留下一個下次再談的機會。' },
+            { text: '我講完啦。', score: 1, note: '雖然結束了，但聽起來比較生硬。' },
+            { text: '冇回應，直接低頭', score: 0, note: '對話不是只靠開始，結尾也需要練習。' }
+          ]}
+        ]
+      },
+      refuse: {
+        title: '小息禮貌拒絕', avatar: '🙋', role: '小息情境', mission: '在不傷害同學感受的情況下，清楚表達你現在不想加入，但仍然保持友善。', location: '操場／小息時間', socialGoal: '清楚拒絕 + 保持關係', supportTip: '拒絕時可以先感謝對方，再表達自己需要。', hint: '禮貌拒絕不代表一定要答應。重點是：說清楚、語氣平靜、不要傷人。', calmPrompt: '如果你怕自己一緊張就說得太直接，可以先用固定句型：「多謝你邀請我，但我而家想休息一下。」',
+        intro: '情境：小息時，兩位同學正在操場旁邊玩拍卡遊戲，見到你之後邀請你一起加入。不過你剛剛上完課有點累，只想坐一會兒休息。',
+        steps: [
+          { prompt: '第 1 步：同學走過來邀請你時，第一個反應應該是？', options: [
+            { text: '望向對方，先聽清楚他們說什麼', score: 2, note: '這表示你有接收對方的信息。' },
+            { text: '一聽到就說「唔玩！」', score: 1, note: '你有直接表達，但語氣較硬。' },
+            { text: '立即擰轉面走開', score: 0, note: '很多 ASD 學生在壓力下會逃開，但對方可能覺得被拒絕得很突然。' }
+          ]},
+          { prompt: '第 2 步：你想拒絕，最合適的說法是？', options: [
+            { text: '多謝你哋邀請我，但我而家想休息一陣。', score: 2, note: '又清楚又有禮貌。' },
+            { text: '我唔想同你哋玩。', score: 1, note: '內容是真實感受，但聽起來像拒絕對方這個人。' },
+            { text: '完全唔出聲', score: 0, note: '沉默雖然常見，但對方未必知道你只是想休息。' }
+          ]},
+          { prompt: '第 3 步：如果你想令氣氛沒那麼僵，可以補充哪一句？', options: [
+            { text: '如果你哋下次再玩，我可能可以一齊。', score: 2, note: '保留關係，對方會感覺較舒服。' },
+            { text: '我今日冇心情。', score: 1, note: '有表達，但不夠具體，可能仍較冷淡。' },
+            { text: '你哋自己玩啦，唔好再搵我。', score: 0, note: '這樣容易令同學覺得被推開。' }
+          ]},
+          { prompt: '第 4 步：其中一位同學有點失望，你應該怎樣做？', options: [
+            { text: '保持平靜語氣，再禮貌講一次', score: 2, note: '重複一次也沒關係，最重要是語氣穩定。' },
+            { text: '假裝聽唔到', score: 1, note: '你可能想避開尷尬，但對方仍然會覺得被忽視。' },
+            { text: '開始覺得煩，語氣變差', score: 0, note: '情緒一轉強，整個對話就容易變僵。' }
+          ]},
+          { prompt: '第 5 步：這段對話最適合怎樣結束？', options: [
+            { text: '多謝你哋明白，祝你哋玩得開心。', score: 2, note: '這樣結尾既自然又友善。' },
+            { text: '講完就立即行開', score: 1, note: '還可以，但對話結尾較急。' },
+            { text: '補一句「真係好煩」', score: 0, note: '最後一句往往最令人記住，這樣會傷害關係。' }
+          ]}
+        ]
+      },
+      conflict: {
+        title: '借文具處理衝突', avatar: '😠', role: '借文具情境', mission: '先控制情緒，再清楚表達自己的界線，必要時尋求老師幫助。', location: '上課前', socialGoal: '表達界線 + 不升級衝突', supportTip: '你可以先說事實，再說需要，例如：「呢支筆係我嘅，可唔可以還返俾我？」', hint: '生氣是可以的，但最有效的做法不是搶回來，而是先講清楚。', calmPrompt: '如果你很想立刻搶回來，可以先把手放在桌上，吸一口氣，再開口說第一句。',
+        intro: '情境：上數學堂前，你發現放在桌上的原子筆被旁邊同學拿了去用，對方沒有先問你。你心裡有點不舒服，但老師已經快要開始上課。',
+        steps: [
+          { prompt: '第 1 步：發現筆被拿走時，第一個反應最理想是？', options: [
+            { text: '先深呼吸一下，再開口', score: 2, note: '先穩住情緒，後面更容易說清楚。' },
+            { text: '馬上很大聲地質問對方', score: 1, note: '你有表達不滿，但容易令事情升級。' },
+            { text: '立即伸手搶回來', score: 0, note: '衝動行為很常見，但會讓衝突變大。' }
+          ]},
+          { prompt: '第 2 步：你可以怎樣說比較清楚？', options: [
+            { text: '呢支筆係我嘅，可唔可以先還返俾我？', score: 2, note: '清楚、有禮，也容易讓人合作。' },
+            { text: '你做咩偷我嘢？', score: 1, note: '這句容易令對方馬上防衛。' },
+            { text: '唔講嘢，只一直望住對方', score: 0, note: '對方可能根本不知道你想他怎樣做。' }
+          ]},
+          { prompt: '第 3 步：如果對方回應「我借一陣啫」，你可以怎樣補充？', options: [
+            { text: '如果你想借，可以先問我，我會舒服啲。', score: 2, note: '你表達了自己的感受，也沒有罵人。' },
+            { text: '算啦，但心裡一直好嬲', score: 1, note: '表面停了，但內心沒有真正處理。' },
+            { text: '你再唔還我就同你翻臉。', score: 0, note: '威脅會令情況更難收拾。' }
+          ]},
+          { prompt: '第 4 步：如果對方仍然不合作，下一步最好是？', options: [
+            { text: '請老師幫忙處理', score: 2, note: '知道何時找大人協助，是成熟的做法。' },
+            { text: '不停和對方爭辯', score: 1, note: '有時愈爭愈亂，快要上課更難處理。' },
+            { text: '下課後報復對方', score: 0, note: '這會令事情持續擴大。' }
+          ]},
+          { prompt: '第 5 步：事情解決後，你應該怎樣讓自己回到上課狀態？', options: [
+            { text: '整理情緒，準備好書本，專心上課', score: 2, note: '能回到當下，是很重要的技巧。' },
+            { text: '不停和前後同學講對方壞話', score: 1, note: '這只會延長負面情緒。' },
+            { text: '整堂課都一直記住件事', score: 0, note: '事情雖過了，但情緒還在困住你。' }
+          ]}
+        ]
+      },
+      respond: {
+        title: '放學前作出回應', avatar: '😊', role: '放學前情境', mission: '讓對方感受到你有在聆聽，並用友善、自然的方式作出回應。', location: '放學前', socialGoal: '表達你有聽 + 友善回應', supportTip: '回應別人喜悅時，可先表示興趣，再加一句支持。', hint: '對方最想感受到的，不是你立刻給意見，而是你有在聽、替他高興。', calmPrompt: '如果你不知說什麼，可以用固定句型：第一句「真係呀？」第二句「太好啦！」',
+        intro: '情境：放學前收拾書包時，同學走過來對你說：「我今日中文默書拎到好高分！」對方看起來很開心，也很想找人分享。',
+        steps: [
+          { prompt: '第 1 步：你第一個行動應該是？', options: [
+            { text: '望向對方，表示你有在聽', score: 2, note: '先讓對方知道你有留意他。' },
+            { text: '立即打斷對方，講返自己嘢', score: 1, note: '太快轉主題，會令對方感覺不被重視。' },
+            { text: '繼續執書包，完全唔理', score: 0, note: '對方分享時，如果被忽略會很失落。' }
+          ]},
+          { prompt: '第 2 步：第一句回應可以是？', options: [
+            { text: '真係呀？好勁喎！', score: 2, note: '自然、正面，容易繼續談。' },
+            { text: '哦。', score: 1, note: '雖然有回應，但情感支持不多。' },
+            { text: '咁又點？', score: 0, note: '這句會讓對方覺得你不在乎。' }
+          ]},
+          { prompt: '第 3 步：如果你想延續對話，最適合怎樣問？', options: [
+            { text: '你今次溫咗幾耐呀？', score: 2, note: '這是和對方分享內容有關的追問。' },
+            { text: '其實我今日都幾忙。', score: 1, note: '這樣會把焦點太快轉去自己。' },
+            { text: '你講完未？', score: 0, note: '這樣很容易傷害對方。' }
+          ]},
+          { prompt: '第 4 步：對方分享完後，你可以怎樣表示支持？', options: [
+            { text: '太好啦，你一定好開心。', score: 2, note: '這表示你理解對方感受。' },
+            { text: '嗯，知道。', score: 1, note: '有回應，但支持感較弱。' },
+            { text: '有咩咁值得講？', score: 0, note: '這會令對方以後不想再跟你分享。' }
+          ]},
+          { prompt: '第 5 步：最自然的結尾是？', options: [
+            { text: '恭喜你呀，聽日見！', score: 2, note: '短短一句已經很完整。' },
+            { text: '我走先。', score: 1, note: '可以，但少了一點溫度。' },
+            { text: '轉身就走，冇再回應', score: 0, note: '對話結尾也需要顧及別人感受。' }
+          ]}
+        ]
+      },
+      groupwork: {
+        title: '小組討論加入合作', avatar: '🤝', role: '小組合作情境', mission: '在小組討論中找到合適時機加入，表達自己的想法，也回應別人的意見。', location: '分組活動', socialGoal: '加入對話 + 提出可行意見 + 接受分工', supportTip: '可以先觀察一小段，再用一句簡單句型加入，例如：「我有一個想法。」', hint: '很多 ASD 學生在小組討論不是沒有想法，而是不知道什麼時候說、怎樣說比較自然。', calmPrompt: '如果你覺得小組討論很亂，可以先在心裡準備一句固定開場白：「我有一個簡單想法。」',
+        intro: '情境：通識／專題課上，老師要四人一組完成簡短海報。你被分到一個小組，但其他同學已經開始討論，你不知道什麼時候插話，也擔心自己說錯。',
+        steps: [
+          { prompt: '第 1 步：其他同學正在講，你最好的開始方式是？', options: [
+            { text: '先聽幾秒，等一個空位再加入', score: 2, note: '先觀察節奏，容易找到合適時機。' },
+            { text: '突然大聲插入自己的想法', score: 1, note: '你有參與，但方式可能打斷別人。' },
+            { text: '完全唔講，等別人安排你', score: 0, note: '這很常見，但你可能被忽略。' }
+          ]},
+          { prompt: '第 2 步：你準備加入討論，哪一句最自然？', options: [
+            { text: '我有一個想法，係咪可以試下……？', score: 2, note: '有禮貌，也清楚表示你想參與。' },
+            { text: '我唔識，你哋決定啦。', score: 1, note: '表達了不安，但也讓自己更難參與。' },
+            { text: '你哋講得唔啱。', score: 0, note: '太快否定別人，容易令氣氛變差。' }
+          ]},
+          { prompt: '第 3 步：其中一位組員說「都可以」，你接下來最好怎樣做？', options: [
+            { text: '簡單講清楚自己想法的內容', score: 2, note: '別人已給你空間，現在要把話說完整。' },
+            { text: '只說「冇嘢」然後停住', score: 1, note: '有時太緊張會突然收回想法。' },
+            { text: '突然轉講別的自己有興趣的題目', score: 0, note: '這可能偏離任務。' }
+          ]},
+          { prompt: '第 4 步：另一位同學提出不同意見，你可以怎樣回應？', options: [
+            { text: '我明白，你嗰個方法都可以，我哋可唔可以比較下？', score: 2, note: '這樣能表達不同意，又不會太衝。' },
+            { text: '算啦，乜都得。', score: 1, note: '避免衝突了，但也失去真正參與。' },
+            { text: '唔好改，我覺得我嗰個一定最好。', score: 0, note: '太堅持自己會令合作變難。' }
+          ]},
+          { prompt: '第 5 步：老師說還有 5 分鐘完成，你在小組裡最好的做法是？', options: [
+            { text: '主動接一個清楚任務，例如寫標題或整理資料', score: 2, note: '有明確分工時，參與感會更強。' },
+            { text: '坐著等別人叫你做事', score: 1, note: '仍然可以完成，但較被動。' },
+            { text: '因為緊張而完全退出討論', score: 0, note: '這會讓你更難累積合作經驗。' }
+          ]}
+        ]
       }
+    };
+
+    let currentAsdGame = null;
+    let currentAsdStep = 0;
+    let currentAsdScore = 0;
+    let currentAsdStrengths = [];
+    let currentAsdImprovements = [];
+    let currentChoiceNotes = [];
+
+    function addAnimateIn(el) {
+      if (!el || document.body.classList.contains('reduced-motion')) return;
+      el.classList.remove('animate-in');
+      void el.offsetWidth;
+      el.classList.add('animate-in');
     }
 
-    function swapStory() {
-      const current = document.getElementById('storyBox').innerHTML;
-      const currentIndex = stories.indexOf(current);
-      const nextIndex = currentIndex === -1 ? 1 : (currentIndex + 1) % stories.length;
-      document.getElementById('storyBox').innerHTML = stories[nextIndex];
+    function showToast(message, type = 'success') {
+      const wrap = document.getElementById('toastWrap');
+      const div = document.createElement('div');
+      div.className = `toast ${type === 'success' ? 'success-toast' : 'warning-toast'} animate-in`;
+      div.textContent = message;
+      wrap.appendChild(div);
+      setTimeout(() => div.remove(), 2500);
     }
 
-    function setDialogue(type) {
-      document.getElementById('dialogueBox').innerHTML = dialogues[type];
+    function renderBadges() {
+      const grid = document.getElementById('badgeGrid');
+      grid.innerHTML = '';
+      Object.keys(badgeMeta).forEach((key) => {
+        const meta = badgeMeta[key];
+        const unlocked = badgeState[key];
+        const div = document.createElement('div');
+        div.className = `badge ${unlocked ? 'unlocked' : ''}`;
+        div.innerHTML = `
+          <span class="badge-icon">${meta.icon}</span>
+          <span class="badge-name">${meta.name}</span>
+          <span>${unlocked ? '已解鎖' : '未解鎖'}</span>
+        `;
+        grid.appendChild(div);
+      });
     }
 
-    function setAsdScenario(type) {
-      document.getElementById('asdBox').innerHTML = asdScenarios[type];
+    function updateAchievementRow() {
+      const row = document.getElementById('achievementRow');
+      const unlocked = Object.values(badgeState).filter(Boolean).length;
+      const pills = ['<div class="achievement-pill">校園任務模式</div>'];
+      if (unlocked >= 1) pills.push('<div class="achievement-pill">已解鎖首枚徽章</div>');
+      if (unlocked >= 3) pills.push('<div class="achievement-pill">穩定練習中</div>');
+      if (unlocked === 5) pills.push('<div class="achievement-pill">全情境完成</div>');
+      row.innerHTML = pills.join('');
     }
 
-    function checkEmotion(choice) {
-      const box = document.getElementById('emotionFeedback');
-      if (choice === 'happy') {
-        box.innerHTML = '<span class="good">答對了！</span> 因為對方微笑，而且願意和你說話，這通常代表他現在比較開心。';
-      } else {
-        box.innerHTML = '<span class="warn">再想一想。</span> 對方微笑、語氣輕鬆，通常不是生氣或傷心。';
+    function updateGameStatusText() {
+      const completed = Object.values(badgeState).filter(Boolean).length;
+      appState.completedCount = completed;
+      document.getElementById('gameStatusText').textContent = `已完成情境：${completed} / 5｜提示使用：${appState.hintCount} 次｜冷靜模式：${appState.calmCount} 次`;
+      updateAchievementRow();
+    }
+
+    function setScreen(screen) {
+      appState.currentScreen = screen;
+      document.getElementById('coverScreen').classList.remove('active');
+      document.getElementById('settingsScreen').classList.remove('active');
+      document.getElementById('situationScreen').classList.remove('active');
+      document.getElementById('gameScreen').classList.remove('active');
+      if (screen === 'cover') document.getElementById('coverScreen').classList.add('active');
+      if (screen === 'settings') document.getElementById('settingsScreen').classList.add('active');
+      if (screen === 'situation') document.getElementById('situationScreen').classList.add('active');
+      if (screen === 'game') document.getElementById('gameScreen').classList.add('active');
+      saveProgress();
+    }
+
+    function showCoverScreen() { setScreen('cover'); }
+    function showSettingsScreen() { setScreen('settings'); syncSettingControls(); }
+    function showSituationScreen() { setScreen('situation'); }
+    function showGameScreen() { setScreen('game'); renderBadges(); updateGameStatusText(); }
+
+    function getStars(score, maxScore) {
+      const ratio = score / maxScore;
+      if (ratio >= 0.8) return 3;
+      if (ratio >= 0.5) return 2;
+      if (ratio > 0) return 1;
+      return 0;
+    }
+
+    function renderStars(count) {
+      let html = '';
+      for (let i = 1; i <= 3; i++) {
+        html += i <= count ? '<span class="star-filled">★</span>' : '<span class="star-empty">★</span>';
       }
+      return html;
     }
 
-    function generateFeedback() {
-      const c1 = document.getElementById('c1').checked;
-      const c2 = document.getElementById('c2').checked;
-      const c3 = document.getElementById('c3').checked;
-      let feedback = '今日回饋：';
-
-      if (c1 || c2 || c3) {
-        feedback += '學生今天有';
-        const items = [];
-        if (c1) items.push('主動打招呼');
-        if (c2) items.push('等待別人講完');
-        if (c3) items.push('作出相關回應');
-        feedback += items.join('、') + '。';
-
-        if (items.length === 3) {
-          feedback += ' 表現很好，可以下次增加情境難度。';
-        } else if (items.length === 2) {
-          feedback += ' 已有明顯進步，建議下次集中再練最後一項。';
-        } else {
-          feedback += ' 有初步進步，建議保持簡單練習和即時鼓勵。';
-        }
-      } else {
-        feedback += '今天仍未觀察到明顯表現，建議先由示範和一句固定句型開始。';
+    function renderSceneMeta(game) {
+      const el = document.getElementById('sceneMeta');
+      if (!game) {
+        el.classList.add('hidden');
+        el.innerHTML = '';
+        return;
       }
-
-      document.getElementById('teacherFeedback').textContent = feedback;
-    }
-
-    function saveLog() {
-      const dialogue = document.getElementById('dialogueBox').innerText || '未有基本對話練習';
-      const asd = document.getElementById('asdBox').innerText || '未有 ASD 情境練習';
-      const feedback = document.getElementById('teacherFeedback').innerText;
-      document.getElementById('logBox').innerHTML = `
-        <strong>今日目標完成：</strong> ${goalCount} / ${goalTarget}<br>
-        <strong>最近基本對話練習：</strong> ${dialogue}<br>
-        <strong>最近 ASD 情境練習：</strong> ${asd}<br>
-        <strong>老師／家長回饋：</strong> ${feedback}
+      el.classList.remove('hidden');
+      el.innerHTML = `
+        <div class="meta-box"><strong>地點：</strong><br>${game.location}</div>
+        <div class="meta-box"><strong>目標：</strong><br>${game.socialGoal}</div>
+        <div class="meta-box"><strong>小貼士：</strong><br>${game.supportTip}</div>
       `;
     }
 
-    updateGoal();
+    function updateReviewList() {
+      const list = document.getElementById('reviewList');
+      if (appState.reviewHistory.length === 0) {
+        list.innerHTML = '<div class="review-item">尚未開始遊戲。</div>';
+        return;
+      }
+      list.innerHTML = appState.reviewHistory.slice(-5).reverse().map(item => `
+        <div class="review-item">
+          <strong>${item.title}</strong><br>
+          第 ${item.step} 步：${item.choice}
+        </div>
+      `).join('');
+    }
+
+    function pushReview(title, step, choice) {
+      appState.reviewHistory.push({ title, step, choice });
+      if (appState.reviewHistory.length > 20) appState.reviewHistory = appState.reviewHistory.slice(-20);
+      updateReviewList();
+      saveProgress();
+    }
+
+    function updateQuickNotes(customNotes = []) {
+      const notes = [
+        '先聽清楚別人說什麼，再回應。',
+        '唔想做某件事，可以清楚而有禮貌咁講。',
+        '緊張時可以先停一停，深呼吸。',
+        '表達感受時，可用「我覺得……」開頭。'
+      ];
+      const merged = [...customNotes, ...notes].slice(0, 4);
+      document.getElementById('quickNotesList').innerHTML = merged.map(item => `<div class="quick-note">${item}</div>`).join('');
+    }
+
+    function updateProgressBar() {
+      const game = asdGames[currentAsdGame];
+      if (!game) {
+        document.getElementById('asdProgressBar').style.width = '0%';
+        return;
+      }
+      const percent = (currentAsdStep / game.steps.length) * 100;
+      document.getElementById('asdProgressBar').style.width = percent + '%';
+    }
+
+    function startAsdGame(type) {
+      currentAsdGame = type;
+      currentAsdStep = 0;
+      currentAsdScore = 0;
+      currentAsdStrengths = [];
+      currentAsdImprovements = [];
+      currentChoiceNotes = [];
+
+      const game = asdGames[type];
+      document.getElementById('characterAvatar').textContent = game.avatar;
+      document.getElementById('characterName').textContent = '學生';
+      document.getElementById('characterRole').textContent = game.role;
+      document.getElementById('characterInfo').innerHTML = `<strong>目前任務：</strong><br>${game.mission}`;
+
+      hideHint();
+      hideCalmMode();
+      hideInlineReview();
+      renderSceneMeta(game);
+      updateQuickNotes([game.supportTip, `在 ${game.location} 這個情境中，留意語氣和時機。`]);
+      showGameScreen();
+      renderAsdStep();
+      showToast(`已開始：${game.title}`, 'success');
+      saveProgress();
+    }
+
+    function renderAsdStep() {
+      const game = asdGames[currentAsdGame];
+      if (!game) return;
+      const progress = document.getElementById('asdProgressText');
+      const box = document.getElementById('asdBox');
+      const choices = document.getElementById('asdChoices');
+      const step = game.steps[currentAsdStep];
+
+      progress.textContent = `情境：${game.title}｜第 ${currentAsdStep + 1} / ${game.steps.length} 步`;
+      box.innerHTML = `
+        <div class="scene-badge">${game.title}</div>
+        <strong>${game.intro}</strong><br><br>
+        ${step.prompt}
+      `;
+
+      choices.innerHTML = '';
+      step.options.forEach((option) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-button';
+        btn.textContent = option.text;
+        btn.onclick = () => chooseAsdOption(option);
+        choices.appendChild(btn);
+      });
+
+      updateProgressBar();
+      addAnimateIn(box);
+      addAnimateIn(choices);
+      maybeSpeak(box.innerText);
+      saveProgress();
+    }
+
+    function chooseAsdOption(option) {
+      const game = asdGames[currentAsdGame];
+      currentAsdScore += option.score;
+      currentChoiceNotes.push(option.note);
+      if (option.score === 2) currentAsdStrengths.push(option.text);
+      else currentAsdImprovements.push(option.text);
+      pushReview(game.title, currentAsdStep + 1, option.text);
+      showInlineReview(option.note);
+      currentAsdStep++;
+      if (currentAsdStep >= game.steps.length) showAsdResult();
+      else renderAsdStep();
+    }
+
+    function showAsdResult() {
+      const game = asdGames[currentAsdGame];
+      const maxScore = game.steps.length * 2;
+      const starCount = getStars(currentAsdScore, maxScore);
+      const box = document.getElementById('asdBox');
+      const choices = document.getElementById('asdChoices');
+      const progress = document.getElementById('asdProgressText');
+
+      let level = '';
+      let overall = '';
+      if (currentAsdScore >= 8) {
+        level = '表現很好';
+        overall = '你能夠用比較合適、平靜和有禮貌的方法處理這個校園情境。';
+      } else if (currentAsdScore >= 5) {
+        level = '有進步';
+        overall = '你已掌握部分社交技巧，但有些地方可以再更自然、更清楚。';
+      } else {
+        level = '再練習一下';
+        overall = '你願意完成全部步驟已經很好，下一次可以多留意語氣、禮貌和結尾方式。';
+      }
+
+      const strengths = currentAsdStrengths.length ? `<ul>${currentAsdStrengths.slice(0, 4).map(item => `<li>${item}</li>`).join('')}</ul>` : '<p>你有完成整個情境，這已經是一個好開始。</p>';
+      const improvements = currentAsdImprovements.length ? `<ul>${currentAsdImprovements.slice(0, 4).map(item => `<li>下次遇到類似情況時，可以比「${item}」更平靜、清楚或有禮貌。</li>`).join('')}</ul>` : '<p>你今次每一步都做得不錯，可以挑戰更難情境。</p>';
+      const noteSummary = currentChoiceNotes.length ? `<div class="summary-box"><strong>這次練習中，你的選擇提醒：</strong><div class="timeline-list">${currentChoiceNotes.slice(0,5).map(note => `<div class="timeline-item">${note}</div>`).join('')}</div></div>` : '';
+
+      badgeState[currentAsdGame] = true;
+      renderBadges();
+      updateGameStatusText();
+      progress.textContent = `完成：${game.title}`;
+      document.getElementById('asdProgressBar').style.width = '100%';
+      document.getElementById('characterInfo').innerHTML = `<strong>任務完成：</strong><br>你已完成「${game.title}」，並成功解鎖一枚徽章。`;
+
+      box.innerHTML = `
+        <div class="scene-badge">完成結果</div>
+        <strong>${game.title} RPG 結果：${level}</strong>
+        <div class="stars">${renderStars(starCount)}</div>
+        <div class="summary-box"><strong>整體評語：</strong> ${overall}</div>
+        ${noteSummary}
+        <div class="result-good"><strong>你做得好的地方：</strong>${strengths}</div>
+        <div class="result-improve"><strong>你可以改進的地方：</strong>${improvements}</div>
+      `;
+
+      choices.innerHTML = `
+        <div class="action-row">
+          <button onclick="startAsdGame('${currentAsdGame}')">再玩一次這個情境</button>
+          <button class="secondary" onclick="showSituationScreen()">返回情境選擇</button>
+          <button class="secondary" onclick="copyResultSummary()">複製結果摘要</button>
+        </div>
+      `;
+
+      showToast(`已解鎖徽章：${badgeMeta[currentAsdGame].name}`, 'success');
+      addAnimateIn(box);
+      addAnimateIn(choices);
+      saveProgress();
+    }
+
+    function showHint() {
+      const game = asdGames[currentAsdGame];
+      const box = document.getElementById('hintBox');
+      if (!game) { showToast('請先開始一個情境。', 'warning'); return; }
+      appState.hintCount += 1;
+      box.classList.remove('hidden');
+      box.innerHTML = `<strong>提示：</strong><br>${game.hint}`;
+      updateGameStatusText();
+      saveProgress();
+    }
+
+    function hideHint() {
+      const box = document.getElementById('hintBox');
+      box.classList.add('hidden');
+      box.innerHTML = '';
+    }
+
+    function showCalmMode() {
+      const game = asdGames[currentAsdGame];
+      const box = document.getElementById('calmBox');
+      appState.calmCount += 1;
+      box.classList.remove('hidden');
+      box.innerHTML = game ? `<strong>冷靜模式：</strong><br>${game.calmPrompt}<br><br><strong>呼吸提示：</strong>吸氣 4 秒 → 停 2 秒 → 呼氣 4 秒。` : `<strong>冷靜模式：</strong><br>吸氣 4 秒、停 2 秒、呼氣 4 秒。等自己穩定後，再開始一個情境。`;
+      updateGameStatusText();
+      saveProgress();
+    }
+
+    function hideCalmMode() {
+      const box = document.getElementById('calmBox');
+      box.classList.add('hidden');
+      box.innerHTML = '';
+    }
+
+    function showInlineReview(text) {
+      const box = document.getElementById('reviewBoxInline');
+      box.classList.remove('hidden');
+      box.innerHTML = `<strong>即時回顧：</strong><br>${text}`;
+    }
+
+    function hideInlineReview() {
+      const box = document.getElementById('reviewBoxInline');
+      box.classList.add('hidden');
+      box.innerHTML = '';
+    }
+
+    function repeatCurrentText() {
+      const box = document.getElementById('asdBox');
+      maybeSpeak(box.innerText, true);
+    }
+
+    function maybeSpeak(text, force = false) {
+      if (!('speechSynthesis' in window)) return;
+      if (!appState.speechEnabled && !force) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-HK';
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function toggleSpeech() {
+      appState.speechEnabled = !appState.speechEnabled;
+      syncSettingControls();
+      showToast(appState.speechEnabled ? '已開啟語音朗讀' : '已關閉語音朗讀', 'success');
+      saveProgress();
+    }
+
+    function handleSpeechToggle() {
+      appState.speechEnabled = document.getElementById('speechToggle').checked;
+      saveProgress();
+    }
+
+    function toggleHighContrast() {
+      appState.highContrast = !appState.highContrast;
+      applyVisualModes();
+      syncSettingControls();
+      saveProgress();
+    }
+
+    function handleContrastToggle() {
+      appState.highContrast = document.getElementById('contrastToggle').checked;
+      applyVisualModes();
+      saveProgress();
+    }
+
+    function toggleReducedMotion() {
+      appState.reducedMotion = !appState.reducedMotion;
+      applyVisualModes();
+      syncSettingControls();
+      saveProgress();
+    }
+
+    function handleMotionToggle() {
+      appState.reducedMotion = document.getElementById('motionToggle').checked;
+      applyVisualModes();
+      saveProgress();
+    }
+
+    function applyVisualModes() {
+      document.body.classList.toggle('high-contrast', appState.highContrast);
+      document.body.classList.toggle('reduced-motion', appState.reducedMotion);
+    }
+
+    function syncSettingControls() {
+      const s = document.getElementById('speechToggle');
+      const c = document.getElementById('contrastToggle');
+      const m = document.getElementById('motionToggle');
+      if (s) s.checked = appState.speechEnabled;
+      if (c) c.checked = appState.highContrast;
+      if (m) m.checked = appState.reducedMotion;
+    }
+
+    function cycleFontSize() {
+      appState.fontModeIndex = (appState.fontModeIndex + 1) % fontScales.length;
+      document.documentElement.style.setProperty('--font-scale', fontScales[appState.fontModeIndex]);
+      showToast('字體大小已調整', 'success');
+      saveProgress();
+    }
+
+    function saveJournal() {
+      const value = document.getElementById('journalInput').value.trim();
+      appState.lastJournal = value;
+      saveProgress();
+      showToast(value ? '已儲存反思日誌' : '已清空反思日誌', 'success');
+    }
+
+    function loadJournalToBox() {
+      const box = document.getElementById('asdBox');
+      if (!appState.lastJournal) { showToast('未有已儲存日誌。', 'warning'); return; }
+      box.innerHTML = `<div class="scene-badge">最近日誌</div><div class="summary-box">${escapeHtml(appState.lastJournal).replace(/\n/g, '<br>')}</div>`;
+      addAnimateIn(box);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function copyResultSummary() {
+      const text = document.getElementById('asdBox').innerText;
+      navigator.clipboard.writeText(text).then(() => showToast('已複製結果摘要', 'success')).catch(() => showToast('未能複製摘要', 'warning'));
+    }
+
+    function saveProgress() {
+      const payload = {
+        badgeState,
+        appState,
+        currentAsdGame,
+        currentAsdStep,
+        currentAsdScore,
+        currentAsdStrengths,
+        currentAsdImprovements,
+        currentChoiceNotes,
+        journal: document.getElementById('journalInput') ? document.getElementById('journalInput').value : ''
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.badgeState) Object.assign(badgeState, data.badgeState);
+        if (data.appState) Object.assign(appState, data.appState);
+        currentAsdGame = data.currentAsdGame || null;
+        currentAsdStep = data.currentAsdStep || 0;
+        currentAsdScore = data.currentAsdScore || 0;
+        currentAsdStrengths = data.currentAsdStrengths || [];
+        currentAsdImprovements = data.currentAsdImprovements || [];
+        currentChoiceNotes = data.currentChoiceNotes || [];
+        if (document.getElementById('journalInput')) document.getElementById('journalInput').value = data.journal || appState.lastJournal || '';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function restoreCurrentGameView() {
+      syncSettingControls();
+      applyVisualModes();
+      document.documentElement.style.setProperty('--font-scale', fontScales[appState.fontModeIndex] || 1);
+      updateReviewList();
+      renderBadges();
+      updateGameStatusText();
+      updateQuickNotes();
+      if (document.getElementById('journalInput') && appState.lastJournal) document.getElementById('journalInput').value = appState.lastJournal;
+      if (!currentAsdGame) {
+        document.getElementById('asdProgressText').textContent = '請先從情境選擇頁開始一個情境。';
+        document.getElementById('asdBox').innerHTML = '這裡會顯示故事背景、題目和最後結果。';
+        document.getElementById('asdChoices').innerHTML = '';
+        updateProgressBar();
+        return;
+      }
+      const game = asdGames[currentAsdGame];
+      document.getElementById('characterAvatar').textContent = game.avatar;
+      document.getElementById('characterName').textContent = '學生';
+      document.getElementById('characterRole').textContent = game.role;
+      document.getElementById('characterInfo').innerHTML = `<strong>目前任務：</strong><br>${game.mission}`;
+      renderSceneMeta(game);
+      if (currentAsdStep >= game.steps.length) showAsdResult();
+      else renderAsdStep();
+    }
+
+    function resetAllData() {
+      const confirmed = confirm('你確定要清除所有徽章、日誌和進度嗎？');
+      if (!confirmed) return;
+      localStorage.removeItem(STORAGE_KEY);
+      Object.keys(badgeState).forEach(key => badgeState[key] = false);
+      appState.speechEnabled = false;
+      appState.highContrast = false;
+      appState.reducedMotion = false;
+      appState.fontModeIndex = 0;
+      appState.completedCount = 0;
+      appState.hintCount = 0;
+      appState.calmCount = 0;
+      appState.reviewHistory = [];
+      appState.lastJournal = '';
+      appState.currentScreen = 'cover';
+      currentAsdGame = null;
+      currentAsdStep = 0;
+      currentAsdScore = 0;
+      currentAsdStrengths = [];
+      currentAsdImprovements = [];
+      currentChoiceNotes = [];
+      if (document.getElementById('journalInput')) document.getElementById('journalInput').value = '';
+      document.documentElement.style.setProperty('--font-scale', 1);
+      applyVisualModes();
+      syncSettingControls();
+      updateReviewList();
+      renderBadges();
+      updateGameStatusText();
+      updateQuickNotes();
+      renderSceneMeta(null);
+      document.getElementById('asdProgressText').textContent = '請先從情境選擇頁開始一個情境。';
+      document.getElementById('asdBox').innerHTML = '這裡會顯示故事背景、題目和最後結果。';
+      document.getElementById('asdChoices').innerHTML = '';
+      updateProgressBar();
+      showCoverScreen();
+      showToast('已清除所有資料', 'success');
+    }
+
+    loadProgress();
+    syncSettingControls();
+    applyVisualModes();
+    document.documentElement.style.setProperty('--font-scale', fontScales[appState.fontModeIndex] || 1);
+    if (appState.currentScreen === 'settings') showSettingsScreen();
+    else if (appState.currentScreen === 'situation') showSituationScreen();
+    else if (appState.currentScreen === 'game') showGameScreen();
+    else showCoverScreen();
+    restoreCurrentGameView();
   </script>
 </body>
 </html>
