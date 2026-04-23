@@ -15,7 +15,6 @@
   --radius: 22px;
   --gold: #f5b301;
   --panel: rgba(249, 251, 255, 0.96);
-  --soft-blue: #dbe7ff;
   --soft-green: #effcf4;
   --soft-orange: #fff8ed;
   --soft-purple: #f4f3ff;
@@ -112,7 +111,7 @@ header p {
 }
 
 .container {
-  max-width: 1220px;
+  max-width: 1240px;
   margin: 28px auto 42px;
   padding: 0 16px;
 }
@@ -143,10 +142,9 @@ h4 {
   margin-top: 0;
 }
 
-/* force main buttons blue */
 button {
-  background: #4f7cff;
-  color: #ffffff;
+  background: var(--primary);
+  color: white;
   border: none;
   border-radius: 14px;
   padding: 11px 16px;
@@ -158,40 +156,27 @@ button {
 }
 
 button:hover {
-  background: #3559c7;
+  background: var(--primary-dark);
   transform: translateY(-1px);
+}
+
+button:focus-visible,
+.choice-button:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(79, 124, 255, 0.25);
+  outline-offset: 2px;
 }
 
 .secondary {
   background: #eef2ff;
-  color: #3559c7;
-  border: 1px solid #dfe8ff;
+  color: var(--primary-dark);
   box-shadow: none;
+  border: 1px solid #dfe8ff;
 }
 
 .secondary:hover {
   background: #dfe8ff;
-  color: #3559c7;
-}
-
-.choice-button {
-  background: #ffffff;
-  color: #1f2937;
-  border: 1px solid #dbe3f0;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.03);
-}
-
-/* stop faded disabled look unless actually disabled */
-button:disabled {
-  opacity: 1;
-  background: #4f7cff;
-  color: #ffffff;
-  cursor: not-allowed;
-}
-
-.secondary:disabled {
-  background: #eef2ff;
-  color: #3559c7;
+  color: var(--primary-dark);
 }
 
 .screen {
@@ -265,7 +250,7 @@ button:disabled {
 
 .scenario-select-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-top: 18px;
   text-align: left;
@@ -279,6 +264,8 @@ button:disabled {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
   display: grid;
   gap: 10px;
+  min-height: 220px;
+  align-content: start;
 }
 
 .scenario-card .emoji {
@@ -523,7 +510,7 @@ button:disabled {
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 18px;
-  min-height: 250px;
+  min-height: 260px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
@@ -692,11 +679,6 @@ button:disabled {
   background: rgba(255, 255, 255, 0.95);
 }
 
-.journal-panel textarea:focus-visible {
-  outline: 3px solid rgba(79, 124, 255, 0.22);
-  border-color: var(--primary);
-}
-
 .journal-actions,
 .achievement-row {
   display: flex;
@@ -768,7 +750,11 @@ footer {
   font-size: 0.92rem;
 }
 
-@media (max-width: 1120px) {
+@media (max-width: 1180px) {
+  .scenario-select-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .game-layout {
     grid-template-columns: 280px 1fr;
   }
@@ -779,6 +765,10 @@ footer {
 }
 
 @media (max-width: 920px) {
+  .scenario-select-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .game-layout {
     grid-template-columns: 1fr;
   }
@@ -788,20 +778,36 @@ footer {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 640px) {
+  .scenario-select-grid {
+    grid-template-columns: 1fr;
+  }
+
   .welcome-actions,
   .menu-actions,
-  .action-row {
+  .action-row,
+  .journal-actions,
+  .settings-buttons {
     flex-direction: column;
   }
 
   .welcome-actions button,
   .menu-actions button,
-  .action-row button {
+  .action-row button,
+  .journal-actions button,
+  .settings-buttons button {
     width: 100%;
   }
 
   .badge-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .hero-card {
+    padding: 22px 16px;
   }
 }
