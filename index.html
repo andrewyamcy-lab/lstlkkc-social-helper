@@ -4,48 +4,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASD 校園社交 RPG</title>
+  <title>校園社交練習</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="toast-wrap" id="toastWrap"></div>
 
   <header>
-    <h1>ASD 校園社交 RPG</h1>
-    <p>封面頁 → 設定頁／開始遊戲 → 情境選擇 → 正式遊玩</p>
+    <h1>校園社交練習</h1>
+    <p>開始 → 選擇情境 → 作答練習 → 查看結果</p>
   </header>
 
   <div class="container">
     <section class="card">
       <div id="coverScreen" class="screen active welcome-screen">
         <div class="hero-card animate-in">
-          <div class="tag">封面頁</div>
+          <div class="tag">開始頁</div>
           <div class="hero-avatar">🎮</div>
-          <h2>校園社交任務</h2>
-          <p>透過真實學校生活情境，練習發起對話、禮貌拒絕、處理衝突、回應他人，以及小組合作。</p>
+          <h2>歡迎使用校園社交練習</h2>
+          <p>你可以透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人和小組合作。</p>
           <div class="menu-actions">
-            <button onclick="showSituationScreen()">開始遊戲</button>
-            <button class="secondary" onclick="showSettingsScreen()">設定</button>
+            <button onclick="showSituationScreen()">開始練習</button>
+            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
       </div>
 
       <div id="settingsScreen" class="screen welcome-screen">
         <div class="hero-card animate-in">
-          <div class="tag">設定</div>
+          <div class="tag">我的設定</div>
           <div class="hero-avatar">⚙️</div>
-          <h2>設定</h2>
-          <p>你可以在這裡調整視覺、語音和輔助功能。所有設定都會自動保存。</p>
+          <h2>我的設定</h2>
+          <p>你可以在這裡調整字體、語音和畫面顯示。</p>
 
           <div class="settings-grid">
             <div class="settings-card">
               <h3>輔助功能</h3>
               <div class="toggle-row">
-                <span>語音朗讀題目</span>
+                <span>朗讀題目</span>
                 <input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" />
               </div>
               <div class="toggle-row">
-                <span>高對比模式</span>
+                <span>高對比畫面</span>
                 <input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" />
               </div>
               <div class="toggle-row">
@@ -56,25 +56,25 @@
 
             <div class="settings-card">
               <h3>顯示設定</h3>
-              <p class="small">按下面按鈕調整字體大小，方便閱讀。</p>
+              <p class="small">按按鈕調整字體大小，讓你看得更舒服。</p>
               <div class="settings-buttons">
-                <button class="secondary" onclick="cycleFontSize()">字體大小</button>
-                <button class="secondary" onclick="toggleSpeech()">切換語音</button>
+                <button class="secondary" onclick="cycleFontSize()">調整字體大小</button>
+                <button class="secondary" onclick="toggleSpeech()">開關朗讀</button>
               </div>
             </div>
 
             <div class="settings-card">
               <h3>資料管理</h3>
-              <p class="small">你可以手動儲存資料，或者清除全部遊戲紀錄。</p>
+              <p class="small">你可以儲存目前進度，或重新開始。</p>
               <div class="settings-buttons">
-                <button class="secondary" onclick="saveProgress(); showToast('已手動儲存', 'success');">儲存</button>
-                <button class="secondary" onclick="resetAllData()">清除所有資料</button>
+                <button class="secondary" onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
+                <button class="secondary" onclick="resetAllData()">重新開始</button>
               </div>
             </div>
           </div>
 
           <div class="welcome-actions">
-            <button onclick="showCoverScreen()">返回</button>
+            <button onclick="showCoverScreen()">返回開始頁</button>
             <button class="secondary" onclick="showSituationScreen()">前往情境選擇</button>
           </div>
         </div>
@@ -84,78 +84,78 @@
         <div class="hero-card animate-in">
           <div class="tag">情境選擇</div>
           <div class="hero-avatar">🏫</div>
-          <h2>選擇情境</h2>
-          <p>按一個情境開始。每個情境有 5 步，完成後會顯示總結與徽章。</p>
+          <h2>選擇你想練習的情境</h2>
+          <p>每個情境有 5 題，完成後可以看到結果和鼓勵。</p>
 
           <div class="scenario-select-grid">
             <div class="scenario-card">
               <div class="emoji">🗣️</div>
               <strong>課室：發起對話</strong>
               <div class="small">早上第一節課前，主動和較少接觸的新同學說話。</div>
-              <button onclick="startAsdGame('start')">開始</button>
+              <button onclick="startAsdGame('start')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">🙅</div>
               <strong>小息：禮貌拒絕</strong>
               <div class="small">小息時被同學邀請玩遊戲，但你想休息。</div>
-              <button onclick="startAsdGame('refuse')">開始</button>
+              <button onclick="startAsdGame('refuse')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">🧩</div>
               <strong>借文具：處理衝突</strong>
               <div class="small">上課前發現同學未經同意拿了你的筆。</div>
-              <button onclick="startAsdGame('conflict')">開始</button>
+              <button onclick="startAsdGame('conflict')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">💬</div>
               <strong>放學前：作出回應</strong>
               <div class="small">同學分享今天默書拿高分，想和你說話。</div>
-              <button onclick="startAsdGame('respond')">開始</button>
+              <button onclick="startAsdGame('respond')">開始這個情境</button>
             </div>
 
             <div class="scenario-card">
               <div class="emoji">🤝</div>
               <strong>小組：加入合作</strong>
               <div class="small">分組活動時，學習怎樣加入討論和合作。</div>
-              <button onclick="startAsdGame('groupwork')">開始</button>
+              <button onclick="startAsdGame('groupwork')">開始這個情境</button>
             </div>
           </div>
 
           <div class="welcome-actions">
-            <button onclick="showCoverScreen()">返回</button>
-            <button class="secondary" onclick="showSettingsScreen()">設定</button>
+            <button onclick="showCoverScreen()">返回開始頁</button>
+            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
       </div>
 
       <div id="gameScreen" class="screen">
-        <div class="tag">ASD 社交訓練遊戲</div>
-        <h2>正在遊玩</h2>
-        <p>完成當前情境後，你可以返回情境選擇頁再揀另一個。</p>
+        <div class="tag">社交練習</div>
+        <h2>正在練習</h2>
+        <p>完成這個情境後，你可以再選另一個情境繼續練習。</p>
 
         <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
-          <button class="secondary" onclick="showSituationScreen()">情境選擇</button>
-          <button class="secondary" onclick="showSettingsScreen()">設定</button>
-          <button class="secondary" onclick="showCoverScreen()">封面頁</button>
+          <button class="secondary" onclick="showSituationScreen()">選擇其他情境</button>
+          <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
+          <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
         </div>
 
         <div class="top-status">
           <div class="status-box">
-            <div class="status-title">步驟進度</div>
-            <div id="asdProgressText" class="small">請先從情境選擇頁開始一個情境。</div>
+            <div class="status-title">目前進度</div>
+            <div id="asdProgressText" class="small">請先選擇一個情境開始練習。</div>
             <div class="progress-wrap">
               <div class="progress-bar" id="asdProgressBar"></div>
             </div>
           </div>
 
           <div class="status-box">
-            <div class="status-title">遊戲概況</div>
-            <div id="gameStatusText" class="small">已完成情境：0 / 5｜提示使用：0 次｜冷靜模式：0 次</div>
+            <div class="status-title">我的表現</div>
+            <div id="gameStatusText" class="small">已完成情境：0 / 5｜使用提示：0 次｜使用冷靜模式：0 次</div>
             <div class="achievement-row" id="achievementRow">
-              <div class="achievement-pill">校園任務模式</div>
+              <div class="achievement-pill">我的練習模式</div>
             </div>
           </div>
         </div>
@@ -163,27 +163,27 @@
         <div class="game-layout">
           <div class="side-column left-column">
             <div class="avatar-panel animate-in">
-              <div class="character-card-badge">角色卡</div>
+              <div class="character-card-badge">我的角色</div>
               <div class="avatar" id="characterAvatar">🧑</div>
-              <div class="avatar-name" id="characterName">學生</div>
-              <div class="avatar-role" id="characterRole">主角</div>
+              <div class="avatar-name" id="characterName">我</div>
+              <div class="avatar-role" id="characterRole">學生</div>
               <div class="character-info" id="characterInfo">
-                <strong>目前任務：</strong><br>
-                先從情境選擇頁開始你的校園社交挑戰。
+                <strong>現在要做的事：</strong><br>
+                先從情境選擇頁開始你的社交練習。
               </div>
             </div>
 
             <div class="badge-panel animate-in">
-              <div class="panel-badge">徽章系統</div>
-              <h3>已解鎖徽章</h3>
-              <p class="small">完成情境後會自動解鎖對應徽章。</p>
+              <div class="panel-badge">我的徽章</div>
+              <h3>已得到的徽章</h3>
+              <p class="small">完成情境後會得到對應徽章。</p>
               <div class="badge-grid" id="badgeGrid"></div>
             </div>
           </div>
 
           <div class="dialogue-area center-column">
             <div class="dialogue-box animate-in" id="asdBox">
-              這裡會顯示故事背景、題目和最後結果。
+              這裡會顯示情境故事、問題和結果。
             </div>
 
             <div id="sceneMeta" class="scene-meta hidden"></div>
@@ -193,40 +193,40 @@
             <div class="choice-grid" id="asdChoices"></div>
 
             <div class="action-row">
-              <button class="secondary" onclick="showHint()">提示</button>
-              <button class="secondary" onclick="showCalmMode()">冷靜模式</button>
-              <button class="secondary" onclick="repeatCurrentText()">重讀題目</button>
-              <button class="secondary" onclick="saveProgress(); showToast('已手動儲存', 'success');">儲存</button>
+              <button class="secondary" onclick="showHint()">看看提示</button>
+              <button class="secondary" onclick="showCalmMode()">先冷靜一下</button>
+              <button class="secondary" onclick="repeatCurrentText()">再讀一次題目</button>
+              <button class="secondary" onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
             </div>
           </div>
 
           <div class="side-column right-column">
             <div class="review-panel animate-in">
-              <div class="panel-badge">即時回顧</div>
-              <h3>最近選擇</h3>
-              <p class="small">這裡會記錄你最近幾步做了什麼選擇。</p>
+              <div class="panel-badge">我的作答紀錄</div>
+              <h3>最近的選擇</h3>
+              <p class="small">這裡會顯示你最近幾題的作答。</p>
               <div class="review-list" id="reviewList">
-                <div class="review-item">尚未開始遊戲。</div>
+                <div class="review-item">你還未開始練習。</div>
               </div>
             </div>
 
             <div class="help-panel animate-in">
-              <div class="panel-badge">社交小貼士</div>
+              <div class="panel-badge">小提醒</div>
               <div class="quick-notes-list" id="quickNotesList">
-                <div class="quick-note">先聽清楚別人說什麼，再回應。</div>
-                <div class="quick-note">唔想做某件事，可以清楚而有禮貌咁講。</div>
-                <div class="quick-note">緊張時可以先停一停，深呼吸。</div>
-                <div class="quick-note">表達感受時，可用「我覺得……」開頭。</div>
+                <div class="quick-note">先聽清楚別人說什麼，再回答。</div>
+                <div class="quick-note">如果不想做某件事，可以清楚又有禮貌地說出來。</div>
+                <div class="quick-note">緊張時，可以先停一停、慢慢呼吸。</div>
+                <div class="quick-note">說感受時，可以用「我覺得……」開頭。</div>
               </div>
             </div>
 
             <div class="journal-panel animate-in">
-              <div class="panel-badge">反思日誌</div>
-              <p class="small">完成情境後，可以寫低：你最想記住哪一句？或者下次想改進什麼？</p>
-              <textarea id="journalInput" placeholder="例如：下次如果同學借我文具，我想先冷靜再開口。"></textarea>
+              <div class="panel-badge">我的反思</div>
+              <p class="small">完成情境後，可以寫下：你最想記住什麼？下次想怎樣做得更好？</p>
+              <textarea id="journalInput" placeholder="例如：下次我想先深呼吸，再慢慢說出自己的想法。"></textarea>
               <div class="journal-actions">
-                <button class="secondary" onclick="saveJournal()">儲存日誌</button>
-                <button class="secondary" onclick="loadJournalToBox()">查看最近日誌</button>
+                <button class="secondary" onclick="saveJournal()">儲存反思</button>
+                <button class="secondary" onclick="loadJournalToBox()">查看最近反思</button>
               </div>
             </div>
           </div>
@@ -236,7 +236,7 @@
   </div>
 
   <footer>
-    GitHub Pages 原型 · 封面頁＋獨立設定頁＋情境選擇流程
+    校園社交練習學生版
   </footer>
 
   <script src="script.js"></script>
