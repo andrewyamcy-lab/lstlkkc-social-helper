@@ -1,4 +1,4 @@
-<!-- /script.js -->
+// /script.js
 const STORAGE_KEY = 'asd_school_rpg_v4';
 
 const badgeState = {
@@ -87,6 +87,7 @@ const asdGames = {
       }
     ]
   },
+
   refuse: {
     title: '小息禮貌拒絕',
     avatar: '🙋',
@@ -141,6 +142,7 @@ const asdGames = {
       }
     ]
   },
+
   conflict: {
     title: '借文具：處理衝突',
     avatar: '😠',
@@ -195,6 +197,7 @@ const asdGames = {
       }
     ]
   },
+
   respond: {
     title: '放學前：作出回應',
     avatar: '😊',
@@ -249,6 +252,7 @@ const asdGames = {
       }
     ]
   },
+
   groupwork: {
     title: '小組：加入合作',
     avatar: '🤝',
@@ -918,7 +922,9 @@ function resetAllData() {
 
   localStorage.removeItem(STORAGE_KEY);
 
-  Object.keys(badgeState).forEach((key) => { badgeState[key] = false; });
+  Object.keys(badgeState).forEach((key) => {
+    badgeState[key] = false;
+  });
 
   appState.speechEnabled = false;
   appState.highContrast = false;
