@@ -850,9 +850,75 @@ function showAsdResult() {
     ? `<ul>${currentAsdStrengths.slice(0, 4).map((item) => `<li>${item}</li>`).join('')}</ul>`
     : '<p>你有完成整個情境，這已經是一個好開始。</p>';
 
-  const improvements = currentAsdImprovements.length
-    ? `<ul>${currentAsdImprovements.slice(0, 4).map((item) => `<li>下次遇到類似情況時，可以比「${item}」更平靜、清楚或有禮貌。</li>`).join('')}</ul>`
-    : '<p>你今次每一步都做得不錯，可以挑戰更難情境。</p>';
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function getBetterSocialAdvice(item) {
+  const text = String(item || '');
+
+  if (text.includes('算啦') || text.includes('唔問')) {
+    return '如果不明白，可以主動問清楚，例如：「我不太明白，可以再說一次嗎？」';
+  }
+
+  if (text.includes('完全不再理會老師') || text.includes('不理會老師')) {
+    return '如果仍然不明白老師的回答，可以有禮貌地再問一次，例如：「多謝老師，我會再試一次。如果仍然不明白，我再請教你。」';
+  }
+
+  if (text.includes('不耐煩') || text.includes('轉身')) {
+    return '如果覺得需要時間消化，可以先用平靜語氣表達，例如：「多謝你告訴我，我需要一點時間想一想。」';
+  }
+
+  if (text.includes('完全不出聲') || text.includes('不說話') || text.includes('一句都不說')) {
+    return '如果一時不知道怎樣回答，可以先講出自己的狀態，例如：「我而家有少少緊張，可以俾我諗一諗先嗎？」';
+  }
+
+  if (text.includes('突然大聲') || text.includes('大聲') || text.includes('質問')) {
+    return '如果感到不滿，可以先降低聲量，再清楚說出需要，例如：「我想講一講這件事，可以嗎？」';
+  }
+
+  if (text.includes('偷我') || text.includes('搶回來') || text.includes('拿我的東西')) {
+    return '如果別人未問就用了你的物品，可以清楚表達界線，例如：「這支筆是我的，可以先還給我嗎？」';
+  }
+
+  if (text.includes('報復') || text.includes('翻臉') || text.includes('威脅')) {
+    return '如果衝突未能解決，可以尋求老師協助，例如：「我現在有點不開心，我想請老師幫忙處理。」';
+  }
+
+  if (text.includes('唔玩') || text.includes('唔好再搵') || text.includes('好煩')) {
+    return '如果想拒絕同學邀請，可以先感謝，再說出需要，例如：「多謝你邀請我，但我現在想休息一下。」';
+  }
+
+  if (text.includes('咁又點') || text.includes('講完未') || text.includes('有咩咁值得講')) {
+    return '如果同學分享開心的事，可以先回應對方感受，例如：「真係呀？聽起來你很開心，恭喜你。」';
+  }
+
+  if (text.includes('乜都得') || text.includes('你哋自己決定')) {
+    return '如果在小組討論中不知道怎樣加入，可以用簡單句子參與，例如：「我有一個簡單想法，可以分享一下嗎？」';
+  }
+
+  if (text.includes('我唔識')) {
+    return '如果暫時未想到答案，可以先表達需要時間，例如：「我暫時未諗到答案，可以先聽聽你哋的想法嗎？」';
+  }
+
+  if (text.includes('直接走開') || text.includes('不回應') || text.includes('不再回應')) {
+    return '如果想離開，可以先簡單交代，例如：「我先離開一下，等陣再同你講。」';
+  }
+
+  return '下次遇到類似情況時，可以先停一停，再用清楚和有禮貌的方式表達自己的想法。';
+}
+
+const improvements = currentAsdImprovements.length
+  ? `<ul>${currentAsdImprovements
+      .slice(0, 4)
+      .map((item) => `<li>${escapeHtml(getBetterSocialAdvice(item))}</li>`)
+      .join('')}</ul>`
+  : '<p>你今次每一步都做得不錯，可以挑戰更難情境。</p>';
 
   const noteSummary = currentChoiceNotes.length
     ? `
