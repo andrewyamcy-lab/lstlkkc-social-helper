@@ -26,13 +26,31 @@
 
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
-            <button class="secondary" id="badgeToggleBtn" onclick="toggleCoverBadges()" aria-expanded="false">查看我的徽章</button>
-            <div id="coverBadgePanel" class="badge-panel animate-in hidden" style="text-align:left; margin:2px 0; box-shadow:none;">
-              <div class="panel-badge">我的徽章</div>
-              <h3>已得到的徽章</h3>
-              <p class="small">完成情境後會得到對應徽章。</p>
+            <button class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
+            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="badgeScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">我的徽章</div>
+          <div class="hero-avatar">🏅</div>
+          <h2>我的徽章</h2>
+          <p>完成不同校園情境後，你會得到對應徽章。你可以在這裡查看自己的練習進度。</p>
+
+          <div class="settings-grid">
+            <div class="settings-card" style="grid-column: 1 / -1;">
+              <div class="panel-badge">已得到的徽章</div>
+              <h3>我的練習成果</h3>
+              <p class="small">完成情境後，灰色徽章會變成彩色徽章。</p>
               <div class="badge-grid" id="badgeGrid"></div>
             </div>
+          </div>
+
+          <div class="welcome-actions">
+            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
+            <button onclick="showSituationScreen()">前往情境選擇</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -99,6 +117,7 @@
 
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
+            <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -111,6 +130,7 @@
 
         <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
           <button onclick="showSituationScreen()">選擇其他情境</button>
+          <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
           <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
         </div>
@@ -183,23 +203,35 @@
 
   <script src="script.js"></script>
   <script>
-    function toggleCoverBadges() {
-      const panel = document.getElementById('coverBadgePanel');
-      const button = document.getElementById('badgeToggleBtn');
-      if (!panel || !button) return;
-      const isHidden = panel.classList.contains('hidden');
-      panel.classList.toggle('hidden', !isHidden);
-      button.textContent = isHidden ? '收起我的徽章' : '查看我的徽章';
-      button.setAttribute('aria-expanded', String(isHidden));
+    function setActiveScreen(screenId, stateName) {
+      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
+      screenIds.forEach((id) => {
+        const screen = document.getElementById(id);
+        if (screen) screen.classList.toggle('active', id === screenId);
+      });
+      if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
+      window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
+    }
+
+    function showCoverScreen() {
+      setActiveScreen('coverScreen', 'cover');
+    }
+
+    function showBadgeScreen() {
+      if (typeof renderBadges === 'function') renderBadges();
+      setActiveScreen('badgeScreen', 'badge');
+    }
+
+    function showSettingsScreen() {
+      setActiveScreen('settingsScreen', 'settings');
+    }
+
+    function showSituationScreen() {
+      setActiveScreen('situationScreen', 'situation');
     }
 
     function forceStartAtCoverPage() {
-      const screenIds = ['coverScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
-      screenIds.forEach((id) => {
-        const screen = document.getElementById(id);
-        if (screen) screen.classList.toggle('active', id === 'coverScreen');
-      });
-      if (typeof appState !== 'undefined' && appState) appState.currentScreen = 'cover';
+      setActiveScreen('coverScreen', 'cover');
       try {
         const raw = localStorage.getItem('asd_school_rpg_v5');
         if (raw) {
