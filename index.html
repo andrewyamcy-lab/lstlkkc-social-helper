@@ -25,6 +25,14 @@
           <p>本工具為樂善堂梁銶琚書院（梁書）校園情境而設，協助學生透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人、小組合作、向老師求助、加入同學，以及確認功課。</p>
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
+
+            <div class="badge-panel animate-in" style="text-align:left; margin:2px 0; box-shadow:none;">
+              <div class="panel-badge">我的徽章</div>
+              <h3>已得到的徽章</h3>
+              <p class="small">完成情境後會得到對應徽章。</p>
+              <div class="badge-grid" id="badgeGrid"></div>
+            </div>
+
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -181,8 +189,8 @@
           </div>
         </div>
 
-        <div class="game-layout">
-          <div class="side-column left-column">
+        <div class="game-layout" style="grid-template-columns: 1fr; max-width: 780px; margin-left:auto; margin-right:auto;">
+          <div class="side-column left-column" style="display:none;">
             <div class="avatar-panel animate-in">
               <div class="character-card-badge">我的角色</div>
               <div class="avatar" id="characterAvatar">🧑</div>
@@ -192,13 +200,6 @@
                 <strong>現在要做的事：</strong><br>
                 先從情境選擇頁開始你的社交練習。
               </div>
-            </div>
-
-            <div class="badge-panel animate-in">
-              <div class="panel-badge">我的徽章</div>
-              <h3>已得到的徽章</h3>
-              <p class="small">完成情境後會得到對應徽章。</p>
-              <div class="badge-grid" id="badgeGrid"></div>
             </div>
           </div>
 
@@ -235,7 +236,7 @@
             </div>
           </div>
 
-          <div class="side-column right-column">
+          <div class="side-column right-column" style="display:none;">
             <div class="review-panel animate-in">
               <div class="panel-badge">我的作答紀錄</div>
               <h3>最近的選擇</h3>
