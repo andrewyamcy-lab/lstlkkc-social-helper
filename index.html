@@ -26,7 +26,6 @@
 
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
-
             <button class="secondary" id="badgeToggleBtn" onclick="toggleCoverBadges()" aria-expanded="false">查看我的徽章</button>
             <div id="coverBadgePanel" class="badge-panel animate-in hidden" style="text-align:left; margin:2px 0; box-shadow:none;">
               <div class="panel-badge">我的徽章</div>
@@ -34,7 +33,6 @@
               <p class="small">完成情境後會得到對應徽章。</p>
               <div class="badge-grid" id="badgeGrid"></div>
             </div>
-
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -50,18 +48,9 @@
           <div class="settings-grid">
             <div class="settings-card">
               <h3>輔助功能</h3>
-              <div class="toggle-row">
-                <span>朗讀題目</span>
-                <input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" />
-              </div>
-              <div class="toggle-row">
-                <span>高對比畫面</span>
-                <input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" />
-              </div>
-              <div class="toggle-row">
-                <span>減少動畫</span>
-                <input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" />
-              </div>
+              <div class="toggle-row"><span>朗讀題目</span><input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" /></div>
+              <div class="toggle-row"><span>高對比畫面</span><input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" /></div>
+              <div class="toggle-row"><span>減少動畫</span><input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" /></div>
             </div>
 
             <div class="settings-card">
@@ -98,54 +87,14 @@
           <p>每個情境有 5 題，每題有 4 個選項。完成後可以看到結果和鼓勵。</p>
 
           <div class="scenario-select-grid">
-            <div class="scenario-card">
-              <div class="emoji">🗣️</div>
-              <strong>課室：發起對話</strong>
-              <div class="small">主動和同學打招呼，開始簡單對話。</div>
-              <button onclick="startAsdGame('start')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">🙅</div>
-              <strong>小息：禮貌拒絕</strong>
-              <div class="small">被同學邀請玩遊戲時，清楚而友善地拒絕。</div>
-              <button onclick="startAsdGame('refuse')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">🧩</div>
-              <strong>借文具：處理衝突</strong>
-              <div class="small">同學未經同意拿了你的筆，學習平靜表達界線。</div>
-              <button onclick="startAsdGame('conflict')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">💬</div>
-              <strong>放學前：作出回應</strong>
-              <div class="small">同學開心分享事情時，學習聆聽和回應。</div>
-              <button onclick="startAsdGame('respond')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">🤝</div>
-              <strong>小組：加入合作</strong>
-              <div class="small">在分組活動裡，找到時機加入和表達想法。</div>
-              <button onclick="startAsdGame('groupwork')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">🙋</div>
-              <strong>課堂中：向老師求助</strong>
-              <div class="small">聽不明白時，練習用清楚方式向老師求助。</div>
-              <button onclick="startAsdGame('help')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">🍱</div>
-              <strong>午飯時間：加入同學</strong>
-              <div class="small">想加入同學一起吃飯時，學習自然地開口。</div>
-              <button onclick="startAsdGame('lunch')">開始這個情境</button>
-            </div>
-            <div class="scenario-card">
-              <div class="emoji">📚</div>
-              <strong>放學後：確認功課</strong>
-              <div class="small">不確定功課內容時，學習向同學清楚確認。</div>
-              <button onclick="startAsdGame('homework')">開始這個情境</button>
-            </div>
+            <div class="scenario-card"><div class="emoji">🗣️</div><strong>課室：發起對話</strong><div class="small">主動和同學打招呼，開始簡單對話。</div><button onclick="startAsdGame('start')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">🙅</div><strong>小息：禮貌拒絕</strong><div class="small">被同學邀請玩遊戲時，清楚而友善地拒絕。</div><button onclick="startAsdGame('refuse')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">🧩</div><strong>借文具：處理衝突</strong><div class="small">同學未經同意拿了你的筆，學習平靜表達界線。</div><button onclick="startAsdGame('conflict')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">💬</div><strong>放學前：作出回應</strong><div class="small">同學開心分享事情時，學習聆聽和回應。</div><button onclick="startAsdGame('respond')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">🤝</div><strong>小組：加入合作</strong><div class="small">在分組活動裡，找到時機加入和表達想法。</div><button onclick="startAsdGame('groupwork')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">🙋</div><strong>課堂中：向老師求助</strong><div class="small">聽不明白時，練習用清楚方式向老師求助。</div><button onclick="startAsdGame('help')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">🍱</div><strong>午飯時間：加入同學</strong><div class="small">想加入同學一起吃飯時，學習自然地開口。</div><button onclick="startAsdGame('lunch')">開始這個情境</button></div>
+            <div class="scenario-card"><div class="emoji">📚</div><strong>放學後：確認功課</strong><div class="small">不確定功課內容時，學習向同學清楚確認。</div><button onclick="startAsdGame('homework')">開始這個情境</button></div>
           </div>
 
           <div class="welcome-actions">
@@ -221,19 +170,9 @@
           </div>
 
           <div class="side-column right-column" style="display:none;">
-            <div class="review-panel animate-in">
-              <div class="panel-badge">我的作答紀錄</div>
-              <h3>最近的選擇</h3>
-              <p class="small">這裡會顯示你最近幾題的作答。</p>
-              <div class="review-list" id="reviewList"><div class="review-item">你還未開始練習。</div></div>
-            </div>
+            <div class="review-panel animate-in"><div class="panel-badge">我的作答紀錄</div><h3>最近的選擇</h3><p class="small">這裡會顯示你最近幾題的作答。</p><div class="review-list" id="reviewList"><div class="review-item">你還未開始練習。</div></div></div>
             <div class="help-panel animate-in"><div class="panel-badge">小提醒</div><div class="quick-notes-list" id="quickNotesList"></div></div>
-            <div class="journal-panel animate-in">
-              <div class="panel-badge">我的反思</div>
-              <p class="small">完成情境後，可以寫下：你最想記住什麼？下次想怎樣做得更好？</p>
-              <textarea id="journalInput" placeholder="例如：下次我想先深呼吸，再慢慢說出自己的想法。"></textarea>
-              <div class="journal-actions"><button onclick="saveJournal()">儲存反思</button><button class="secondary" onclick="loadJournalToBox()">查看最近反思</button></div>
-            </div>
+            <div class="journal-panel animate-in"><div class="panel-badge">我的反思</div><p class="small">完成情境後，可以寫下：你最想記住什麼？下次想怎樣做得更好？</p><textarea id="journalInput" placeholder="例如：下次我想先深呼吸，再慢慢說出自己的想法。"></textarea><div class="journal-actions"><button onclick="saveJournal()">儲存反思</button><button class="secondary" onclick="loadJournalToBox()">查看最近反思</button></div></div>
           </div>
         </div>
       </div>
@@ -254,24 +193,42 @@
       button.setAttribute('aria-expanded', String(isHidden));
     }
 
+    function getPositiveExampleForBadChoice(choiceText) {
+      const text = (choiceText || '').replace(/[。\s]/g, '');
+      const rules = [
+        { keys: ['算啦', '唔問'], example: '「我不太明白，可以再說一次嗎？」' },
+        { keys: ['完全不再理會老師的回答', '不再理會老師', '不理會老師'], example: '「多謝老師，我會再試一次。如果仍然不明白，我再請教你。」' },
+        { keys: ['一臉不耐煩地轉身', '不耐煩', '轉身'], example: '「多謝你告訴我，我需要一點時間想一想。」' },
+        { keys: ['完全不出聲', '不說話', '一句都不說'], example: '「我而家有少少緊張，可以俾我諗一諗先嗎？」' },
+        { keys: ['大聲', '質問', '偷我'], example: '「這支筆是我的，可以先還給我嗎？」' },
+        { keys: ['搶回來'], example: '「這支筆我現在要用，可以請你先還給我嗎？」' },
+        { keys: ['報復', '翻臉'], example: '「我現在有點不開心，我想請老師幫忙處理。」' },
+        { keys: ['唔玩', '唔好再搵', '好煩'], example: '「多謝你邀請我，但我現在想休息一下。」' },
+        { keys: ['咁又點', '講完未', '有咩咁值得講'], example: '「真係呀？聽起來你很開心，恭喜你。」' },
+        { keys: ['乜都得', '你哋自己決定'], example: '「我有一個簡單想法，可以分享一下嗎？」' },
+        { keys: ['我唔識'], example: '「我暫時未諗到答案，可以先聽聽你哋的想法嗎？」' },
+        { keys: ['直接走開', '不回應', '不再回應'], example: '「我先離開一下，等陣再同你講。」' }
+      ];
+      const matched = rules.find(rule => rule.keys.some(key => text.includes(key.replace(/[。\s]/g, ''))));
+      return matched ? matched.example : '「我想先冷靜一下，再慢慢說清楚自己的想法。」';
+    }
+
     function cleanFeedbackSentence(text) {
       if (!text) return text;
       let output = text;
-      const safeAdvice = '下次遇到類似情況時，可以先停一停，再用清楚和有禮貌的方式表達自己的想法。';
-      const badPattern = /算啦|唔問|完全不再理會|不再理會|不理會|不耐煩|轉身|大聲|質問|報復|翻臉|好煩|唔好再搵|偷我|唔識|直接走開|完全不出聲|一直看著|搶回來|不說話|一句都不說|不再回應|唔玩|咁又點|講完未|有咩咁值得講|我走先|乜都得|你哋自己決定|不回應|不舒服|忽略|傷害|威脅/;
 
-      output = output.replace(/下次遇到類似情況時，可以比「[^」]+」[^。]*。?/g, safeAdvice);
-      output = output.replace(/下次遇到類似情況時，可以比「[^」]+。」[^。]*。?/g, safeAdvice);
-      output = output.replace(/下次遇到類似情況時，可以比[^。]+用較清楚、溫和的方式表達。/g, safeAdvice);
-      output = output.replace(/下次遇到類似情況時，可以比[^。]+更平靜、清楚或有禮貌。/g, safeAdvice);
+      function replaceBadAdvice(match, quotedText) {
+        return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
+      }
 
-      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)。」/g, function(match, quote) {
-        return badPattern.test(quote) ? safeAdvice : match;
+      output = output.replace(/下次遇到類似情況時，可以比「([^」]+)。」[^。]*。?/g, replaceBadAdvice);
+      output = output.replace(/下次遇到類似情況時，可以比「([^」]+)」[^。]*。?/g, replaceBadAdvice);
+      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)。」/g, function(match, quotedText) {
+        return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
       });
-      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)」/g, function(match, quote) {
-        return badPattern.test(quote) ? safeAdvice : match;
+      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)」/g, function(match, quotedText) {
+        return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
       });
-
       output = output.replace(/更平靜、清楚或有禮貌。/g, '用較清楚、溫和的方式表達。');
       output = output.replace(/更平靜、清楚或有禮貌/g, '較清楚、溫和的表達方式');
       return output;
