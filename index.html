@@ -200,9 +200,7 @@
         if (!screen) return;
         screen.classList.toggle('active', id === 'coverScreen');
       });
-      if (typeof appState !== 'undefined' && appState) {
-        appState.currentScreen = 'cover';
-      }
+      if (typeof appState !== 'undefined' && appState) appState.currentScreen = 'cover';
       try {
         const raw = localStorage.getItem('asd_school_rpg_v5');
         if (raw) {
@@ -252,9 +250,10 @@
       return output;
     }
 
-    function replaceAwkwardFeedbackText(root = document.body) {
-      if (!root) return;
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    function replaceAwkwardFeedbackText(root) {
+      const target = root || document.getElementById('asdBox') || document.body;
+      if (!target) return;
+      const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
       const textNodes = [];
       let node;
       while ((node = walker.nextNode())) textNodes.push(node);
@@ -264,22 +263,20 @@
       });
     }
 
-    (function setupFeedbackTextCleaner() {
+    (function setupSafeTextFixer() {
+      let fixTimer = null;
+      function scheduleFix() {
+        clearTimeout(fixTimer);
+        fixTimer = setTimeout(() => replaceAwkwardFeedbackText(document.getElementById('asdBox')), 80);
+      }
       window.addEventListener('load', () => {
-        replaceAwkwardFeedbackText();
-        if (!window.MutationObserver) return;
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-              if (node.nodeType === Node.TEXT_NODE) node.nodeValue = cleanFeedbackSentence(node.nodeValue);
-              else if (node.nodeType === Node.ELEMENT_NODE) replaceAwkwardFeedbackText(node);
-            });
-            if (mutation.type === 'characterData' && mutation.target) {
-              mutation.target.nodeValue = cleanFeedbackSentence(mutation.target.nodeValue);
-            }
-          });
-        });
-        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+        scheduleFix();
+        const asdBox = document.getElementById('asdBox');
+        if (asdBox && window.MutationObserver) {
+          const observer = new MutationObserver(scheduleFix);
+          observer.observe(asdBox, { childList: true, subtree: true });
+        }
+        document.addEventListener('click', scheduleFix);
       });
     })();
 
@@ -327,21 +324,19 @@
       function observeElement(id) {
         const el = document.getElementById(id);
         if (!el || !window.MutationObserver) return;
+        let timer = null;
         const observer = new MutationObserver(() => {
-          updateQuestionTracker();
-          replaceAwkwardFeedbackText();
+          clearTimeout(timer);
+          timer = setTimeout(updateQuestionTracker, 80);
         });
-        observer.observe(el, { childList: true, subtree: true, characterData: true });
+        observer.observe(el, { childList: true, subtree: true });
       }
       window.addEventListener('load', () => {
         setTimeout(forceStartAtCoverPage, 0);
         updateQuestionTracker();
         observeElement('asdProgressText');
         observeElement('asdBox');
-        document.addEventListener('click', () => setTimeout(() => {
-          updateQuestionTracker();
-          replaceAwkwardFeedbackText();
-        }, 60));
+        document.addEventListener('click', () => setTimeout(updateQuestionTracker, 80));
       });
     })();
   </script>
