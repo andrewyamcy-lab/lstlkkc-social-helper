@@ -23,10 +23,11 @@
           <div class="hero-avatar">🎮</div>
           <h2>歡迎使用梁書校園社交練習</h2>
           <p>本工具為樂善堂梁銶琚書院（梁書）校園情境而設，協助學生透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人、小組合作、向老師求助、加入同學，以及確認功課。</p>
+
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
 
-            <button class="secondary" id="badgeToggleBtn" onclick="toggleCoverBadges()">查看我的徽章</button>
+            <button class="secondary" id="badgeToggleBtn" onclick="toggleCoverBadges()" aria-expanded="false">查看我的徽章</button>
             <div id="coverBadgePanel" class="badge-panel animate-in hidden" style="text-align:left; margin:2px 0; box-shadow:none;">
               <div class="panel-badge">我的徽章</div>
               <h3>已得到的徽章</h3>
@@ -103,49 +104,42 @@
               <div class="small">主動和同學打招呼，開始簡單對話。</div>
               <button onclick="startAsdGame('start')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">🙅</div>
               <strong>小息：禮貌拒絕</strong>
               <div class="small">被同學邀請玩遊戲時，清楚而友善地拒絕。</div>
               <button onclick="startAsdGame('refuse')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">🧩</div>
               <strong>借文具：處理衝突</strong>
               <div class="small">同學未經同意拿了你的筆，學習平靜表達界線。</div>
               <button onclick="startAsdGame('conflict')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">💬</div>
               <strong>放學前：作出回應</strong>
               <div class="small">同學開心分享事情時，學習聆聽和回應。</div>
               <button onclick="startAsdGame('respond')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">🤝</div>
               <strong>小組：加入合作</strong>
               <div class="small">在分組活動裡，找到時機加入和表達想法。</div>
               <button onclick="startAsdGame('groupwork')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">🙋</div>
               <strong>課堂中：向老師求助</strong>
               <div class="small">聽不明白時，練習用清楚方式向老師求助。</div>
               <button onclick="startAsdGame('help')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">🍱</div>
               <strong>午飯時間：加入同學</strong>
               <div class="small">想加入同學一起吃飯時，學習自然地開口。</div>
               <button onclick="startAsdGame('lunch')">開始這個情境</button>
             </div>
-
             <div class="scenario-card">
               <div class="emoji">📚</div>
               <strong>放學後：確認功課</strong>
@@ -176,17 +170,12 @@
           <div class="status-box">
             <div class="status-title">目前進度</div>
             <div id="asdProgressText" class="small">請先選擇一個情境開始練習。</div>
-            <div class="progress-wrap">
-              <div class="progress-bar" id="asdProgressBar"></div>
-            </div>
+            <div class="progress-wrap"><div class="progress-bar" id="asdProgressBar"></div></div>
           </div>
-
           <div class="status-box">
             <div class="status-title">我的表現</div>
             <div id="gameStatusText" class="small">已完成情境：0 / 8｜使用提示：0 次｜使用冷靜模式：0 次</div>
-            <div class="achievement-row" id="achievementRow">
-              <div class="achievement-pill">我的練習模式</div>
-            </div>
+            <div class="achievement-row" id="achievementRow"><div class="achievement-pill">我的練習模式</div></div>
           </div>
         </div>
 
@@ -197,10 +186,7 @@
               <div class="avatar" id="characterAvatar">🧑</div>
               <div class="avatar-name" id="characterName">我</div>
               <div class="avatar-role" id="characterRole">學生</div>
-              <div class="character-info" id="characterInfo">
-                <strong>現在要做的事：</strong><br>
-                先從情境選擇頁開始你的社交練習。
-              </div>
+              <div class="character-info" id="characterInfo"><strong>現在要做的事：</strong><br>先從情境選擇頁開始你的社交練習。</div>
             </div>
           </div>
 
@@ -219,10 +205,7 @@
               </div>
             </div>
 
-            <div class="dialogue-box animate-in" id="asdBox">
-              這裡會顯示情境故事、問題和結果。
-            </div>
-
+            <div class="dialogue-box animate-in" id="asdBox">這裡會顯示情境故事、問題和結果。</div>
             <div id="sceneMeta" class="scene-meta hidden"></div>
             <div id="hintBox" class="hint-box hidden"></div>
             <div id="calmBox" class="calm-box hidden"></div>
@@ -242,29 +225,14 @@
               <div class="panel-badge">我的作答紀錄</div>
               <h3>最近的選擇</h3>
               <p class="small">這裡會顯示你最近幾題的作答。</p>
-              <div class="review-list" id="reviewList">
-                <div class="review-item">你還未開始練習。</div>
-              </div>
+              <div class="review-list" id="reviewList"><div class="review-item">你還未開始練習。</div></div>
             </div>
-
-            <div class="help-panel animate-in">
-              <div class="panel-badge">小提醒</div>
-              <div class="quick-notes-list" id="quickNotesList">
-                <div class="quick-note">先聽清楚別人說什麼，再回答。</div>
-                <div class="quick-note">如果不想做某件事，可以清楚又有禮貌地說出來。</div>
-                <div class="quick-note">緊張時，可以先停一停、慢慢呼吸。</div>
-                <div class="quick-note">說感受時，可以用「我覺得……」開頭。</div>
-              </div>
-            </div>
-
+            <div class="help-panel animate-in"><div class="panel-badge">小提醒</div><div class="quick-notes-list" id="quickNotesList"></div></div>
             <div class="journal-panel animate-in">
               <div class="panel-badge">我的反思</div>
               <p class="small">完成情境後，可以寫下：你最想記住什麼？下次想怎樣做得更好？</p>
               <textarea id="journalInput" placeholder="例如：下次我想先深呼吸，再慢慢說出自己的想法。"></textarea>
-              <div class="journal-actions">
-                <button onclick="saveJournal()">儲存反思</button>
-                <button class="secondary" onclick="loadJournalToBox()">查看最近反思</button>
-              </div>
+              <div class="journal-actions"><button onclick="saveJournal()">儲存反思</button><button class="secondary" onclick="loadJournalToBox()">查看最近反思</button></div>
             </div>
           </div>
         </div>
@@ -272,9 +240,7 @@
     </section>
   </div>
 
-  <footer>
-    樂善堂梁銶琚書院（梁書）｜校園社交練習學生版
-  </footer>
+  <footer>樂善堂梁銶琚書院（梁書）｜校園社交練習學生版</footer>
 
   <script src="script.js"></script>
   <script>
@@ -282,7 +248,6 @@
       const panel = document.getElementById('coverBadgePanel');
       const button = document.getElementById('badgeToggleBtn');
       if (!panel || !button) return;
-
       const isHidden = panel.classList.contains('hidden');
       panel.classList.toggle('hidden', !isHidden);
       button.textContent = isHidden ? '收起我的徽章' : '查看我的徽章';
@@ -292,55 +257,35 @@
     function cleanFeedbackSentence(text) {
       if (!text) return text;
       let output = text;
+      const safeAdvice = '下次遇到類似情況時，可以先停一停，再用清楚和有禮貌的方式表達自己的想法。';
+      const badPattern = /算啦|唔問|完全不再理會|不再理會|不理會|不耐煩|轉身|大聲|質問|報復|翻臉|好煩|唔好再搵|偷我|唔識|直接走開|完全不出聲|一直看著|搶回來|不說話|一句都不說|不再回應|唔玩|咁又點|講完未|有咩咁值得講|我走先|乜都得|你哋自己決定|不回應|不舒服|忽略|傷害|威脅/;
 
-      output = output.replace(
-        /下次遇到類似情況時，可以比「([^」]+)。」(?:下次可以試下慢慢講清楚，這樣對方會更容易明白你。|用較清楚、溫和的方式表達。|更平靜、清楚或有禮貌。)?/g,
-        '下次遇到類似情況時，可以試下這樣說：「$1。」'
-      );
+      output = output.replace(/下次遇到類似情況時，可以比「[^」]+」[^。]*。?/g, safeAdvice);
+      output = output.replace(/下次遇到類似情況時，可以比「[^」]+。」[^。]*。?/g, safeAdvice);
+      output = output.replace(/下次遇到類似情況時，可以比[^。]+用較清楚、溫和的方式表達。/g, safeAdvice);
+      output = output.replace(/下次遇到類似情況時，可以比[^。]+更平靜、清楚或有禮貌。/g, safeAdvice);
 
-      output = output.replace(
-        /下次遇到類似情況時，可以比「([^」]+)」(?:下次可以試下慢慢講清楚，這樣對方會更容易明白你。|用較清楚、溫和的方式表達。|更平靜、清楚或有禮貌。)?/g,
-        '下次遇到類似情況時，可以試下這樣說：「$1」'
-      );
+      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)。」/g, function(match, quote) {
+        return badPattern.test(quote) ? safeAdvice : match;
+      });
+      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)」/g, function(match, quote) {
+        return badPattern.test(quote) ? safeAdvice : match;
+      });
 
-      output = output.replace(
-        /下次遇到類似情況時，可以比([^。]+)用較清楚、溫和的方式表達。/g,
-        '下次遇到類似情況時，可以試下先想一想，再用清楚、溫和的方式表達。'
-      );
-
-      output = output.replace(
-        /下次遇到類似情況時，可以比([^。]+)更平靜、清楚或有禮貌。/g,
-        '下次遇到類似情況時，可以試下先想一想，再用清楚、溫和的方式表達。'
-      );
-
-      output = output.replace(
-        /更平靜、清楚或有禮貌。/g,
-        '用較清楚、溫和的方式表達。'
-      );
-
-      output = output.replace(
-        /更平靜、清楚或有禮貌/g,
-        '較清楚、溫和的表達方式'
-      );
-
+      output = output.replace(/更平靜、清楚或有禮貌。/g, '用較清楚、溫和的方式表達。');
+      output = output.replace(/更平靜、清楚或有禮貌/g, '較清楚、溫和的表達方式');
       return output;
     }
 
     function replaceAwkwardFeedbackText(root = document.body) {
       if (!root) return;
-
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       const textNodes = [];
       let node;
-      while ((node = walker.nextNode())) {
-        textNodes.push(node);
-      }
-
+      while ((node = walker.nextNode())) textNodes.push(node);
       textNodes.forEach((textNode) => {
         const updatedText = cleanFeedbackSentence(textNode.nodeValue);
-        if (updatedText !== textNode.nodeValue) {
-          textNode.nodeValue = updatedText;
-        }
+        if (updatedText !== textNode.nodeValue) textNode.nodeValue = updatedText;
       });
     }
 
@@ -348,20 +293,18 @@
       window.addEventListener('load', () => {
         replaceAwkwardFeedbackText();
         if (!window.MutationObserver) return;
-
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
-              if (node.nodeType === Node.TEXT_NODE) {
-                node.nodeValue = cleanFeedbackSentence(node.nodeValue);
-              } else if (node.nodeType === Node.ELEMENT_NODE) {
-                replaceAwkwardFeedbackText(node);
-              }
+              if (node.nodeType === Node.TEXT_NODE) node.nodeValue = cleanFeedbackSentence(node.nodeValue);
+              else if (node.nodeType === Node.ELEMENT_NODE) replaceAwkwardFeedbackText(node);
             });
+            if (mutation.type === 'characterData' && mutation.target) {
+              mutation.target.nodeValue = cleanFeedbackSentence(mutation.target.nodeValue);
+            }
           });
         });
-
-        observer.observe(document.body, { childList: true, subtree: true });
+        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
       });
     })();
 
@@ -370,69 +313,59 @@
         const el = document.getElementById(id);
         return el ? el.textContent || '' : '';
       }
-
       function extractQuestionNumber() {
         const text = `${getText('asdProgressText')} ${getText('asdBox')}`;
-        const progressMatch = text.match(/第\s*([1-5])\s*\/\s*5\s*題/);
-        const questionMatch = text.match(/第\s*([1-5])\s*題/);
-        const match = progressMatch || questionMatch;
+        const match = text.match(/第\s*([1-5])\s*\/\s*5\s*題/) || text.match(/第\s*([1-5])\s*題/);
         return match ? Number(match[1]) : 0;
       }
-
       function extractScenarioTitle() {
         const progressText = getText('asdProgressText');
         const progressMatch = progressText.match(/情境\s*[:：]\s*([^｜|]+)/);
         if (progressMatch && progressMatch[1]) return progressMatch[1].trim();
-
         const boxText = getText('asdBox');
         const sceneMatch = boxText.match(/情境\s*[:：]\s*([^\n。]+)/);
-        if (sceneMatch && sceneMatch[1]) return sceneMatch[1].trim();
-
-        return '';
+        return sceneMatch && sceneMatch[1] ? sceneMatch[1].trim() : '';
       }
-
       function updateQuestionTracker() {
         const tracker = document.getElementById('questionTracker');
         const badge = document.getElementById('questionBadgeBig');
         const title = document.getElementById('questionTrackerTitle');
         const pills = document.querySelectorAll('.question-pill');
         if (!tracker || !badge || !title || !pills.length) return;
-
         const questionNumber = extractQuestionNumber();
         const scenarioTitle = extractScenarioTitle();
-
         pills.forEach((pill) => {
           const pillNumber = Number(pill.dataset.q);
           pill.classList.toggle('active', questionNumber === pillNumber);
           pill.classList.toggle('done', questionNumber > pillNumber);
         });
-
         if (!questionNumber) {
           tracker.classList.add('is-waiting');
           badge.textContent = '未開始';
           title.textContent = '請先選擇情境開始練習';
           return;
         }
-
         tracker.classList.remove('is-waiting');
         badge.textContent = `第 ${questionNumber} / 5 題`;
-        title.textContent = scenarioTitle
-          ? `正在練習：${scenarioTitle}`
-          : '請閱讀題目，然後選擇最合適的回應';
+        title.textContent = scenarioTitle ? `正在練習：${scenarioTitle}` : '請閱讀題目，然後選擇最合適的回應';
       }
-
       function observeElement(id) {
         const el = document.getElementById(id);
         if (!el || !window.MutationObserver) return;
-        const observer = new MutationObserver(updateQuestionTracker);
+        const observer = new MutationObserver(() => {
+          updateQuestionTracker();
+          replaceAwkwardFeedbackText();
+        });
         observer.observe(el, { childList: true, subtree: true, characterData: true });
       }
-
       window.addEventListener('load', () => {
         updateQuestionTracker();
         observeElement('asdProgressText');
         observeElement('asdBox');
-        document.addEventListener('click', () => setTimeout(updateQuestionTracker, 60));
+        document.addEventListener('click', () => setTimeout(() => {
+          updateQuestionTracker();
+          replaceAwkwardFeedbackText();
+        }, 60));
       });
     })();
   </script>
