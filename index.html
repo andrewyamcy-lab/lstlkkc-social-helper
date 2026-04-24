@@ -289,13 +289,40 @@
       button.setAttribute('aria-expanded', String(isHidden));
     }
 
+    function cleanFeedbackSentence(text) {
+      if (!text) return text;
+      let output = text;
+
+      output = output.replace(
+        /下次遇到類似情況時，可以比「[^」]*。」下次可以試下慢慢講清楚，這樣對方會更容易明白你。/g,
+        '下次遇到類似情況時，可以試下先問清楚，例如：「我不太明白，可以再說一次嗎？」'
+      );
+
+      output = output.replace(
+        /下次遇到類似情況時，可以比「[^」]*」下次可以試下慢慢講清楚，這樣對方會更容易明白你。/g,
+        '下次遇到類似情況時，可以試下先問清楚，例如：「我不太明白，可以再說一次嗎？」'
+      );
+
+      output = output.replace(
+        /下次遇到類似情況時，可以比「[^」]*。」?更平靜、清楚或有禮貌。/g,
+        '下次遇到類似情況時，可以試下先問清楚，例如：「我不太明白，可以再說一次嗎？」'
+      );
+
+      output = output.replace(
+        /更平靜、清楚或有禮貌。/g,
+        '用較清楚、溫和的方式表達。'
+      );
+
+      output = output.replace(
+        /更平靜、清楚或有禮貌/g,
+        '較清楚、溫和的表達方式'
+      );
+
+      return output;
+    }
+
     function replaceAwkwardFeedbackText(root = document.body) {
       if (!root) return;
-
-      const replacements = [
-        ['更平靜、清楚或有禮貌。', '下次可以試下慢慢講清楚，這樣對方會更容易明白你。'],
-        ['更平靜、清楚或有禮貌', '下次可以試下慢慢講清楚，這樣對方會更容易明白你']
-      ];
 
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       const textNodes = [];
@@ -305,10 +332,7 @@
       }
 
       textNodes.forEach((textNode) => {
-        let updatedText = textNode.nodeValue;
-        replacements.forEach(([oldText, newText]) => {
-          updatedText = updatedText.split(oldText).join(newText);
-        });
+        const updatedText = cleanFeedbackSentence(textNode.nodeValue);
         if (updatedText !== textNode.nodeValue) {
           textNode.nodeValue = updatedText;
         }
@@ -324,10 +348,7 @@
           mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
               if (node.nodeType === Node.TEXT_NODE) {
-                let updatedText = node.nodeValue;
-                updatedText = updatedText.split('更平靜、清楚或有禮貌。').join('下次可以試下慢慢講清楚，這樣對方會更容易明白你。');
-                updatedText = updatedText.split('更平靜、清楚或有禮貌').join('下次可以試下慢慢講清楚，這樣對方會更容易明白你');
-                node.nodeValue = updatedText;
+                node.nodeValue = cleanFeedbackSentence(node.nodeValue);
               } else if (node.nodeType === Node.ELEMENT_NODE) {
                 replaceAwkwardFeedbackText(node);
               }
