@@ -203,6 +203,20 @@
           </div>
 
           <div class="dialogue-area center-column">
+            <div class="question-tracker" id="questionTracker" aria-live="polite">
+              <div class="question-tracker-main">
+                <span class="question-badge-big" id="questionBadgeBig">第 1 / 5 題</span>
+                <span class="question-tracker-title" id="questionTrackerTitle">請先選擇情境開始練習</span>
+              </div>
+              <div class="question-pills" aria-label="題目進度">
+                <span class="question-pill" data-q="1">1</span>
+                <span class="question-pill" data-q="2">2</span>
+                <span class="question-pill" data-q="3">3</span>
+                <span class="question-pill" data-q="4">4</span>
+                <span class="question-pill" data-q="5">5</span>
+              </div>
+            </div>
+
             <div class="dialogue-box animate-in" id="asdBox">
               這裡會顯示情境故事、問題和結果。
             </div>
@@ -261,5 +275,77 @@
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    (function setupQuestionTracker() {
+      function getText(id) {
+        const el = document.getElementById(id);
+        return el ? el.textContent || '' : '';
+      }
+
+      function extractQuestionNumber() {
+        const text = `${getText('asdProgressText')} ${getText('asdBox')}`;
+        const progressMatch = text.match(/第\s*([1-5])\s*\/\s*5\s*題/);
+        const questionMatch = text.match(/第\s*([1-5])\s*題/);
+        const match = progressMatch || questionMatch;
+        return match ? Number(match[1]) : 0;
+      }
+
+      function extractScenarioTitle() {
+        const progressText = getText('asdProgressText');
+        const progressMatch = progressText.match(/情境\s*[:：]\s*([^｜|]+)/);
+        if (progressMatch && progressMatch[1]) return progressMatch[1].trim();
+
+        const boxText = getText('asdBox');
+        const sceneMatch = boxText.match(/情境\s*[:：]\s*([^\n。]+)/);
+        if (sceneMatch && sceneMatch[1]) return sceneMatch[1].trim();
+
+        return '';
+      }
+
+      function updateQuestionTracker() {
+        const tracker = document.getElementById('questionTracker');
+        const badge = document.getElementById('questionBadgeBig');
+        const title = document.getElementById('questionTrackerTitle');
+        const pills = document.querySelectorAll('.question-pill');
+        if (!tracker || !badge || !title || !pills.length) return;
+
+        const questionNumber = extractQuestionNumber();
+        const scenarioTitle = extractScenarioTitle();
+
+        pills.forEach((pill) => {
+          const pillNumber = Number(pill.dataset.q);
+          pill.classList.toggle('active', questionNumber === pillNumber);
+          pill.classList.toggle('done', questionNumber > pillNumber);
+        });
+
+        if (!questionNumber) {
+          tracker.classList.add('is-waiting');
+          badge.textContent = '未開始';
+          title.textContent = '請先選擇情境開始練習';
+          return;
+        }
+
+        tracker.classList.remove('is-waiting');
+        badge.textContent = `第 ${questionNumber} / 5 題`;
+        title.textContent = scenarioTitle
+          ? `正在練習：${scenarioTitle}`
+          : '請閱讀題目，然後選擇最合適的回應';
+      }
+
+      function observeElement(id) {
+        const el = document.getElementById(id);
+        if (!el || !window.MutationObserver) return;
+        const observer = new MutationObserver(updateQuestionTracker);
+        observer.observe(el, { childList: true, subtree: true, characterData: true });
+      }
+
+      window.addEventListener('load', () => {
+        updateQuestionTracker();
+        observeElement('asdProgressText');
+        observeElement('asdBox');
+        document.addEventListener('click', () => setTimeout(updateQuestionTracker, 60));
+      });
+    })();
+  </script>
 </body>
 </html>
