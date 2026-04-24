@@ -230,6 +230,61 @@
       setActiveScreen('situationScreen', 'situation');
     }
 
+    function hasRiskyRecentAnswer() {
+      try {
+        const history = Array.isArray(appState && appState.reviewHistory) ? appState.reviewHistory.slice(-5) : [];
+        const riskyWords = /打架|打人|推人|搶|搶回|報復|翻臉|威脅|大聲|鬧|罵|侮辱|嘲笑|取笑|欺凌|不理|忽視|違反|破壞|真係好煩|唔好再搵我|偷我嘢|質問|爭辯/;
+        return history.some((item) => {
+          const text = JSON.stringify(item || '');
+          return (item && item.score === 0) || /"score"\s*:\s*0/.test(text) || riskyWords.test(text);
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function addConsequenceReminderToResult() {
+      const box = document.getElementById('asdBox');
+      const choices = document.getElementById('asdChoices');
+      if (!box || box.querySelector('.consequence-reminder')) return;
+
+      const boxText = box.innerText || '';
+      const choicesEmpty = !choices || choices.children.length === 0;
+      const looksLikeResult = choicesEmpty && /完成|結果|星|表現|總結|恭喜|徽章|再選另一個情境/.test(boxText);
+      if (!looksLikeResult) return;
+
+      const risky = hasRiskyRecentAnswer();
+      const reminder = document.createElement('div');
+      reminder.className = risky ? 'result-improve consequence-reminder' : 'result-good consequence-reminder';
+      reminder.style.marginTop = '14px';
+      reminder.style.textAlign = 'left';
+
+      if (risky) {
+        reminder.innerHTML = `
+          <strong>⚠️ 後果提醒</strong><br>
+          如果在真實校園生活中選擇打架、搶回物品、侮辱或嘲笑同學、故意破壞課室規則，可能會令事情變得更嚴重，也可能需要由老師或訓輔組跟進；嚴重時有機會被記缺點。<br>
+          <strong>下次可以試：</strong>先停一停、深呼吸、用平靜語氣說出需要，或請老師協助處理。
+        `;
+      } else {
+        reminder.innerHTML = `
+          <strong>✅ 行為提醒</strong><br>
+          你剛才的選擇較能保持禮貌和安全。記住，在校園社交中，避免打架、辱罵、嘲笑同學或破壞課室規則，可以減少衝突，也能避免被老師處理或有機會記缺點。
+        `;
+      }
+
+      box.appendChild(reminder);
+    }
+
+    function startConsequenceReminderWatcher() {
+      const box = document.getElementById('asdBox');
+      if (!box) return;
+      const observer = new MutationObserver(() => {
+        setTimeout(addConsequenceReminderToResult, 80);
+      });
+      observer.observe(box, { childList: true, subtree: true, characterData: true });
+      setInterval(addConsequenceReminderToResult, 1000);
+    }
+
     function forceStartAtCoverPage() {
       setActiveScreen('coverScreen', 'cover');
       try {
@@ -245,6 +300,7 @@
     }
 
     window.addEventListener('load', function () {
+      startConsequenceReminderWatcher();
       setTimeout(forceStartAtCoverPage, 100);
     });
   </script>
