@@ -143,7 +143,7 @@
             <div class="question-tracker" id="questionTracker" aria-live="polite">
               <div class="question-tracker-main">
                 <span class="question-badge-big" id="questionBadgeBig">第 1 / 5 題</span>
-                <span class="question-tracker-title" id="questionTrackerTitle">請先選擇情境開始練習</span>
+                <span class="question-tracker-title" id="questionTrackerTitle">請閱讀題目，然後選擇最合適的回應</span>
               </div>
               <div class="question-pills" aria-label="題目進度">
                 <span class="question-pill" data-q="1">1</span>
@@ -197,148 +197,24 @@
       const screenIds = ['coverScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
       screenIds.forEach((id) => {
         const screen = document.getElementById(id);
-        if (!screen) return;
-        screen.classList.toggle('active', id === 'coverScreen');
+        if (screen) screen.classList.toggle('active', id === 'coverScreen');
       });
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = 'cover';
       try {
         const raw = localStorage.getItem('asd_school_rpg_v5');
         if (raw) {
           const saved = JSON.parse(raw);
-          if (saved && saved.appState) saved.appState.currentScreen = 'cover';
-          localStorage.setItem('asd_school_rpg_v5', JSON.stringify(saved));
+          if (saved && saved.appState) {
+            saved.appState.currentScreen = 'cover';
+            localStorage.setItem('asd_school_rpg_v5', JSON.stringify(saved));
+          }
         }
       } catch (e) {}
     }
 
-    function getPositiveExampleForBadChoice(choiceText) {
-      const text = (choiceText || '').replace(/[。\s]/g, '');
-      const rules = [
-        { keys: ['算啦', '唔問'], example: '「我不太明白，可以再說一次嗎？」' },
-        { keys: ['完全不再理會老師的回答', '不再理會老師', '不理會老師'], example: '「多謝老師，我會再試一次。如果仍然不明白，我再請教你。」' },
-        { keys: ['一臉不耐煩地轉身', '不耐煩', '轉身'], example: '「多謝你告訴我，我需要一點時間想一想。」' },
-        { keys: ['完全不出聲', '不說話', '一句都不說'], example: '「我而家有少少緊張，可以俾我諗一諗先嗎？」' },
-        { keys: ['大聲', '質問', '偷我'], example: '「這支筆是我的，可以先還給我嗎？」' },
-        { keys: ['搶回來'], example: '「這支筆我現在要用，可以請你先還給我嗎？」' },
-        { keys: ['報復', '翻臉'], example: '「我現在有點不開心，我想請老師幫忙處理。」' },
-        { keys: ['唔玩', '唔好再搵', '好煩'], example: '「多謝你邀請我，但我現在想休息一下。」' },
-        { keys: ['咁又點', '講完未', '有咩咁值得講'], example: '「真係呀？聽起來你很開心，恭喜你。」' },
-        { keys: ['乜都得', '你哋自己決定'], example: '「我有一個簡單想法，可以分享一下嗎？」' },
-        { keys: ['我唔識'], example: '「我暫時未諗到答案，可以先聽聽你哋的想法嗎？」' },
-        { keys: ['直接走開', '不回應', '不再回應'], example: '「我先離開一下，等陣再同你講。」' }
-      ];
-      const matched = rules.find(rule => rule.keys.some(key => text.includes(key.replace(/[。\s]/g, ''))));
-      return matched ? matched.example : '「我想先冷靜一下，再慢慢說清楚自己的想法。」';
-    }
-
-    function cleanFeedbackSentence(text) {
-      if (!text) return text;
-      let output = text;
-      function replaceBadAdvice(match, quotedText) {
-        return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
-      }
-      output = output.replace(/下次遇到類似情況時，可以比「([^」]+)。」[^。]*。?/g, replaceBadAdvice);
-      output = output.replace(/下次遇到類似情況時，可以比「([^」]+)」[^。]*。?/g, replaceBadAdvice);
-      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)。」/g, function(match, quotedText) {
-        return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
-      });
-      output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)」/g, function(match, quotedText) {
-        return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
-      });
-      output = output.replace(/更平靜、清楚或有禮貌。/g, '用較清楚、溫和的方式表達。');
-      output = output.replace(/更平靜、清楚或有禮貌/g, '較清楚、溫和的表達方式');
-      return output;
-    }
-
-    function replaceAwkwardFeedbackText(root) {
-      const target = root || document.getElementById('asdBox') || document.body;
-      if (!target) return;
-      const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
-      const textNodes = [];
-      let node;
-      while ((node = walker.nextNode())) textNodes.push(node);
-      textNodes.forEach((textNode) => {
-        const updatedText = cleanFeedbackSentence(textNode.nodeValue);
-        if (updatedText !== textNode.nodeValue) textNode.nodeValue = updatedText;
-      });
-    }
-
-    (function setupSafeTextFixer() {
-      let fixTimer = null;
-      function scheduleFix() {
-        clearTimeout(fixTimer);
-        fixTimer = setTimeout(() => replaceAwkwardFeedbackText(document.getElementById('asdBox')), 80);
-      }
-      window.addEventListener('load', () => {
-        scheduleFix();
-        const asdBox = document.getElementById('asdBox');
-        if (asdBox && window.MutationObserver) {
-          const observer = new MutationObserver(scheduleFix);
-          observer.observe(asdBox, { childList: true, subtree: true });
-        }
-        document.addEventListener('click', scheduleFix);
-      });
-    })();
-
-    (function setupQuestionTracker() {
-      function getText(id) {
-        const el = document.getElementById(id);
-        return el ? el.textContent || '' : '';
-      }
-      function extractQuestionNumber() {
-        const text = `${getText('asdProgressText')} ${getText('asdBox')}`;
-        const match = text.match(/第\s*([1-5])\s*\/\s*5\s*題/) || text.match(/第\s*([1-5])\s*題/);
-        return match ? Number(match[1]) : 0;
-      }
-      function extractScenarioTitle() {
-        const progressText = getText('asdProgressText');
-        const progressMatch = progressText.match(/情境\s*[:：]\s*([^｜|]+)/);
-        if (progressMatch && progressMatch[1]) return progressMatch[1].trim();
-        const boxText = getText('asdBox');
-        const sceneMatch = boxText.match(/情境\s*[:：]\s*([^\n。]+)/);
-        return sceneMatch && sceneMatch[1] ? sceneMatch[1].trim() : '';
-      }
-      function updateQuestionTracker() {
-        const tracker = document.getElementById('questionTracker');
-        const badge = document.getElementById('questionBadgeBig');
-        const title = document.getElementById('questionTrackerTitle');
-        const pills = document.querySelectorAll('.question-pill');
-        if (!tracker || !badge || !title || !pills.length) return;
-        const questionNumber = extractQuestionNumber();
-        const scenarioTitle = extractScenarioTitle();
-        pills.forEach((pill) => {
-          const pillNumber = Number(pill.dataset.q);
-          pill.classList.toggle('active', questionNumber === pillNumber);
-          pill.classList.toggle('done', questionNumber > pillNumber);
-        });
-        if (!questionNumber) {
-          tracker.classList.add('is-waiting');
-          badge.textContent = '未開始';
-          title.textContent = '請先選擇情境開始練習';
-          return;
-        }
-        tracker.classList.remove('is-waiting');
-        badge.textContent = `第 ${questionNumber} / 5 題`;
-        title.textContent = scenarioTitle ? `正在練習：${scenarioTitle}` : '請閱讀題目，然後選擇最合適的回應';
-      }
-      function observeElement(id) {
-        const el = document.getElementById(id);
-        if (!el || !window.MutationObserver) return;
-        let timer = null;
-        const observer = new MutationObserver(() => {
-          clearTimeout(timer);
-          timer = setTimeout(updateQuestionTracker, 80);
-        });
-        observer.observe(el, { childList: true, subtree: true });
-      }
-      window.addEventListener('load', () => {
-        setTimeout(forceStartAtCoverPage, 0);
-        updateQuestionTracker();
-        observeElement('asdProgressText');
-        observeElement('asdBox');
-        document.addEventListener('click', () => setTimeout(updateQuestionTracker, 80));
-      });
-    })();
+    window.addEventListener('load', function () {
+      setTimeout(forceStartAtCoverPage, 100);
+    });
   </script>
 </body>
 </html>
