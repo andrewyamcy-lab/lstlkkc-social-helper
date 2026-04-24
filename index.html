@@ -26,7 +26,8 @@
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
 
-            <div class="badge-panel animate-in" style="text-align:left; margin:2px 0; box-shadow:none;">
+            <button class="secondary" id="badgeToggleBtn" onclick="toggleCoverBadges()">查看我的徽章</button>
+            <div id="coverBadgePanel" class="badge-panel animate-in hidden" style="text-align:left; margin:2px 0; box-shadow:none;">
               <div class="panel-badge">我的徽章</div>
               <h3>已得到的徽章</h3>
               <p class="small">完成情境後會得到對應徽章。</p>
@@ -277,6 +278,17 @@
 
   <script src="script.js"></script>
   <script>
+    function toggleCoverBadges() {
+      const panel = document.getElementById('coverBadgePanel');
+      const button = document.getElementById('badgeToggleBtn');
+      if (!panel || !button) return;
+
+      const isHidden = panel.classList.contains('hidden');
+      panel.classList.toggle('hidden', !isHidden);
+      button.textContent = isHidden ? '收起我的徽章' : '查看我的徽章';
+      button.setAttribute('aria-expanded', String(isHidden));
+    }
+
     (function setupQuestionTracker() {
       function getText(id) {
         const el = document.getElementById(id);
