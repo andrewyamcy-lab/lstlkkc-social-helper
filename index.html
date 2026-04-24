@@ -289,6 +289,56 @@
       button.setAttribute('aria-expanded', String(isHidden));
     }
 
+    function replaceAwkwardFeedbackText(root = document.body) {
+      if (!root) return;
+
+      const replacements = [
+        ['更平靜、清楚或有禮貌。', '下次可以試下慢慢講清楚，這樣對方會更容易明白你。'],
+        ['更平靜、清楚或有禮貌', '下次可以試下慢慢講清楚，這樣對方會更容易明白你']
+      ];
+
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      let node;
+      while ((node = walker.nextNode())) {
+        textNodes.push(node);
+      }
+
+      textNodes.forEach((textNode) => {
+        let updatedText = textNode.nodeValue;
+        replacements.forEach(([oldText, newText]) => {
+          updatedText = updatedText.split(oldText).join(newText);
+        });
+        if (updatedText !== textNode.nodeValue) {
+          textNode.nodeValue = updatedText;
+        }
+      });
+    }
+
+    (function setupFeedbackTextCleaner() {
+      window.addEventListener('load', () => {
+        replaceAwkwardFeedbackText();
+        if (!window.MutationObserver) return;
+
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === Node.TEXT_NODE) {
+                let updatedText = node.nodeValue;
+                updatedText = updatedText.split('更平靜、清楚或有禮貌。').join('下次可以試下慢慢講清楚，這樣對方會更容易明白你。');
+                updatedText = updatedText.split('更平靜、清楚或有禮貌').join('下次可以試下慢慢講清楚，這樣對方會更容易明白你');
+                node.nodeValue = updatedText;
+              } else if (node.nodeType === Node.ELEMENT_NODE) {
+                replaceAwkwardFeedbackText(node);
+              }
+            });
+          });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+      });
+    })();
+
     (function setupQuestionTracker() {
       function getText(id) {
         const el = document.getElementById(id);
