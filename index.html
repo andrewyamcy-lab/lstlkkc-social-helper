@@ -193,6 +193,26 @@
       button.setAttribute('aria-expanded', String(isHidden));
     }
 
+    function forceStartAtCoverPage() {
+      const screenIds = ['coverScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
+      screenIds.forEach((id) => {
+        const screen = document.getElementById(id);
+        if (!screen) return;
+        screen.classList.toggle('active', id === 'coverScreen');
+      });
+      if (typeof appState !== 'undefined' && appState) {
+        appState.currentScreen = 'cover';
+      }
+      try {
+        const raw = localStorage.getItem('asd_school_rpg_v5');
+        if (raw) {
+          const saved = JSON.parse(raw);
+          if (saved && saved.appState) saved.appState.currentScreen = 'cover';
+          localStorage.setItem('asd_school_rpg_v5', JSON.stringify(saved));
+        }
+      } catch (e) {}
+    }
+
     function getPositiveExampleForBadChoice(choiceText) {
       const text = (choiceText || '').replace(/[。\s]/g, '');
       const rules = [
@@ -216,11 +236,9 @@
     function cleanFeedbackSentence(text) {
       if (!text) return text;
       let output = text;
-
       function replaceBadAdvice(match, quotedText) {
         return '下次遇到類似情況時，可以試下這樣說：' + getPositiveExampleForBadChoice(quotedText);
       }
-
       output = output.replace(/下次遇到類似情況時，可以比「([^」]+)。」[^。]*。?/g, replaceBadAdvice);
       output = output.replace(/下次遇到類似情況時，可以比「([^」]+)」[^。]*。?/g, replaceBadAdvice);
       output = output.replace(/下次遇到類似情況時，可以試下這樣說：「([^」]+)。」/g, function(match, quotedText) {
@@ -316,6 +334,7 @@
         observer.observe(el, { childList: true, subtree: true, characterData: true });
       }
       window.addEventListener('load', () => {
+        setTimeout(forceStartAtCoverPage, 0);
         updateQuestionTracker();
         observeElement('asdProgressText');
         observeElement('asdBox');
