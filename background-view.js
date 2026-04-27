@@ -1,8 +1,18 @@
 // /background-view.js
 // 查看背景按鈕：讓學生答題時可隨時重看情境背景。
-// 同時自動載入 scenarios/scenario-visuals.js，讓背景可顯示圖片。
+// 同時自動載入 scenarios/scenario-visuals.js 及 scenario-images.css，讓背景可顯示圖片。
 
 (function () {
+  function loadScenarioImageCss() {
+    if (window.__scenarioImageCssLoaderAdded) return;
+    window.__scenarioImageCssLoaderAdded = true;
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'scenario-images.css';
+    document.head.appendChild(link);
+  }
+
   function loadScenarioVisualsFile() {
     if (window.__scenarioVisualsLoaderAdded) return;
     window.__scenarioVisualsLoaderAdded = true;
@@ -120,6 +130,7 @@
   }
 
   function initBackgroundViewButton() {
+    loadScenarioImageCss();
     loadScenarioVisualsFile();
     addBackgroundButton();
     observeGameScreen();
