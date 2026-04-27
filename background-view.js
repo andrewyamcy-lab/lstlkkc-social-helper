@@ -1,9 +1,22 @@
 // /background-view.js
 // 查看背景按鈕：讓學生答題時可隨時重看情境背景。
-// 使用方法：在 index.html 的 extra-scenarios.js 後加入：
-// <script src="background-view.js"></script>
+// 同時自動載入 scenarios/scenario-visuals.js，讓背景可顯示圖片。
 
 (function () {
+  function loadScenarioVisualsFile() {
+    if (window.__scenarioVisualsLoaderAdded) return;
+    window.__scenarioVisualsLoaderAdded = true;
+
+    const script = document.createElement('script');
+    script.src = 'scenarios/scenario-visuals.js';
+    script.defer = true;
+    script.onload = function () {
+      if (typeof applyScenarioVisuals === 'function') applyScenarioVisuals();
+      if (typeof injectImageIntoBackgroundPage === 'function') injectImageIntoBackgroundPage();
+    };
+    document.head.appendChild(script);
+  }
+
   function escapeHtml(value) {
     return String(value || '')
       .replace(/&/g, '&amp;')
@@ -15,9 +28,11 @@
 
   function getActiveGame() {
     try {
-      if (typeof asdGames === 'undefined' || typeof appState === 'undefined') return null;
-      const key = appState.currentGame || appState.currentScenario || appState.selectedGame || appState.gameKey;
-      if (key && asdGames[key]) return asdGames[key];
+      if (typeof asdGames === 'undefined') return null;
+      if (typeof appState !== 'undefined' && appState) {
+        const key = appState.currentGame || appState.currentScenario || appState.selectedGame || appState.gameKey;
+        if (key && asdGames[key]) return asdGames[key];
+      }
 
       const box = document.getElementById('asdBox');
       const text = box ? box.innerText || '' : '';
@@ -46,6 +61,8 @@
   }
 
   window.toggleScenarioBackground = function () {
+    if (typeof applyScenarioVisuals === 'function') applyScenarioVisuals();
+
     const game = getActiveGame();
     const box = ensureBackgroundBox();
     if (!box) return;
@@ -62,8 +79,11 @@
       return;
     }
 
+    const imageHtml = typeof buildScenarioImageHtml === 'function' ? buildScenarioImageHtml(game) : '';
+
     box.classList.remove('hidden');
     box.innerHTML = `
+      ${imageHtml}
       <strong>📖 背景故事</strong><br>
       <div style="margin-top:8px; line-height:1.8;">${escapeHtml(game.intro)}</div>
       ${game.location ? `<div style="margin-top:10px;"><strong>地點：</strong>${escapeHtml(game.location)}</div>` : ''}
@@ -91,12 +111,16 @@
     const gameScreen = document.getElementById('gameScreen');
     if (!gameScreen || gameScreen.__backgroundButtonObserverInstalled) return;
 
-    const observer = new MutationObserver(() => addBackgroundButton());
+    const observer = new MutationObserver(() => {
+      addBackgroundButton();
+      if (typeof injectImageIntoBackgroundPage === 'function') injectImageIntoBackgroundPage();
+    });
     observer.observe(gameScreen, { childList: true, subtree: true });
     gameScreen.__backgroundButtonObserverInstalled = true;
   }
 
   function initBackgroundViewButton() {
+    loadScenarioVisualsFile();
     addBackgroundButton();
     observeGameScreen();
     setTimeout(addBackgroundButton, 100);
