@@ -1,6 +1,6 @@
 // /background-view.js
 // 查看背景按鈕：讓學生答題時可隨時重看情境背景。
-// 同時自動載入 scenarios/scenario-visuals.js 及 scenario-images.css，讓背景可顯示圖片。
+// 同時自動載入情境圖片 CSS 與 modular scenario files。
 
 (function () {
   function loadScenarioImageCss() {
@@ -13,18 +13,38 @@
     document.head.appendChild(link);
   }
 
-  function loadScenarioVisualsFile() {
-    if (window.__scenarioVisualsLoaderAdded) return;
-    window.__scenarioVisualsLoaderAdded = true;
+  function loadScriptOnce(src, flagName, onload) {
+    if (window[flagName]) {
+      if (typeof onload === 'function') onload();
+      return;
+    }
+    window[flagName] = true;
 
     const script = document.createElement('script');
-    script.src = 'scenarios/scenario-visuals.js';
+    script.src = src;
     script.defer = true;
     script.onload = function () {
-      if (typeof applyScenarioVisuals === 'function') applyScenarioVisuals();
-      if (typeof injectImageIntoBackgroundPage === 'function') injectImageIntoBackgroundPage();
+      if (typeof onload === 'function') onload();
     };
     document.head.appendChild(script);
+  }
+
+  function loadScenarioModules() {
+    // Order matters: data → register → visuals → background flow.
+    loadScriptOnce('scenarios/scenario-data.js', '__scenarioDataLoaderAdded', function () {
+      loadScriptOnce('scenarios/scenario-register.js', '__scenarioRegisterLoaderAdded', function () {
+        if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+      });
+    });
+
+    loadScriptOnce('scenarios/scenario-visuals.js', '__scenarioVisualsLoaderAdded', function () {
+      if (typeof applyScenarioVisuals === 'function') applyScenarioVisuals();
+      if (typeof injectImageIntoBackgroundPage === 'function') injectImageIntoBackgroundPage();
+    });
+
+    loadScriptOnce('scenarios/background-flow.js', '__backgroundFlowLoaderAdded', function () {
+      if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+    });
   }
 
   function escapeHtml(value) {
@@ -71,6 +91,7 @@
   }
 
   window.toggleScenarioBackground = function () {
+    if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
     if (typeof applyScenarioVisuals === 'function') applyScenarioVisuals();
 
     const game = getActiveGame();
@@ -123,6 +144,7 @@
 
     const observer = new MutationObserver(() => {
       addBackgroundButton();
+      if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
       if (typeof injectImageIntoBackgroundPage === 'function') injectImageIntoBackgroundPage();
     });
     observer.observe(gameScreen, { childList: true, subtree: true });
@@ -131,7 +153,7 @@
 
   function initBackgroundViewButton() {
     loadScenarioImageCss();
-    loadScenarioVisualsFile();
+    loadScenarioModules();
     addBackgroundButton();
     observeGameScreen();
     setTimeout(addBackgroundButton, 100);
