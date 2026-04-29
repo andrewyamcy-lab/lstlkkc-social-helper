@@ -242,9 +242,9 @@
   <footer>樂善堂梁銶琚書院（梁書）｜校園社交練習學生版</footer>
 
   <script src="script.js"></script>
-  <script src="extra-scenarios-light.js"></script>
-  <script src="scenario-cleanup.js"></script>
-  <script src="scenario-images-light.js"></script>
+  <script src="extra-scenarios-light.js?v=20260429-2"></script>
+  <script src="scenario-images-light.js?v=20260429-3"></script>
+  <script src="scenario-cleanup.js?v=20260429-4"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -253,8 +253,9 @@
         if (screen) screen.classList.toggle('active', id === screenId);
       });
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
-      if (screenId === 'situationScreen' && typeof initScenarioImagesLight === 'function') {
-        setTimeout(initScenarioImagesLight, 80);
+      if (screenId === 'situationScreen') {
+        if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 80);
+        if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 120);
       }
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
