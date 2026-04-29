@@ -1,14 +1,6 @@
 // /scenario-cleanup.js
 // Removes scenarios that overlap too much with stronger existing scenarios.
-// Kept scenarios:
-// - 午飯時間：加入同學 (kept)
-// - 借文具：處理衝突 (kept)
-// - 小組：加入合作 (kept)
-// Removed scenarios:
-// - 午飯座位：想加入但怕尷尬 (too similar to 午飯時間：加入同學)
-// - 借物品未還：清楚提醒 (too similar to 借文具：處理衝突)
-// - 小組分工：不清楚自己做甚麼 (too similar to 小組：加入合作)
-// - 分不清玩笑：先確認 (removed by request)
+// Also fixes browser Back button behaviour for this single-page app.
 
 (function () {
   const REMOVED_SCENARIOS = [
@@ -17,6 +9,18 @@
     { key: 'groupRole', title: '小組分工：不清楚自己做甚麼' },
     { key: 'jokeConfusion', title: '分不清玩笑：先確認' }
   ];
+
+  const SCREEN_MAP = {
+    cover: 'coverScreen',
+    badge: 'badgeScreen',
+    settings: 'settingsScreen',
+    phraseLibrary: 'phraseLibraryScreen',
+    situation: 'situationScreen',
+    game: 'gameScreen'
+  };
+
+  let isHandlingPopState = false;
+  let historyPatchInstalled = false;
 
   function deleteKeyFromKnownObjects(key) {
     try { if (typeof asdGames !== 'undefined' && asdGames && key in asdGames) delete asdGames[key]; } catch (error) {}
@@ -91,15 +95,120 @@
     }
   }
 
-  window.removeOverlappingScenarios = removeOverlappingScenarios;
+  function getCurrentScreenName() {
+    const active = document.querySelector('.screen.active');
+    if (!active) return 'cover';
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', removeOverlappingScenarios);
-  } else {
-    removeOverlappingScenarios();
+    const idToName = {
+      coverScreen: 'cover',
+      badgeScreen: 'badge',
+      settingsScreen: 'settings',
+      phraseLibraryScreen: 'phraseLibrary',
+      situationScreen: 'situation',
+      gameScreen: 'game'
+    };
+
+    return idToName[active.id] || 'cover';
   }
 
-  setTimeout(removeOverlappingScenarios, 100);
+  function showScreenWithoutHistory(screenName) {
+    const screenId = SCREEN_MAP[screenName] || 'coverScreen';
+    const screenIds = Object.keys(SCREEN_MAP).map(function (key) { return SCREEN_MAP[key]; });
+
+    screenIds.forEach(function (id) {
+      const screen = document.getElementById(id);
+      if (screen) screen.classList.toggle('active', id === screenId);
+    });
+
+    try {
+      if (typeof appState !== 'undefined' && appState) appState.currentScreen = screenName;
+    } catch (error) {}
+
+    if (screenName === 'badge' && typeof renderBadges === 'function') renderBadges();
+    if (screenName === 'situation') {
+      if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 80);
+      if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 120);
+    }
+
+    window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
+  }
+
+  function pushAppHistory(screenName) {
+    if (isHandlingPopState) return;
+    if (!history || !history.pushState) return;
+
+    const currentState = history.state || {};
+    if (currentState.appScreen === screenName) return;
+
+    history.pushState({ appScreen: screenName }, '', '#' + screenName);
+  }
+
+  function patchScreenFunction(functionName, screenName) {
+    if (typeof window[functionName] !== 'function') return;
+    if (window[functionName].__historyPatched) return;
+
+    const original = window[functionName];
+    window[functionName] = function () {
+      const result = original.apply(this, arguments);
+      pushAppHistory(screenName);
+      return result;
+    };
+    window[functionName].__historyPatched = true;
+  }
+
+  function patchStartAsdGameHistory() {
+    if (typeof window.startAsdGame !== 'function') return;
+    if (window.startAsdGame.__historyPatched) return;
+
+    const originalStart = window.startAsdGame;
+    window.startAsdGame = function () {
+      const result = originalStart.apply(this, arguments);
+      pushAppHistory('game');
+      return result;
+    };
+    window.startAsdGame.__historyPatched = true;
+  }
+
+  function installBackButtonFix() {
+    if (historyPatchInstalled) return;
+    historyPatchInstalled = true;
+
+    try {
+      if (!history.state || !history.state.appScreen) {
+        history.replaceState({ appScreen: getCurrentScreenName() }, '', '#cover');
+      }
+    } catch (error) {}
+
+    patchScreenFunction('showCoverScreen', 'cover');
+    patchScreenFunction('showBadgeScreen', 'badge');
+    patchScreenFunction('showSettingsScreen', 'settings');
+    patchScreenFunction('showPhraseLibraryScreen', 'phraseLibrary');
+    patchScreenFunction('showSituationScreen', 'situation');
+    patchStartAsdGameHistory();
+
+    window.addEventListener('popstate', function (event) {
+      const screenName = (event.state && event.state.appScreen) || 'cover';
+      isHandlingPopState = true;
+      showScreenWithoutHistory(screenName);
+      isHandlingPopState = false;
+    });
+  }
+
+  window.removeOverlappingScenarios = removeOverlappingScenarios;
+  window.installBackButtonFix = installBackButtonFix;
+
+  function initCleanupAndHistory() {
+    removeOverlappingScenarios();
+    installBackButtonFix();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCleanupAndHistory);
+  } else {
+    initCleanupAndHistory();
+  }
+
+  setTimeout(initCleanupAndHistory, 100);
   setTimeout(removeOverlappingScenarios, 300);
   setTimeout(removeOverlappingScenarios, 800);
   setTimeout(removeOverlappingScenarios, 1600);
