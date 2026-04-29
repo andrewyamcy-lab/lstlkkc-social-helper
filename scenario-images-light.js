@@ -7,7 +7,7 @@
 (function () {
   // Change this value when replacing images with the same filename.
   // It forces browsers and GitHub Pages to fetch the newest image instead of using the cached one.
-  const IMAGE_VERSION = '2026-04-29-v3';
+  const IMAGE_VERSION = '2026-04-29-v4';
 
   const scenarioImageMap = {
     start: 'images/start-conversation.jpg',
@@ -32,7 +32,11 @@
     jokeConfusion: 'images/joke-confusion.jpg',
     academicOnly: 'images/academic-only.jpg',
     lostItem: 'images/lost-item.jpg',
-    groupRole: 'images/group-role.jpg'
+    groupRole: 'images/group-role.jpg',
+
+    copyHomework: 'images/copy-homework.jpg',
+    quietSpace: 'images/quiet-space.jpg',
+    losingGame: 'images/losing-game.jpg'
   };
 
   const scenarioAltMap = {
@@ -56,7 +60,10 @@
     jokeConfusion: '學生分辨玩笑和誤會的情境圖',
     academicOnly: '學生使用學習助手問學業問題的情境圖',
     lostItem: '學生冷靜處理遺失物品的情境圖',
-    groupRole: '學生在小組中確認分工的情境圖'
+    groupRole: '學生在小組中確認分工的情境圖',
+    copyHomework: '學生拒絕同學抄功課的情境圖',
+    quietSpace: '學生在小息時尋找安靜空間的情境圖',
+    losingGame: '學生在比賽輸了後接受結果的情境圖'
   };
 
   let activeScenarioKey = '';
@@ -188,8 +195,6 @@
         card.insertBefore(img, card.firstChild);
       }
 
-      // Always update the image source and alt text.
-      // This fixes old inserted images staying on screen after changing the mapping or uploading a new file.
       if (img.getAttribute('src') !== versionedSrc) {
         img.style.display = 'block';
         img.src = versionedSrc;
@@ -276,7 +281,6 @@
     initScenarioImagesLight();
   }
 
-  // Run a few delayed passes because extra-scenarios-light.js adds cards after page load.
   setTimeout(initScenarioImagesLight, 200);
   setTimeout(initScenarioImagesLight, 800);
   setTimeout(initScenarioImagesLight, 1600);
