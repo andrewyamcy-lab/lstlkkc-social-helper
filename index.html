@@ -243,9 +243,10 @@
 
   <script src="script.js"></script>
   <script src="extra-scenarios-light.js?v=20260429-2"></script>
-  <script src="scenario-images-light.js?v=20260429-3"></script>
+  <script src="extra-scenarios-add3.js?v=20260429-1"></script>
+  <script src="scenario-images-light.js?v=20260429-4"></script>
   <script src="scenario-cleanup.js?v=20260429-4"></script>
-  <script src="scenario-filters.js?v=20260429-1"></script>
+  <script src="scenario-filters.js?v=20260429-2"></script>
   <script src="scenario-total-sync.js?v=20260429-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
@@ -256,12 +257,13 @@
       });
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
       if (screenId === 'situationScreen') {
-        if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 80);
-        if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 120);
-        if (typeof initScenarioFilters === 'function') setTimeout(initScenarioFilters, 160);
-        if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 220);
+        if (typeof registerNewAdd3Scenarios === 'function') setTimeout(registerNewAdd3Scenarios, 60);
+        if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 100);
+        if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 140);
+        if (typeof initScenarioFilters === 'function') setTimeout(initScenarioFilters, 180);
+        if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 240);
       }
-      if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 260);
+      if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 300);
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
 
@@ -273,7 +275,7 @@
 
     window.addEventListener('load', function () {
       showCoverScreen();
-      if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 500);
+      if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 700);
     });
   </script>
 </body>
