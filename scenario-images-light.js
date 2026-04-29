@@ -7,7 +7,7 @@
 (function () {
   // Change this value when replacing images with the same filename.
   // It forces browsers and GitHub Pages to fetch the newest image instead of using the cached one.
-  const IMAGE_VERSION = '2026-04-29-v2';
+  const IMAGE_VERSION = '2026-04-29-v3';
 
   const scenarioImageMap = {
     start: 'images/start-conversation.jpg',
@@ -115,6 +115,56 @@
     return scenarioAltMap[key] || '梁書校園社交練習情境圖';
   }
 
+  function countRealScenarios() {
+    try {
+      if (typeof asdGames !== 'undefined' && asdGames) {
+        return Object.keys(asdGames).filter(function (key) {
+          return asdGames[key] && asdGames[key].steps;
+        }).length;
+      }
+    } catch (error) {}
+
+    const buttons = document.querySelectorAll('button[onclick*="startAsdGame"]');
+    const keys = new Set();
+    buttons.forEach(function (button) {
+      const onclickText = button.getAttribute('onclick') || '';
+      const match = onclickText.match(/startAsdGame\(['"]([^'"]+)['"]\)/);
+      if (match && match[1]) keys.add(match[1]);
+    });
+    return keys.size || Object.keys(scenarioImageMap).length;
+  }
+
+  function syncScenarioTotalText() {
+    const total = countRealScenarios();
+    const status = document.getElementById('gameStatusText');
+    if (!status || !total) return;
+
+    status.textContent = status.textContent
+      .replace(/已完成情境：\s*(\d+)\s*\/\s*\d+/, '已完成情境：$1 / ' + total)
+      .replace(/已完成情境：\s*(\d+)\s*\/\s*8/, '已完成情境：$1 / ' + total)
+      .replace(/已完成情境：\s*(\d+)\s*\/\s*18/, '已完成情境：$1 / ' + total)
+      .replace(/已完成情境：\s*(\d+)\s*\/\s*21/, '已完成情境：$1 / ' + total);
+  }
+
+  function checkDuplicateImageFilenames() {
+    const used = {};
+    Object.keys(scenarioImageMap).forEach(function (key) {
+      const src = scenarioImageMap[key];
+      if (!used[src]) used[src] = [];
+      used[src].push(key);
+    });
+
+    const duplicates = Object.keys(used).filter(function (src) {
+      return used[src].length > 1;
+    });
+
+    if (duplicates.length) {
+      console.warn('以下圖片檔名被多個情境重複使用：', duplicates.map(function (src) {
+        return src + ' → ' + used[src].join(', ');
+      }));
+    }
+  }
+
   function addImagesToScenarioCards() {
     document.querySelectorAll('.scenario-card').forEach((card) => {
       const button = card.querySelector('button[onclick*="startAsdGame"]');
@@ -203,6 +253,7 @@
       const result = originalStartAsdGame.apply(this, arguments);
       setTimeout(function () {
         showGameImage(key);
+        syncScenarioTotalText();
       }, 60);
       return result;
     };
@@ -213,6 +264,8 @@
     injectImageStyles();
     addImagesToScenarioCards();
     patchStartGame();
+    syncScenarioTotalText();
+    checkDuplicateImageFilenames();
   }
 
   window.initScenarioImagesLight = initScenarioImagesLight;
