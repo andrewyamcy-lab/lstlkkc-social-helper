@@ -204,15 +204,17 @@
   <script src="script.js"></script>
   <script src="extra-scenarios-loader.js"></script>
   <script src="background-view.js"></script>
+  <script src="social-upgrades.js"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
-      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
+      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'situationScreen', 'gameScreen', 'sentenceLibraryScreen'];
       screenIds.forEach((id) => {
         const screen = document.getElementById(id);
         if (screen) screen.classList.toggle('active', id === screenId);
       });
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
       if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+      if (typeof initSocialUpgrades === 'function') initSocialUpgrades();
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
 
@@ -222,6 +224,7 @@
 
     function showBadgeScreen() {
       if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+      if (typeof initSocialUpgrades === 'function') initSocialUpgrades();
       if (typeof renderBadges === 'function') renderBadges();
       setActiveScreen('badgeScreen', 'badge');
     }
@@ -232,6 +235,7 @@
 
     function showSituationScreen() {
       if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+      if (typeof initSocialUpgrades === 'function') initSocialUpgrades();
       setActiveScreen('situationScreen', 'situation');
     }
 
@@ -286,11 +290,13 @@
       const observer = new MutationObserver(() => {
         setTimeout(addConsequenceReminderToResult, 80);
         if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+        if (typeof initSocialUpgrades === 'function') initSocialUpgrades();
       });
       observer.observe(box, { childList: true, subtree: true, characterData: true });
       setInterval(() => {
         addConsequenceReminderToResult();
         if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+        if (typeof initSocialUpgrades === 'function') initSocialUpgrades();
       }, 1000);
     }
 
@@ -310,6 +316,7 @@
 
     window.addEventListener('load', function () {
       if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
+      if (typeof initSocialUpgrades === 'function') initSocialUpgrades();
       startConsequenceReminderWatcher();
       setTimeout(forceStartAtCoverPage, 100);
     });
