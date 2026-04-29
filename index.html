@@ -202,7 +202,7 @@
           </div>
           <div class="status-box">
             <div class="status-title">我的表現</div>
-            <div id="gameStatusText" class="small">已完成情境：0 / 18｜使用提示：0 次｜使用冷靜模式：0 次</div>
+            <div id="gameStatusText" class="small">正在計算情境數量｜使用提示：0 次｜使用冷靜模式：0 次</div>
             <div class="achievement-row" id="achievementRow"><div class="achievement-pill">我的練習模式</div></div>
           </div>
         </div>
@@ -246,6 +246,7 @@
   <script src="scenario-images-light.js?v=20260429-3"></script>
   <script src="scenario-cleanup.js?v=20260429-4"></script>
   <script src="scenario-filters.js?v=20260429-1"></script>
+  <script src="scenario-total-sync.js?v=20260429-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -258,7 +259,9 @@
         if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 80);
         if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 120);
         if (typeof initScenarioFilters === 'function') setTimeout(initScenarioFilters, 160);
+        if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 220);
       }
+      if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 260);
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
 
@@ -270,6 +273,7 @@
 
     window.addEventListener('load', function () {
       showCoverScreen();
+      if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 500);
     });
   </script>
 </body>
