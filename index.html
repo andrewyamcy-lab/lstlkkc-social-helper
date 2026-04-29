@@ -23,7 +23,6 @@
           <div class="hero-avatar">🎮</div>
           <h2>歡迎使用梁書校園社交練習</h2>
           <p>本工具為樂善堂梁銶琚書院（梁書）校園情境而設，協助學生透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人、小組合作、向老師求助、加入同學，以及確認功課。</p>
-
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
             <button class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
@@ -37,8 +36,7 @@
           <div class="tag">我的徽章</div>
           <div class="hero-avatar">🏅</div>
           <h2>我的徽章</h2>
-          <p>完成不同校園情境後，你會得到對應徽章。你可以在這裡查看自己的練習進度。</p>
-
+          <p>完成不同校園情境後，你會得到對應徽章。</p>
           <div class="settings-grid">
             <div class="settings-card" style="grid-column: 1 / -1;">
               <div class="panel-badge">已得到的徽章</div>
@@ -47,7 +45,6 @@
               <div class="badge-grid" id="badgeGrid"></div>
             </div>
           </div>
-
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
@@ -62,7 +59,6 @@
           <div class="hero-avatar">⚙️</div>
           <h2>我的設定</h2>
           <p>你可以在這裡調整字體、語音和畫面顯示。</p>
-
           <div class="settings-grid">
             <div class="settings-card">
               <h3>輔助功能</h3>
@@ -70,7 +66,6 @@
               <div class="toggle-row"><span>高對比畫面</span><input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" /></div>
               <div class="toggle-row"><span>減少動畫</span><input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" /></div>
             </div>
-
             <div class="settings-card">
               <h3>顯示設定</h3>
               <p class="small">按按鈕調整字體大小，讓你看得更舒服。</p>
@@ -79,7 +74,6 @@
                 <button class="secondary" onclick="toggleSpeech()">開關朗讀</button>
               </div>
             </div>
-
             <div class="settings-card">
               <h3>資料管理</h3>
               <p class="small">你可以儲存目前進度，或重新開始。</p>
@@ -89,7 +83,6 @@
               </div>
             </div>
           </div>
-
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
@@ -103,7 +96,6 @@
           <div class="hero-avatar">🏫</div>
           <h2>選擇你想練習的情境</h2>
           <p>每個情境有 5 題，每題有 4 個選項。完成後可以看到結果和鼓勵。</p>
-
           <div class="scenario-select-grid">
             <div class="scenario-card"><div class="emoji">🗣️</div><strong>課室：發起對話</strong><div class="small">主動和同學打招呼，開始簡單對話。</div><button onclick="startAsdGame('start')">開始這個情境</button></div>
             <div class="scenario-card"><div class="emoji">🙅</div><strong>小息：禮貌拒絕</strong><div class="small">被同學邀請玩遊戲時，清楚而友善地拒絕。</div><button onclick="startAsdGame('refuse')">開始這個情境</button></div>
@@ -114,7 +106,6 @@
             <div class="scenario-card"><div class="emoji">🍱</div><strong>午飯時間：加入同學</strong><div class="small">想加入同學一起吃飯時，學習自然地開口。</div><button onclick="startAsdGame('lunch')">開始這個情境</button></div>
             <div class="scenario-card"><div class="emoji">📚</div><strong>放學後：確認功課</strong><div class="small">不確定功課內容時，學習向同學清楚確認。</div><button onclick="startAsdGame('homework')">開始這個情境</button></div>
           </div>
-
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
@@ -127,14 +118,12 @@
         <div class="tag">梁書社交練習</div>
         <h2>正在練習</h2>
         <p>完成這個情境後，你可以再選另一個情境繼續練習。</p>
-
         <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
           <button onclick="showSituationScreen()">選擇其他情境</button>
           <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
           <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
         </div>
-
         <div class="top-status">
           <div class="status-box">
             <div class="status-title">目前進度</div>
@@ -143,22 +132,11 @@
           </div>
           <div class="status-box">
             <div class="status-title">我的表現</div>
-            <div id="gameStatusText" class="small">已完成情境：0 / 13｜使用提示：0 次｜使用冷靜模式：0 次</div>
+            <div id="gameStatusText" class="small">已完成情境：0 / 8｜使用提示：0 次｜使用冷靜模式：0 次</div>
             <div class="achievement-row" id="achievementRow"><div class="achievement-pill">我的練習模式</div></div>
           </div>
         </div>
-
         <div class="game-layout" style="grid-template-columns: 1fr; max-width: 780px; margin-left:auto; margin-right:auto;">
-          <div class="side-column left-column" style="display:none;">
-            <div class="avatar-panel animate-in">
-              <div class="character-card-badge">我的角色</div>
-              <div class="avatar" id="characterAvatar">🧑</div>
-              <div class="avatar-name" id="characterName">我</div>
-              <div class="avatar-role" id="characterRole">學生</div>
-              <div class="character-info" id="characterInfo"><strong>現在要做的事：</strong><br>先從情境選擇頁開始你的社交練習。</div>
-            </div>
-          </div>
-
           <div class="dialogue-area center-column">
             <div class="question-tracker" id="questionTracker" aria-live="polite">
               <div class="question-tracker-main">
@@ -173,26 +151,18 @@
                 <span class="question-pill" data-q="5">5</span>
               </div>
             </div>
-
             <div class="dialogue-box animate-in" id="asdBox">這裡會顯示情境故事、問題和結果。</div>
             <div id="sceneMeta" class="scene-meta hidden"></div>
             <div id="hintBox" class="hint-box hidden"></div>
             <div id="calmBox" class="calm-box hidden"></div>
             <div id="reviewBoxInline" class="review-box hidden"></div>
             <div class="choice-grid" id="asdChoices"></div>
-
             <div class="action-row">
               <button class="secondary" onclick="showHint()">看看提示</button>
               <button class="secondary" onclick="showCalmMode()">先冷靜一下</button>
               <button class="secondary" onclick="repeatCurrentText()">再讀一次題目</button>
               <button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
             </div>
-          </div>
-
-          <div class="side-column right-column" style="display:none;">
-            <div class="review-panel animate-in"><div class="panel-badge">我的作答紀錄</div><h3>最近的選擇</h3><p class="small">這裡會顯示你最近幾題的作答。</p><div class="review-list" id="reviewList"><div class="review-item">你還未開始練習。</div></div></div>
-            <div class="help-panel animate-in"><div class="panel-badge">小提醒</div><div class="quick-notes-list" id="quickNotesList"></div></div>
-            <div class="journal-panel animate-in"><div class="panel-badge">我的反思</div><p class="small">完成情境後，可以寫下：你最想記住什麼？下次想怎樣做得更好？</p><textarea id="journalInput" placeholder="例如：下次我想先深呼吸，再慢慢說出自己的想法。"></textarea><div class="journal-actions"><button onclick="saveJournal()">儲存反思</button><button class="secondary" onclick="loadJournalToBox()">查看最近反思</button></div></div>
           </div>
         </div>
       </div>
@@ -202,9 +172,6 @@
   <footer>樂善堂梁銶琚書院（梁書）｜校園社交練習學生版</footer>
 
   <script src="script.js"></script>
-  <script src="extra-scenarios-loader.js"></script>
-  <script src="background-view.js"></script>
-  <!-- social-upgrades.js is temporarily disabled because it caused the page to become unresponsive. -->
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
@@ -213,103 +180,16 @@
         if (screen) screen.classList.toggle('active', id === screenId);
       });
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
-      if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
 
-    function showCoverScreen() {
-      setActiveScreen('coverScreen', 'cover');
-    }
-
-    function showBadgeScreen() {
-      if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
-      if (typeof renderBadges === 'function') renderBadges();
-      setActiveScreen('badgeScreen', 'badge');
-    }
-
-    function showSettingsScreen() {
-      setActiveScreen('settingsScreen', 'settings');
-    }
-
-    function showSituationScreen() {
-      if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
-      setActiveScreen('situationScreen', 'situation');
-    }
-
-    function hasRiskyRecentAnswer() {
-      try {
-        const history = Array.isArray(appState && appState.reviewHistory) ? appState.reviewHistory.slice(-5) : [];
-        const riskyWords = /打架|打人|推人|搶|搶回|報復|翻臉|威脅|大聲|鬧|罵|侮辱|嘲笑|取笑|欺凌|不理|忽視|違反|破壞|真係好煩|唔好再搵我|偷我嘢|質問|爭辯|駁嘴|拍桌|故意不聽|叫其他同學一起不聽課/;
-        return history.some((item) => {
-          const text = JSON.stringify(item || '');
-          return (item && item.score === 0) || /"score"\s*:\s*0/.test(text) || riskyWords.test(text);
-        });
-      } catch (e) {
-        return false;
-      }
-    }
-
-    function addConsequenceReminderToResult() {
-      const box = document.getElementById('asdBox');
-      const choices = document.getElementById('asdChoices');
-      if (!box || box.querySelector('.consequence-reminder')) return;
-
-      const boxText = box.innerText || '';
-      const choicesEmpty = !choices || choices.children.length === 0;
-      const looksLikeResult = choicesEmpty && /完成|結果|星|表現|總結|恭喜|徽章|再選另一個情境/.test(boxText);
-      if (!looksLikeResult) return;
-
-      const risky = hasRiskyRecentAnswer();
-      const reminder = document.createElement('div');
-      reminder.className = risky ? 'result-improve consequence-reminder' : 'result-good consequence-reminder';
-      reminder.style.marginTop = '14px';
-      reminder.style.textAlign = 'left';
-
-      if (risky) {
-        reminder.innerHTML = `
-          <strong>⚠️ 後果提醒</strong><br>
-          如果在真實校園生活中選擇打架、搶回物品、侮辱或嘲笑同學、故意破壞課室規則，可能會令事情變得更嚴重，也可能需要由老師或訓輔組跟進；嚴重時有機會被記缺點。<br>
-          <strong>下次可以試：</strong>先停一停、深呼吸、用平靜語氣說出需要，或請老師協助處理。
-        `;
-      } else {
-        reminder.innerHTML = `
-          <strong>✅ 行為提醒</strong><br>
-          你剛才的選擇較能保持禮貌和安全。記住，在校園社交中，避免打架、辱罵、嘲笑同學或破壞課室規則，可以減少衝突，也能避免被老師處理或有機會記缺點。
-        `;
-      }
-
-      box.appendChild(reminder);
-    }
-
-    function startConsequenceReminderWatcher() {
-      const box = document.getElementById('asdBox');
-      if (!box || box.__consequenceWatcherInstalled) return;
-      box.__consequenceWatcherInstalled = true;
-
-      const observer = new MutationObserver(() => {
-        setTimeout(addConsequenceReminderToResult, 80);
-      });
-      observer.observe(box, { childList: true, subtree: true, characterData: true });
-    }
-
-    function forceStartAtCoverPage() {
-      setActiveScreen('coverScreen', 'cover');
-      try {
-        const raw = localStorage.getItem('asd_school_rpg_v5');
-        if (raw) {
-          const saved = JSON.parse(raw);
-          if (saved && saved.appState) {
-            saved.appState.currentScreen = 'cover';
-            localStorage.setItem('asd_school_rpg_v5', JSON.stringify(saved));
-          }
-        }
-      } catch (e) {}
-    }
+    function showCoverScreen() { setActiveScreen('coverScreen', 'cover'); }
+    function showBadgeScreen() { if (typeof renderBadges === 'function') renderBadges(); setActiveScreen('badgeScreen', 'badge'); }
+    function showSettingsScreen() { setActiveScreen('settingsScreen', 'settings'); }
+    function showSituationScreen() { setActiveScreen('situationScreen', 'situation'); }
 
     window.addEventListener('load', function () {
-      if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
-      startConsequenceReminderWatcher();
-      setTimeout(forceStartAtCoverPage, 100);
+      showCoverScreen();
     });
   </script>
 </body>
