@@ -25,6 +25,7 @@
           <p>本工具為樂善堂梁銶琚書院（梁書）校園情境而設，協助學生透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人、小組合作、向老師求助、加入同學，以及確認功課。</p>
           <div class="menu-actions">
             <button onclick="showSituationScreen()">開始練習</button>
+            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
             <button class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
@@ -48,6 +49,7 @@
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
+            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -86,6 +88,72 @@
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
+            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="phraseLibraryScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">社交句式庫</div>
+          <div class="hero-avatar">💬</div>
+          <h2>社交句式庫</h2>
+          <p>這裡是一些梁書校園生活常用句式。學生可以先讀熟，再在情境練習中使用。</p>
+
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3>🗣️ 打招呼 / 開始對話</h3>
+              <p>早晨，我想同你打個招呼。</p>
+              <p>你好，我可以坐喺附近嗎？</p>
+              <p>你今日上邊一課呀？</p>
+              <p>我想問下你啱啱老師講咗咩？</p>
+            </div>
+
+            <div class="settings-card">
+              <h3>🙅 禮貌拒絕</h3>
+              <p>多謝你邀請我，但我而家想休息一陣。</p>
+              <p>我今日未必參加到，下次再一齊可以嗎？</p>
+              <p>我而家想自己安靜一陣，多謝你明白。</p>
+              <p>我唔係唔鍾意你哋，只係而家有少少攰。</p>
+            </div>
+
+            <div class="settings-card">
+              <h3>🛡️ 表達不舒服 / 設立界線</h3>
+              <p>你咁講我會唔舒服，請你唔好再講。</p>
+              <p>我唔鍾意人未問我就攞我嘅嘢。</p>
+              <p>我需要少少空間，請你停一停。</p>
+              <p>如果你想借，可以先問我。</p>
+            </div>
+
+            <div class="settings-card">
+              <h3>🙋 向老師 / 社工求助</h3>
+              <p>老師，我想請你幫一幫我。</p>
+              <p>我而家有少少唔知點處理，可以同你講嗎？</p>
+              <p>剛才有同學令我不舒服，我想請你協助。</p>
+              <p>我想冷靜一下，可以去安全位置嗎？</p>
+            </div>
+
+            <div class="settings-card">
+              <h3>🤝 小組合作 / 接受不同意見</h3>
+              <p>我有一個簡單想法，想分享一下。</p>
+              <p>我明白你嘅意思，我哋可唔可以比較兩個方法？</p>
+              <p>你覺得邊一部分需要改？</p>
+              <p>咁我負責呢部分，可以嗎？</p>
+            </div>
+
+            <div class="settings-card">
+              <h3>🌱 道歉 / 修補關係</h3>
+              <p>對不起，我剛才語氣太急。</p>
+              <p>我頭先太緊張，所以講得唔清楚。</p>
+              <p>我想重新講一次，可以嗎？</p>
+              <p>多謝你提醒我，我下次會留意。</p>
+            </div>
+          </div>
+
+          <div class="welcome-actions">
+            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
+            <button onclick="showSituationScreen()">前往情境選擇</button>
+            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
       </div>
@@ -108,6 +176,7 @@
           </div>
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
+            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
             <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
@@ -120,6 +189,7 @@
         <p>完成這個情境後，你可以再選另一個情境繼續練習。</p>
         <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
           <button onclick="showSituationScreen()">選擇其他情境</button>
+          <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
           <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
           <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
@@ -132,7 +202,7 @@
           </div>
           <div class="status-box">
             <div class="status-title">我的表現</div>
-            <div id="gameStatusText" class="small">已完成情境：0 / 8｜使用提示：0 次｜使用冷靜模式：0 次</div>
+            <div id="gameStatusText" class="small">已完成情境：0 / 18｜使用提示：0 次｜使用冷靜模式：0 次</div>
             <div class="achievement-row" id="achievementRow"><div class="achievement-pill">我的練習模式</div></div>
           </div>
         </div>
@@ -175,7 +245,7 @@
   <script src="extra-scenarios-light.js"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
-      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'situationScreen', 'gameScreen'];
+      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
       screenIds.forEach((id) => {
         const screen = document.getElementById(id);
         if (screen) screen.classList.toggle('active', id === screenId);
@@ -187,6 +257,7 @@
     function showCoverScreen() { setActiveScreen('coverScreen', 'cover'); }
     function showBadgeScreen() { if (typeof renderBadges === 'function') renderBadges(); setActiveScreen('badgeScreen', 'badge'); }
     function showSettingsScreen() { setActiveScreen('settingsScreen', 'settings'); }
+    function showPhraseLibraryScreen() { setActiveScreen('phraseLibraryScreen', 'phraseLibrary'); }
     function showSituationScreen() { setActiveScreen('situationScreen', 'situation'); }
 
     window.addEventListener('load', function () {
