@@ -1,10 +1,14 @@
 // /scenario-images-light.js
 // Lightweight scenario image display.
 // Uses /images/*.jpg files. No MutationObserver, no repeated interval, no extra module loader.
-// Each scenario now has its own unique image filename.
+// Each scenario has its own unique image filename.
 // If an image has not been uploaded yet, it will simply be hidden until the file exists.
 
 (function () {
+  // Change this value when replacing images with the same filename.
+  // It forces browsers and GitHub Pages to fetch the newest image instead of using the cached one.
+  const IMAGE_VERSION = '2026-04-29-v2';
+
   const scenarioImageMap = {
     start: 'images/start-conversation.jpg',
     refuse: 'images/polite-refusal.jpg',
@@ -57,6 +61,11 @@
 
   let activeScenarioKey = '';
 
+  function withImageVersion(src) {
+    if (!src) return '';
+    return src + '?v=' + encodeURIComponent(IMAGE_VERSION);
+  }
+
   function injectImageStyles() {
     if (document.getElementById('scenarioImagesLightStyle')) return;
     const style = document.createElement('style');
@@ -108,7 +117,6 @@
 
   function addImagesToScenarioCards() {
     document.querySelectorAll('.scenario-card').forEach((card) => {
-      if (card.dataset.imageAdded === 'true') return;
       const button = card.querySelector('button[onclick*="startAsdGame"]');
       if (!button) return;
 
@@ -120,17 +128,29 @@
       const imageSrc = getImageForKey(key);
       if (!imageSrc) return;
 
-      const img = document.createElement('img');
-      img.className = 'scenario-thumb';
-      img.src = imageSrc;
+      const versionedSrc = withImageVersion(imageSrc);
+      let img = card.querySelector('img.scenario-thumb');
+
+      if (!img) {
+        img = document.createElement('img');
+        img.className = 'scenario-thumb';
+        img.loading = 'lazy';
+        card.insertBefore(img, card.firstChild);
+      }
+
+      // Always update the image source and alt text.
+      // This fixes old inserted images staying on screen after changing the mapping or uploading a new file.
+      if (img.getAttribute('src') !== versionedSrc) {
+        img.style.display = 'block';
+        img.src = versionedSrc;
+      }
       img.alt = getAltForKey(key);
-      img.loading = 'lazy';
       img.onerror = function () {
         img.style.display = 'none';
       };
 
-      card.insertBefore(img, card.firstChild);
       card.dataset.imageAdded = 'true';
+      card.dataset.imageKey = key;
     });
   }
 
@@ -169,7 +189,7 @@
 
     box.classList.remove('hidden');
     box.innerHTML = `
-      <img src="${imageSrc}" alt="${getAltForKey(activeScenarioKey)}" loading="lazy" onerror="this.parentElement.classList.add('hidden')">
+      <img src="${withImageVersion(imageSrc)}" alt="${getAltForKey(activeScenarioKey)}" loading="lazy" onerror="this.parentElement.classList.add('hidden')">
       ${title ? `<div class="game-scenario-image-caption">${title}</div>` : ''}
     `;
   }
