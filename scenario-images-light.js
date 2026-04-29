@@ -18,14 +18,16 @@
     disagree: 'images/disagree.jpg',
     teacherReminder: 'images/teacher-reminder.jpg',
 
-    queueJump: 'images/emotion-reminder.jpg',
-    peGrouping: 'images/emotion-reminder.jpg',
+    // Extra scenarios use the closest matching existing image file.
+    // This avoids repeating emotion-reminder.jpg too often while you do not yet have unique images for every scenario.
+    queueJump: 'images/bumped.jpg',
+    peGrouping: 'images/groupwork.jpg',
     whatsappIgnored: 'images/homework-check.jpg',
     borrowedNoReturn: 'images/stationery-conflict.jpg',
     lunchSeat: 'images/lunch-join.jpg',
-    jokeConfusion: 'images/emotion-reminder.jpg',
+    jokeConfusion: 'images/disagree.jpg',
     academicOnly: 'images/ask-teacher-help.jpg',
-    lostItem: 'images/emotion-reminder.jpg',
+    lostItem: 'images/homework-check.jpg',
     groupRole: 'images/groupwork.jpg'
   };
 
@@ -41,7 +43,16 @@
     teasing: '學生被取笑時保持冷靜的情境圖',
     bumped: '學生在走廊被撞到的情境圖',
     disagree: '學生在小組中面對不同意見的情境圖',
-    teacherReminder: '學生被老師提醒後修正行為的情境圖'
+    teacherReminder: '學生被老師提醒後修正行為的情境圖',
+    queueJump: '學生在排隊時遇到插隊的情境圖',
+    peGrouping: '學生在體育堂分組時嘗試加入同學的情境圖',
+    whatsappIgnored: '學生在班群確認功課的情境圖',
+    borrowedNoReturn: '學生提醒同學歸還文具的情境圖',
+    lunchSeat: '學生午飯時嘗試加入同學的情境圖',
+    jokeConfusion: '學生分辨玩笑和誤會的情境圖',
+    academicOnly: '學生使用學習助手向老師求助的情境圖',
+    lostItem: '學生冷靜處理遺失物品的情境圖',
+    groupRole: '學生在小組中確認分工的情境圖'
   };
 
   let activeScenarioKey = '';
