@@ -245,6 +245,7 @@
   <script src="extra-scenarios-light.js?v=20260429-2"></script>
   <script src="scenario-images-light.js?v=20260429-3"></script>
   <script src="scenario-cleanup.js?v=20260429-4"></script>
+  <script src="scenario-filters.js?v=20260429-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -256,6 +257,7 @@
       if (screenId === 'situationScreen') {
         if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 80);
         if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 120);
+        if (typeof initScenarioFilters === 'function') setTimeout(initScenarioFilters, 160);
       }
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
