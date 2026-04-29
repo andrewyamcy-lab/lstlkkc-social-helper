@@ -31,8 +31,14 @@
     peGrouping: ['group', 'classmates'],
     whatsappIgnored: ['online', 'emotion'],
     academicOnly: ['responsibility', 'teacher'],
-    lostItem: ['responsibility', 'emotion']
+    lostItem: ['responsibility', 'emotion'],
+
+    copyHomework: ['responsibility', 'classmates'],
+    quietSpace: ['emotion'],
+    losingGame: ['emotion', 'group', 'classmates']
   };
+
+  const REMOVED_KEYS = ['lunchSeat', 'borrowedNoReturn', 'groupRole', 'jokeConfusion'];
 
   let activeCategory = 'all';
 
@@ -164,6 +170,13 @@
     });
   }
 
+  function getValidCards() {
+    return Array.from(document.querySelectorAll('.scenario-card')).filter(function (card) {
+      const key = getScenarioKeyFromCard(card);
+      return key && !REMOVED_KEYS.includes(key);
+    });
+  }
+
   function updateCountNote(visible, total) {
     const note = document.getElementById('scenarioCountNote');
     if (!note) return;
@@ -177,8 +190,15 @@
 
   function applyScenarioFilter(category) {
     activeCategory = category || 'all';
-    const cards = Array.from(document.querySelectorAll('.scenario-card'));
+    const cards = getValidCards();
     let visible = 0;
+
+    document.querySelectorAll('.scenario-card').forEach(function (card) {
+      const key = getScenarioKeyFromCard(card);
+      if (REMOVED_KEYS.includes(key)) {
+        card.classList.add('filtered-out');
+      }
+    });
 
     cards.forEach(function (card) {
       const categories = getCardCategories(card);
@@ -189,6 +209,7 @@
 
     updateActiveButton();
     updateCountNote(visible, cards.length);
+    if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 80);
   }
 
   function initScenarioFilters() {
@@ -206,8 +227,8 @@
     initScenarioFilters();
   }
 
-  // Delayed passes because extra scenarios and cleanup may update cards shortly after load.
   setTimeout(initScenarioFilters, 250);
   setTimeout(initScenarioFilters, 900);
   setTimeout(initScenarioFilters, 1700);
+  setTimeout(initScenarioFilters, 2800);
 })();
