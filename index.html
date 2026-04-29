@@ -243,6 +243,7 @@
 
   <script src="script.js"></script>
   <script src="extra-scenarios-light.js"></script>
+  <script src="scenario-images-light.js"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -251,6 +252,9 @@
         if (screen) screen.classList.toggle('active', id === screenId);
       });
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
+      if (screenId === 'situationScreen' && typeof initScenarioImagesLight === 'function') {
+        setTimeout(initScenarioImagesLight, 80);
+      }
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
     }
 
