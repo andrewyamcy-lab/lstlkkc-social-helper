@@ -1,29 +1,38 @@
 // /header-home-link.js
 // Makes the site header clickable so users can return to the home page.
-// Also adds an RPG 校園地圖 entry point and a clickable mission-map screen.
+// Adds an RPG 校園地圖 entry point using the real school map image.
 
 (function () {
+  const SCHOOL_MAP_IMAGE = 'images/school-map.jpg?v=20260430-1';
+
   const RPG_MISSIONS = [
-    { key: 'start', icon: '🗣️', floor: '3/F', room: '301 課室', title: '課室：發起對話', desc: '主動和同學打招呼，開始簡單對話。' },
-    { key: 'refuse', icon: '🙅', floor: 'G/F', room: '操場', title: '小息：禮貌拒絕', desc: '被邀請玩遊戲時，清楚而友善地拒絕。' },
-    { key: 'conflict', icon: '🧩', floor: '3/F', room: '302 課室', title: '借文具：處理衝突', desc: '同學未經同意拿了你的筆，學習表達界線。' },
-    { key: 'respond', icon: '💬', floor: '3/F', room: '303 課室', title: '放學前：作出回應', desc: '同學分享開心事時，學習聆聽和回應。' },
-    { key: 'groupwork', icon: '🤝', floor: '6/F', room: '小組教室', title: '小組：加入合作', desc: '在分組活動裡，找到時機加入和表達想法。' },
-    { key: 'help', icon: '🙋', floor: '5/F', room: '教員室附近', title: '課堂中：向老師求助', desc: '聽不明白時，練習用清楚方式向老師求助。' },
-    { key: 'lunch', icon: '🍱', floor: '3/F', room: '小食部', title: '午飯時間：加入同學', desc: '想加入同學一起吃飯時，學習自然地開口。' },
-    { key: 'homework', icon: '📚', floor: '1/F', room: '101 課室', title: '放學後：確認功課', desc: '不確定功課內容時，學習向同學清楚確認。' },
-    { key: 'teasing', icon: '🛡️', floor: '6/F', room: '走廊', title: '被同學取笑：保持冷靜', desc: '被取笑時，學習表達不舒服和求助。' },
-    { key: 'bumped', icon: '🚶', floor: '4/F', room: '樓梯 / 走廊', title: '轉堂被撞：控制反應', desc: '被撞到時，分辨意外和故意。' },
-    { key: 'disagree', icon: '🧠', floor: '6/F', room: '小組教室', title: '意見不同：接受分歧', desc: '小組討論被否定時，學習彈性思考。' },
-    { key: 'teacherReminder', icon: '📋', floor: '4/F', room: '課室', title: '老師提醒：接受指正', desc: '被老師提醒時，學習修正行為。' },
-    { key: 'queueJump', icon: '🧃', floor: '3/F', room: '小食部', title: '小賣部排隊：有人打尖', desc: '有人插隊時，學習平靜提醒。' },
-    { key: 'peGrouping', icon: '🏀', floor: 'G/F', room: '操場', title: '體育堂分組：未被邀請', desc: '分組時未被邀請，練習主動加入和求助。' },
-    { key: 'whatsappIgnored', icon: '📱', floor: '8/F', room: '電腦室', title: '班群訊息：沒有人回覆', desc: '問功課沒有人即時回覆，練習等待和清楚發問。' },
-    { key: 'academicOnly', icon: '🎓', floor: '8/F', room: '圖書館', title: '學業問題：只想問功課', desc: '想集中學業問題時，學習清楚表達。' },
-    { key: 'lostItem', icon: '🗂️', floor: 'G/F', room: '校務處 / 走廊', title: '文件袋不見了：冷靜處理', desc: '遺失物品時，學習回想、求助和跟進。' },
-    { key: 'copyHomework', icon: '📝', floor: '1/F', room: '課室', title: '同學叫你借功課：拒絕抄襲', desc: '同學想抄你的功課時，學習堅定但有禮貌地拒絕。' },
-    { key: 'quietSpace', icon: '🌿', floor: '2/F', room: '輔導室 / 社工室', title: '小息太嘈：需要安靜空間', desc: '環境太嘈時，學習表達需要和安全離開。' },
-    { key: 'losingGame', icon: '🏆', floor: 'G/F', room: '操場', title: '比賽輸了：接受結果', desc: '輸了時，學習處理失望和保持風度。' }
+    { key: 'start', icon: '🗣️', floor: '3/F', room: '301 課室', x: 24.8, y: 54.4, title: '課室：發起對話', desc: '主動和同學打招呼，開始簡單對話。' },
+    { key: 'conflict', icon: '🧩', floor: '3/F', room: '302 課室', x: 27.1, y: 54.4, title: '借文具：處理衝突', desc: '同學未經同意拿了你的筆，學習平靜表達界線。' },
+    { key: 'respond', icon: '💬', floor: '3/F', room: '303 課室', x: 29.4, y: 54.4, title: '放學前：作出回應', desc: '同學開心分享事情時，學習聆聽和回應。' },
+    { key: 'lunch', icon: '🍱', floor: '3/F', room: '小食部', x: 77.0, y: 55.5, title: '午飯時間：加入同學', desc: '想加入同學一起吃飯時，學習自然地開口。' },
+    { key: 'queueJump', icon: '🧃', floor: '3/F', room: '小食部', x: 79.0, y: 55.5, title: '小賣部排隊：有人打尖', desc: '排隊買食物時有人插隊，學習平靜提醒。' },
+
+    { key: 'bumped', icon: '🚶', floor: '4/F', room: '樓梯 / 走廊', x: 69.6, y: 47.4, title: '轉堂被撞：控制反應', desc: '走廊很多人時被撞到，練習分辨意外和故意。' },
+    { key: 'teacherReminder', icon: '📋', floor: '4/F', room: '課室', x: 26.0, y: 47.2, title: '老師提醒：接受指正', desc: '上課被老師提醒時，學習修正行為。' },
+
+    { key: 'help', icon: '🙋', floor: '5/F', room: '教員室附近', x: 34.8, y: 39.0, title: '課堂中：向老師求助', desc: '聽不明白時，練習用清楚方式向老師求助。' },
+
+    { key: 'groupwork', icon: '🤝', floor: '6/F', room: '小組教室', x: 33.5, y: 32.0, title: '小組：加入合作', desc: '在分組活動裡，找到時機加入和表達想法。' },
+    { key: 'teasing', icon: '🛡️', floor: '6/F', room: '走廊', x: 47.2, y: 31.8, title: '被同學取笑：保持冷靜', desc: '被同學取笑說話方式時，學習表達不舒服和求助。' },
+    { key: 'disagree', icon: '🧠', floor: '6/F', room: '小組教室', x: 50.0, y: 32.0, title: '意見不同：接受分歧', desc: '小組討論被否定時，學習彈性思考。' },
+
+    { key: 'whatsappIgnored', icon: '📱', floor: '8/F', room: '電腦室', x: 51.0, y: 14.5, title: '班群訊息：沒有人回覆', desc: '問功課沒有人即時回覆，練習等待和清楚發問。' },
+    { key: 'academicOnly', icon: '🎓', floor: '8/F', room: '圖書館', x: 58.0, y: 14.0, title: '學業問題：只想問功課', desc: '想集中學業問題時，學習清楚表達。' },
+
+    { key: 'homework', icon: '📚', floor: '1/F', room: '101 課室', x: 21.0, y: 72.0, title: '放學後：確認功課', desc: '不確定功課內容時，學習向同學清楚確認。' },
+    { key: 'copyHomework', icon: '📝', floor: '1/F', room: '課室', x: 25.0, y: 72.0, title: '同學叫你借功課：拒絕抄襲', desc: '同學想抄你的功課時，學習堅定但有禮貌地拒絕。' },
+
+    { key: 'quietSpace', icon: '🌿', floor: '2/F', room: '輔導室 / 社工室', x: 51.0, y: 63.5, title: '小息太嘈：需要安靜空間', desc: '小息環境太嘈時，學習表達需要和安全離開。' },
+
+    { key: 'refuse', icon: '🙅', floor: 'G/F', room: '操場', x: 94.2, y: 54.6, title: '小息：禮貌拒絕', desc: '被同學邀請玩遊戲時，清楚而友善地拒絕。' },
+    { key: 'peGrouping', icon: '🏀', floor: 'G/F', room: '操場', x: 96.0, y: 55.8, title: '體育堂分組：未被邀請', desc: '分組時未被邀請，練習主動加入和求助。' },
+    { key: 'lostItem', icon: '🗂️', floor: 'G/F', room: '校務處 / 走廊', x: 34.7, y: 39.8, title: '文件袋不見了：冷靜處理', desc: '遺失物品時，學習回想、求助和跟進。' },
+    { key: 'losingGame', icon: '🏆', floor: 'G/F', room: '操場', x: 95.0, y: 57.8, title: '比賽輸了：接受結果', desc: '體育或班際活動輸了時，練習處理失望和保持風度。' }
   ];
 
   function escapeHtml(value) {
@@ -60,28 +69,17 @@
     const style = document.createElement('style');
     style.id = 'rpgMapStyle';
     style.textContent = `
-      .rpg-map-shell {
-        text-align: left;
-      }
-
-      .rpg-map-header {
-        text-align: center;
-        margin-bottom: 18px;
-      }
-
+      .rpg-map-shell { text-align: left; }
+      .rpg-map-header { text-align: center; margin-bottom: 18px; }
       .rpg-map-board {
         position: relative;
         overflow: hidden;
         border-radius: 30px;
-        padding: 20px;
-        background:
-          radial-gradient(circle at 12% 18%, rgba(255, 214, 10, 0.22), transparent 24%),
-          radial-gradient(circle at 86% 22%, rgba(0, 122, 255, 0.22), transparent 26%),
-          linear-gradient(135deg, rgba(255,255,255,0.74), rgba(255,255,255,0.38));
+        padding: 18px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.42));
         border: 1px solid rgba(255,255,255,0.68);
         box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.78);
       }
-
       .rpg-map-title-row {
         display: flex;
         align-items: center;
@@ -90,156 +88,124 @@
         flex-wrap: wrap;
         margin-bottom: 14px;
       }
-
-      .rpg-map-floor-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-      }
-
-      .rpg-floor-card {
-        min-height: 210px;
-        padding: 15px;
-        border-radius: 24px;
-        background: rgba(255,255,255,0.48);
-        border: 1px solid rgba(255,255,255,0.66);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.76), 0 10px 24px rgba(29, 53, 87, 0.08);
-      }
-
-      .rpg-floor-title {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 950;
-        color: var(--primary-dark);
-        margin-bottom: 10px;
-      }
-
-      .rpg-room-list {
-        display: grid;
-        gap: 9px;
-      }
-
-      .rpg-room-btn {
+      .rpg-mini-map-note { margin-top: 6px; color: var(--muted); font-size: 0.92rem; }
+      .rpg-real-map-scroll {
         width: 100%;
-        text-align: left;
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 8px 10px;
-        align-items: start;
-        background: rgba(255,255,255,0.62);
-        color: var(--text);
-        border-radius: 18px;
-        padding: 11px 12px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.78), 0 8px 18px rgba(29,53,87,0.07);
+        overflow: auto;
+        border-radius: 24px;
+        background: rgba(255,255,255,0.72);
+        border: 1px solid rgba(255,255,255,0.70);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.76), 0 14px 34px rgba(29,53,87,0.10);
       }
-
-      .rpg-room-btn::before {
+      .rpg-real-map-wrap {
+        position: relative;
+        min-width: 980px;
+        line-height: 0;
+      }
+      .rpg-real-map-img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 22px;
+      }
+      .rpg-map-fallback {
         display: none;
-      }
-
-      .rpg-room-btn:hover {
-        background: rgba(255,255,255,0.84);
-        transform: translateY(-2px) scale(1.01);
-      }
-
-      .rpg-room-icon {
-        font-size: 1.35rem;
-        line-height: 1.2;
-      }
-
-      .rpg-room-main strong {
-        display: block;
-        color: var(--primary-dark);
-        font-size: 0.95rem;
-      }
-
-      .rpg-room-main span {
-        display: block;
+        padding: 28px;
+        text-align: center;
+        line-height: 1.8;
         color: var(--muted);
-        font-size: 0.82rem;
-        line-height: 1.45;
-        margin-top: 2px;
       }
-
+      .rpg-real-map-wrap.map-missing .rpg-real-map-img { display: none; }
+      .rpg-real-map-wrap.map-missing .rpg-map-marker { display: none; }
+      .rpg-real-map-wrap.map-missing .rpg-map-fallback { display: block; }
+      .rpg-map-marker {
+        position: absolute;
+        left: calc(var(--x) * 1%);
+        top: calc(var(--y) * 1%);
+        transform: translate(-50%, -50%);
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 1.25rem;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(230,242,255,0.96));
+        color: var(--primary-dark);
+        border: 3px solid rgba(0,122,255,0.78);
+        box-shadow: 0 8px 22px rgba(0, 87, 217, 0.28), 0 0 0 6px rgba(0,122,255,0.15);
+        z-index: 2;
+      }
+      .rpg-map-marker::before { display: none; }
+      .rpg-map-marker:hover {
+        transform: translate(-50%, -50%) scale(1.13);
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 87, 217, 0.34), 0 0 0 8px rgba(0,122,255,0.18);
+      }
+      .rpg-map-marker::after {
+        content: attr(data-label);
+        position: absolute;
+        left: 50%;
+        top: -36px;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        background: rgba(20, 32, 51, 0.92);
+        color: white;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        padding: 6px 9px;
+        border-radius: 999px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+      }
+      .rpg-map-marker:hover::after { opacity: 1; }
       .rpg-mission-preview {
         margin-top: 16px;
         padding: 16px;
         border-radius: 24px;
-        background: rgba(255,255,255,0.62);
+        background: rgba(255,255,255,0.72);
         border: 1px solid rgba(255,255,255,0.68);
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.76), 0 10px 24px rgba(29, 53, 87, 0.08);
+        line-height: 1.65;
       }
-
-      .rpg-mission-preview.hidden {
-        display: none !important;
-      }
-
-      .rpg-mini-map-note {
-        margin-top: 10px;
-        color: var(--muted);
-        font-size: 0.92rem;
-      }
-
-      @media (max-width: 1060px) {
-        .rpg-map-floor-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
+      .rpg-mission-preview.hidden { display: none !important; }
       @media (max-width: 640px) {
-        .rpg-map-floor-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .rpg-map-board {
-          padding: 14px;
-        }
+        .rpg-map-board { padding: 12px; }
+        .rpg-real-map-wrap { min-width: 900px; }
+        .rpg-map-marker { width: 40px; height: 40px; font-size: 1.15rem; }
       }
     `;
     document.head.appendChild(style);
   }
 
-  function getFloorOrder() {
-    return ['8/F', '7/F', '6/F', '5/F', '4/F', '3/F', '2/F', '1/F', 'G/F'];
+  function buildMissionMarkersHtml() {
+    return RPG_MISSIONS.map(function (mission) {
+      return '<button type="button" class="rpg-map-marker" style="--x:' + mission.x + '; --y:' + mission.y + ';" data-rpg-scenario="' + escapeHtml(mission.key) + '" data-label="' + escapeHtml(mission.room) + '" aria-label="' + escapeHtml(mission.title) + '">' + escapeHtml(mission.icon) + '</button>';
+    }).join('');
   }
 
   function buildRpgMapHtml() {
-    const floors = {};
-    RPG_MISSIONS.forEach(function (mission) {
-      if (!floors[mission.floor]) floors[mission.floor] = [];
-      floors[mission.floor].push(mission);
-    });
-
-    const floorHtml = getFloorOrder().filter(function (floor) {
-      return floors[floor] && floors[floor].length;
-    }).map(function (floor) {
-      const missions = floors[floor].map(function (mission) {
-        return '<button type="button" class="rpg-room-btn" data-rpg-scenario="' + escapeHtml(mission.key) + '">' +
-          '<span class="rpg-room-icon">' + escapeHtml(mission.icon) + '</span>' +
-          '<span class="rpg-room-main"><strong>' + escapeHtml(mission.room) + '</strong><span>' + escapeHtml(mission.title) + '</span></span>' +
-        '</button>';
-      }).join('');
-
-      return '<div class="rpg-floor-card">' +
-        '<div class="rpg-floor-title">🗺️ ' + escapeHtml(floor) + '</div>' +
-        '<div class="rpg-room-list">' + missions + '</div>' +
-      '</div>';
-    }).join('');
-
     return '<div class="hero-card animate-in rpg-map-shell">' +
       '<div class="rpg-map-header">' +
         '<div class="tag">RPG 校園地圖</div>' +
         '<div class="hero-avatar">🗺️</div>' +
         '<h2>梁書 RPG 校園任務地圖</h2>' +
-        '<p>請選擇一個地點開始任務。每個地點都對應一個校園社交情境。</p>' +
+        '<p>請在學校地圖上選擇一個任務標記。每個地點都對應一個校園社交情境。</p>' +
       '</div>' +
       '<div class="rpg-map-board">' +
         '<div class="rpg-map-title-row">' +
-          '<div><strong>任務地圖</strong><div class="rpg-mini-map-note">根據梁書校園房間地圖設計：課室、小食部、操場、圖書館、輔導室、社工室等位置。</div></div>' +
+          '<div><strong>任務地圖</strong><div class="rpg-mini-map-note">使用真正學校房間地圖。按地圖上的 Emoji 任務點開始 RPG 任務。</div></div>' +
           '<button class="secondary" type="button" onclick="showSituationScreen()">改用情境列表</button>' +
         '</div>' +
-        '<div class="rpg-map-floor-grid">' + floorHtml + '</div>' +
+        '<div class="rpg-real-map-scroll">' +
+          '<div class="rpg-real-map-wrap" id="rpgRealMapWrap">' +
+            '<img class="rpg-real-map-img" src="' + SCHOOL_MAP_IMAGE + '" alt="樂善堂梁銶琚書院學校房間地圖" onerror="document.getElementById(\'rpgRealMapWrap\').classList.add(\'map-missing\')">' +
+            buildMissionMarkersHtml() +
+            '<div class="rpg-map-fallback"><strong>暫時未找到學校地圖圖片。</strong><br>請把地圖圖片放入 GitHub repo 的 <code>images/school-map.jpg</code>。<br>放好之後重新整理頁面，這裡就會顯示真正學校地圖。</div>' +
+          '</div>' +
+        '</div>' +
         '<div class="rpg-mission-preview hidden" id="rpgMissionPreview"></div>' +
       '</div>' +
       '<div class="welcome-actions">' +
