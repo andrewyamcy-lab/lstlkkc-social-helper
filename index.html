@@ -248,6 +248,7 @@
   <script src="scenario-cleanup.js?v=20260429-4"></script>
   <script src="scenario-filters.js?v=20260429-2"></script>
   <script src="scenario-total-sync.js?v=20260429-1"></script>
+  <script src="answer-randomizer.js?v=20260430-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -261,6 +262,7 @@
         if (typeof initScenarioImagesLight === 'function') setTimeout(initScenarioImagesLight, 100);
         if (typeof removeOverlappingScenarios === 'function') setTimeout(removeOverlappingScenarios, 140);
         if (typeof initScenarioFilters === 'function') setTimeout(initScenarioFilters, 180);
+        if (typeof initAnswerRandomizer === 'function') setTimeout(initAnswerRandomizer, 210);
         if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 240);
       }
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 300);
@@ -275,6 +277,7 @@
 
     window.addEventListener('load', function () {
       showCoverScreen();
+      if (typeof initAnswerRandomizer === 'function') setTimeout(initAnswerRandomizer, 400);
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 700);
     });
   </script>
