@@ -1,6 +1,6 @@
 // /scenarios/background-flow.js
 // 管理「先讀背景 → 開始答題」流程。
-// Stable version: background-flow owns the start wrapper and calls the real game only after the student clicks start.
+// Stable version: choose scenario → read background → click button → Question 1.
 
 (function () {
   let originalStartAsdGame = null;
@@ -95,17 +95,48 @@
 
     if (choices) {
       choices.innerHTML = `
-        <button class="choice-button start-question-button" onclick="window.startQuestionAfterBackground('${escapeHtml(key)}')">
+        <button type="button" class="choice-button start-question-button" id="startQuestionAfterBackgroundBtn" data-scenario-key="${escapeHtml(key)}">
           我已閱讀背景，開始答題
         </button>
       `;
+
+      const button = document.getElementById('startQuestionAfterBackgroundBtn');
+      if (button) {
+        button.addEventListener('click', function () {
+          const scenarioKey = button.getAttribute('data-scenario-key') || activeScenarioKey;
+          window.startQuestionAfterBackground(scenarioKey);
+        });
+      }
     }
 
     return true;
   }
 
+  function findRealStartFunction() {
+    if (typeof originalStartAsdGame === 'function') return originalStartAsdGame;
+
+    if (typeof window.startAsdGame === 'function') {
+      if (typeof window.startAsdGame.__backgroundOriginalStart === 'function') {
+        originalStartAsdGame = window.startAsdGame.__backgroundOriginalStart;
+        return originalStartAsdGame;
+      }
+
+      // Fallback: call current startAsdGame while bypassBackgroundOnce is true.
+      return window.startAsdGame;
+    }
+
+    return null;
+  }
+
   function startRealQuestionFlow(key) {
-    if (typeof originalStartAsdGame !== 'function') return;
+    const startFn = findRealStartFunction();
+    if (typeof startFn !== 'function') {
+      const choices = document.getElementById('asdChoices');
+      if (choices) {
+        choices.innerHTML = '<div class="hint-box">未能開始答題，請重新整理頁面後再試。</div>';
+      }
+      return;
+    }
 
     activeScenarioKey = key;
     bypassBackgroundOnce = true;
@@ -116,7 +147,7 @@
     }
 
     try {
-      originalStartAsdGame(key);
+      startFn.call(window, key);
     } finally {
       bypassBackgroundOnce = false;
     }
@@ -188,7 +219,12 @@
 
   function patchStartGameForBackground() {
     if (typeof window.startAsdGame !== 'function') return;
-    if (window.startAsdGame.__backgroundFirstPatched || window.startAsdGame.__modularBackgroundPatched) return;
+    if (window.startAsdGame.__backgroundFirstPatched || window.startAsdGame.__modularBackgroundPatched) {
+      if (typeof window.startAsdGame.__backgroundOriginalStart === 'function') {
+        originalStartAsdGame = window.startAsdGame.__backgroundOriginalStart;
+      }
+      return;
+    }
 
     originalStartAsdGame = window.startAsdGame;
 
@@ -205,6 +241,7 @@
 
     patched.__backgroundFirstPatched = true;
     patched.__modularBackgroundPatched = true;
+    patched.__backgroundOriginalStart = originalStartAsdGame;
     window.startAsdGame = patched;
   }
 
