@@ -4,6 +4,7 @@
 // Updated: after choosing an answer, it automatically goes to the next question.
 // Feedback appears together at the end.
 // Final result uses 3-star rating instead of numeric score.
+// Final page includes a Try Again button.
 
 (function () {
   let activeScenarioKey = '';
@@ -329,6 +330,11 @@
     '</div>';
   }
 
+  function tryAgainCurrentScenario() {
+    if (!activeScenarioKey) return;
+    showBackgroundFirst(activeScenarioKey);
+  }
+
   function renderFinish() {
     setTrackerDone();
     clearSupportBoxes();
@@ -361,8 +367,14 @@
 
     if (choices) {
       choices.innerHTML =
-        '<button type="button" class="choice-button" onclick="showSituationScreen()">選擇其他情境</button>' +
+        '<button type="button" class="choice-button" id="tryAgainCurrentScenarioBtn">重新挑戰這個情境</button>' +
+        '<button type="button" class="choice-button secondary" onclick="showSituationScreen()">選擇其他情境</button>' +
         '<button type="button" class="choice-button secondary" onclick="showPhraseLibraryScreen()">前往社交句式庫</button>';
+
+      const tryAgainBtn = document.getElementById('tryAgainCurrentScenarioBtn');
+      if (tryAgainBtn) {
+        tryAgainBtn.addEventListener('click', tryAgainCurrentScenario);
+      }
     }
   }
 
@@ -393,6 +405,7 @@
       renderQuestion(0);
     };
 
+    window.tryAgainCurrentScenario = tryAgainCurrentScenario;
     window.showHint = showHintStandalone;
     window.showCalmMode = showCalmStandalone;
   }
