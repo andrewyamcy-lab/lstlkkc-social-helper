@@ -84,6 +84,196 @@
   font-size: 0.76rem;
 }
 
+/* RPG map classroom mission placement.
+   Real classroom zones on the school map:
+   201-204, 301-304, 401-404, 601-604, 701-704. */
+.rpg-map-marker[data-rpg-scenario="homework"] {
+  --x: 22.0 !important;
+  --y: 64.0 !important;
+}
+.rpg-map-marker[data-rpg-scenario="homework"]::after {
+  content: "201 課室｜放學後：確認功課" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="homework"].is-selected) #rpgMissionPreview {
+  --px: 22.0 !important;
+  --py: 64.0 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="homework"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="homework"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "2/F｜201 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="copyHomework"] {
+  --x: 24.9 !important;
+  --y: 64.0 !important;
+}
+.rpg-map-marker[data-rpg-scenario="copyHomework"]::after {
+  content: "202 課室｜同學叫你借功課：拒絕抄襲" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="copyHomework"].is-selected) #rpgMissionPreview {
+  --px: 24.9 !important;
+  --py: 64.0 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="copyHomework"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="copyHomework"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "2/F｜202 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="start"] {
+  --x: 22.0 !important;
+  --y: 54.4 !important;
+}
+.rpg-map-marker[data-rpg-scenario="start"]::after {
+  content: "301 課室｜課室：發起對話" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="start"].is-selected) #rpgMissionPreview {
+  --px: 22.0 !important;
+  --py: 54.4 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="start"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="start"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "3/F｜301 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="conflict"] {
+  --x: 24.9 !important;
+  --y: 54.4 !important;
+}
+.rpg-map-marker[data-rpg-scenario="conflict"]::after {
+  content: "302 課室｜借文具：處理衝突" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="conflict"].is-selected) #rpgMissionPreview {
+  --px: 24.9 !important;
+  --py: 54.4 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="conflict"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="conflict"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "3/F｜302 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="respond"] {
+  --x: 27.8 !important;
+  --y: 54.4 !important;
+}
+.rpg-map-marker[data-rpg-scenario="respond"]::after {
+  content: "303 課室｜放學前：作出回應" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="respond"].is-selected) #rpgMissionPreview {
+  --px: 27.8 !important;
+  --py: 54.4 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="respond"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="respond"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "3/F｜303 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="teacherReminder"] {
+  --x: 22.0 !important;
+  --y: 46.2 !important;
+}
+.rpg-map-marker[data-rpg-scenario="teacherReminder"]::after {
+  content: "401 課室｜老師提醒：接受指正" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teacherReminder"].is-selected) #rpgMissionPreview {
+  --px: 22.0 !important;
+  --py: 46.2 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teacherReminder"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teacherReminder"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "4/F｜401 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="help"] {
+  --x: 24.9 !important;
+  --y: 46.2 !important;
+}
+.rpg-map-marker[data-rpg-scenario="help"]::after {
+  content: "402 課室｜課堂中：向老師求助" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="help"].is-selected) #rpgMissionPreview {
+  --px: 24.9 !important;
+  --py: 46.2 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="help"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="help"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "4/F｜402 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="groupwork"] {
+  --x: 22.0 !important;
+  --y: 31.7 !important;
+}
+.rpg-map-marker[data-rpg-scenario="groupwork"]::after {
+  content: "601 課室｜小組：加入合作" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="groupwork"].is-selected) #rpgMissionPreview {
+  --px: 22.0 !important;
+  --py: 31.7 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="groupwork"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="groupwork"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "6/F｜601 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="teasing"] {
+  --x: 24.9 !important;
+  --y: 31.7 !important;
+}
+.rpg-map-marker[data-rpg-scenario="teasing"]::after {
+  content: "602 課室｜被同學取笑：保持冷靜" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teasing"].is-selected) #rpgMissionPreview {
+  --px: 24.9 !important;
+  --py: 31.7 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teasing"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teasing"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "6/F｜602 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="disagree"] {
+  --x: 27.8 !important;
+  --y: 31.7 !important;
+}
+.rpg-map-marker[data-rpg-scenario="disagree"]::after {
+  content: "603 課室｜意見不同：接受分歧" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="disagree"].is-selected) #rpgMissionPreview {
+  --px: 27.8 !important;
+  --py: 31.7 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="disagree"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="disagree"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "6/F｜603 課室";
+  font-size: 0.76rem;
+}
+
+.rpg-map-marker[data-rpg-scenario="whatsappIgnored"] {
+  --x: 22.0 !important;
+  --y: 23.2 !important;
+}
+.rpg-map-marker[data-rpg-scenario="whatsappIgnored"]::after {
+  content: "701 課室｜班群訊息：沒有人回覆" !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview {
+  --px: 22.0 !important;
+  --py: 23.2 !important;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "7/F｜701 課室";
+  font-size: 0.76rem;
+}
+
 @media (hover: none) {
   .scenario-card:hover,
   .scenario-card:hover .scenario-thumb,
