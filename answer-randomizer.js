@@ -1,7 +1,7 @@
 // /answer-randomizer.js
 // Randomizes answer option order each time a scenario starts.
 // Scores and feedback notes stay attached to the correct option.
-// No MutationObserver. No interval. Lightweight and safe.
+// Fix: do not re-wrap startAsdGame after background-flow has patched it.
 
 (function () {
   const originalStepCache = {};
@@ -53,8 +53,6 @@
   }
 
   function avoidSameFirstBestOption(originalOptions, shuffledOptions) {
-    // If the original first option was a best answer and the shuffled first option is the same text,
-    // rotate once to reduce the old pattern of "first answer is usually best".
     if (!originalOptions || !shuffledOptions || originalOptions.length < 2 || shuffledOptions.length < 2) return shuffledOptions;
 
     const highestScore = Math.max.apply(null, originalOptions.map(function (option) { return Number(option.score) || 0; }));
@@ -94,7 +92,15 @@
 
   function patchStartAsdGame() {
     if (typeof window.startAsdGame !== 'function') return false;
-    if (window.startAsdGame.__answerRandomizerPatched) return true;
+
+    // Very important:
+    // If background-flow has already patched startAsdGame, do NOT wrap it again.
+    // Otherwise the "start question" button can call the background page again.
+    if (window.__backgroundFlowInstalled || window.startAsdGame.__backgroundFirstPatched || window.startAsdGame.__modularBackgroundPatched) {
+      return true;
+    }
+
+    if (window.startAsdGame.__answerRandomizerPatched || window.__answerRandomizerInstalled) return true;
 
     const originalStartAsdGame = window.startAsdGame;
 
@@ -104,6 +110,7 @@
     };
 
     window.startAsdGame.__answerRandomizerPatched = true;
+    window.__answerRandomizerInstalled = true;
     return true;
   }
 
@@ -120,7 +127,6 @@
     initAnswerRandomizer();
   }
 
-  // One-off delayed patches because other lightweight scripts also wrap startAsdGame.
+  // Only one short delayed pass. Do not keep rewrapping after background-flow loads.
   setTimeout(initAnswerRandomizer, 200);
-  setTimeout(initAnswerRandomizer, 900);
 })();
