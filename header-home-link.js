@@ -1,8 +1,9 @@
 // /header-home-link.js
 // Header home link + RPG 校園地圖 using the real school map image.
+// Updated: mission preview appears beside the clicked map marker like an RPG dialogue card.
 
 (function () {
-  const SCHOOL_MAP_IMAGE = 'images/school-map.jpg?v=20260430-2';
+  const SCHOOL_MAP_IMAGE = 'images/school-map.jpg?v=20260430-3';
 
   const RPG_MISSIONS = [
     { key: 'start', icon: '🗣️', floor: '3/F', room: '301 課室', x: 24.8, y: 54.4, title: '課室：發起對話', desc: '主動和同學打招呼，開始簡單對話。' },
@@ -26,6 +27,29 @@
     { key: 'lostItem', icon: '🗂️', floor: 'G/F', room: '校務處 / 走廊', x: 34.7, y: 39.8, title: '文件袋不見了：冷靜處理', desc: '遺失物品時，學習回想、求助和跟進。' },
     { key: 'losingGame', icon: '🏆', floor: 'G/F', room: '操場', x: 95.0, y: 57.8, title: '比賽輸了：接受結果', desc: '體育或班際活動輸了時，練習處理失望和保持風度。' }
   ];
+
+  const SCENARIO_IMAGES = {
+    start: 'images/start-conversation.jpg',
+    refuse: 'images/polite-refusal.jpg',
+    conflict: 'images/stationery-conflict.jpg',
+    respond: 'images/respond-friend.jpg',
+    groupwork: 'images/groupwork.jpg',
+    help: 'images/ask-teacher-help.jpg',
+    lunch: 'images/lunch-join.jpg',
+    homework: 'images/homework-check.jpg',
+    teasing: 'images/teasing.jpg',
+    bumped: 'images/bumped.jpg',
+    disagree: 'images/disagree.jpg',
+    teacherReminder: 'images/teacher-reminder.jpg',
+    queueJump: 'images/queue-jump.jpg',
+    peGrouping: 'images/pe-grouping.jpg',
+    whatsappIgnored: 'images/whatsapp-ignored.jpg',
+    academicOnly: 'images/academic-only.jpg',
+    lostItem: 'images/lost-item.jpg',
+    copyHomework: 'images/copy-homework.jpg',
+    quietSpace: 'images/quiet-space.jpg',
+    losingGame: 'images/losing-game.jpg'
+  };
 
   function escapeHtml(value) {
     return String(value || '')
@@ -120,7 +144,8 @@
         color: var(--muted);
       }
       .rpg-real-map-wrap.map-missing .rpg-real-map-img { display: none; }
-      .rpg-real-map-wrap.map-missing .rpg-map-marker { display: none; }
+      .rpg-real-map-wrap.map-missing .rpg-map-marker,
+      .rpg-real-map-wrap.map-missing .rpg-floating-preview { display: none; }
       .rpg-real-map-wrap.map-missing .rpg-map-fallback { display: block; }
       .rpg-map-marker {
         position: absolute;
@@ -146,6 +171,15 @@
         z-index: 4;
         animation: rpgMarkerPulse 1.55s ease-in-out infinite;
       }
+      .rpg-map-marker.is-selected {
+        z-index: 30;
+        transform: translate(-50%, -50%) scale(1.18);
+        border-color: #ff6b00;
+        box-shadow:
+          0 18px 36px rgba(255, 107, 0, 0.36),
+          0 0 0 9px rgba(255, 176, 0, 0.36),
+          0 0 0 18px rgba(0, 122, 255, 0.20);
+      }
       .rpg-map-marker::before {
         content: "";
         display: block;
@@ -163,10 +197,6 @@
         transform: translate(-50%, -50%) scale(1.18);
         background: #ffffff;
         z-index: 20;
-        box-shadow:
-          0 18px 36px rgba(0, 87, 217, 0.44),
-          0 0 0 8px rgba(255, 176, 0, 0.32),
-          0 0 0 17px rgba(0, 122, 255, 0.20);
       }
       .rpg-marker-icon {
         font-size: 1.45rem;
@@ -203,16 +233,143 @@
       }
       .rpg-map-marker:hover::after,
       .rpg-map-marker:focus-visible::after { opacity: 1; }
-      .rpg-mission-preview {
-        margin-top: 16px;
-        padding: 18px;
+      .rpg-floating-preview {
+        position: absolute;
+        left: calc(var(--px) * 1%);
+        top: calc(var(--py) * 1%);
+        width: 292px;
+        max-width: 292px;
+        transform: translate(32px, -50%);
+        z-index: 40;
+        line-height: 1.55;
         border-radius: 24px;
-        background: rgba(255,255,255,0.86);
-        border: 2px solid rgba(0,122,255,0.26);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.86), 0 16px 34px rgba(29, 53, 87, 0.12);
-        line-height: 1.65;
+        background:
+          linear-gradient(145deg, rgba(255,255,255,0.96), rgba(235,246,255,0.92)),
+          radial-gradient(circle at 20% 10%, rgba(255,214,10,0.26), transparent 34%);
+        border: 3px solid rgba(255,176,0,0.76);
+        box-shadow:
+          0 24px 60px rgba(29, 53, 87, 0.28),
+          0 0 0 7px rgba(0,122,255,0.12),
+          inset 0 1px 0 rgba(255,255,255,0.88);
+        padding: 12px;
+        animation: rpgCardPop 0.24s ease;
       }
-      .rpg-mission-preview.hidden { display: none !important; }
+      .rpg-floating-preview.left-side {
+        transform: translate(calc(-100% - 32px), -50%);
+      }
+      .rpg-floating-preview.top-side {
+        transform: translate(32px, 0);
+      }
+      .rpg-floating-preview.left-side.top-side {
+        transform: translate(calc(-100% - 32px), 0);
+      }
+      .rpg-floating-preview.bottom-side {
+        transform: translate(32px, -100%);
+      }
+      .rpg-floating-preview.left-side.bottom-side {
+        transform: translate(calc(-100% - 32px), -100%);
+      }
+      .rpg-floating-preview.hidden { display: none !important; }
+      .rpg-floating-preview::before {
+        content: "";
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        transform: translateY(-50%) rotate(45deg);
+        width: 24px;
+        height: 24px;
+        background: rgba(255,255,255,0.96);
+        border-left: 3px solid rgba(255,176,0,0.76);
+        border-bottom: 3px solid rgba(255,176,0,0.76);
+        border-radius: 4px;
+      }
+      .rpg-floating-preview.left-side::before {
+        left: auto;
+        right: -15px;
+        border-left: 0;
+        border-bottom: 0;
+        border-right: 3px solid rgba(255,176,0,0.76);
+        border-top: 3px solid rgba(255,176,0,0.76);
+      }
+      .rpg-preview-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .rpg-preview-tag {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: #0057d9;
+        color: white;
+        font-size: 0.76rem;
+        font-weight: 950;
+      }
+      .rpg-preview-close {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        border-radius: 999px;
+        padding: 0;
+        background: rgba(255,255,255,0.72);
+        color: var(--primary-dark);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 6px 16px rgba(29,53,87,0.08);
+        border: 1px solid rgba(0,122,255,0.18);
+      }
+      .rpg-preview-close::before { display: none; }
+      .rpg-preview-body {
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: 10px;
+        align-items: start;
+      }
+      .rpg-preview-image {
+        width: 92px;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 18px;
+        border: 2px solid rgba(255,176,0,0.42);
+        background: #eef6ff;
+        box-shadow: 0 8px 18px rgba(29,53,87,0.10);
+      }
+      .rpg-preview-content h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+        line-height: 1.35;
+        color: var(--text);
+      }
+      .rpg-preview-content p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.5;
+      }
+      .rpg-preview-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .rpg-preview-actions button {
+        padding: 9px 12px;
+        border-radius: 14px;
+        font-size: 0.86rem;
+      }
+      @keyframes rpgCardPop {
+        from { opacity: 0; transform: translate(20px, -50%) scale(0.94); }
+        to { opacity: 1; transform: translate(32px, -50%) scale(1); }
+      }
+      .rpg-floating-preview.left-side {
+        animation-name: rpgCardPopLeft;
+      }
+      @keyframes rpgCardPopLeft {
+        from { opacity: 0; transform: translate(calc(-100% - 20px), -50%) scale(0.94); }
+        to { opacity: 1; transform: translate(calc(-100% - 32px), -50%) scale(1); }
+      }
       @keyframes rpgMarkerPulse {
         0%, 100% { filter: brightness(1); }
         50% { filter: brightness(1.12); }
@@ -223,12 +380,16 @@
         100% { transform: scale(1.35); opacity: 0; }
       }
       body.reduced-motion .rpg-map-marker,
-      body.reduced-motion .rpg-map-marker::before { animation: none !important; }
+      body.reduced-motion .rpg-map-marker::before,
+      body.reduced-motion .rpg-floating-preview { animation: none !important; }
       @media (max-width: 640px) {
         .rpg-map-board { padding: 12px; }
         .rpg-real-map-wrap { min-width: 900px; }
         .rpg-map-marker { width: 52px; height: 52px; }
         .rpg-marker-icon { font-size: 1.35rem; }
+        .rpg-floating-preview { width: 268px; max-width: 268px; }
+        .rpg-preview-body { grid-template-columns: 80px 1fr; }
+        .rpg-preview-image { width: 80px; }
       }
     `;
     document.head.appendChild(style);
@@ -261,10 +422,10 @@
           '<div class="rpg-real-map-wrap" id="rpgRealMapWrap">' +
             '<img class="rpg-real-map-img" src="' + SCHOOL_MAP_IMAGE + '" alt="樂善堂梁銶琚書院學校房間地圖" onerror="document.getElementById(\'rpgRealMapWrap\').classList.add(\'map-missing\')">' +
             buildMissionMarkersHtml() +
+            '<div class="rpg-floating-preview hidden" id="rpgMissionPreview"></div>' +
             '<div class="rpg-map-fallback"><strong>暫時未找到學校地圖圖片。</strong><br>請把地圖圖片放入 GitHub repo 的 <code>images/school-map.jpg</code>。<br>放好之後重新整理頁面，這裡就會顯示真正學校地圖。</div>' +
           '</div>' +
         '</div>' +
-        '<div class="rpg-mission-preview hidden" id="rpgMissionPreview"></div>' +
       '</div>' +
       '<div class="welcome-actions">' +
         '<button class="secondary" onclick="showCoverScreen()">返回開始頁</button>' +
@@ -321,22 +482,53 @@
     return RPG_MISSIONS.find(function (mission) { return mission.key === key; });
   }
 
+  function getPreviewPositionClasses(mission) {
+    const classes = [];
+    if (mission.x > 72) classes.push('left-side');
+    if (mission.y < 20) classes.push('top-side');
+    if (mission.y > 78) classes.push('bottom-side');
+    return classes.join(' ');
+  }
+
   function showRpgMissionPreview(key) {
     const mission = getMissionByKey(key);
     const preview = document.getElementById('rpgMissionPreview');
     if (!mission || !preview) return;
 
-    preview.classList.remove('hidden');
-    preview.innerHTML =
-      '<div class="tag">' + escapeHtml(mission.floor) + '｜' + escapeHtml(mission.room) + '</div>' +
-      '<h3>' + escapeHtml(mission.icon + ' ' + mission.title) + '</h3>' +
-      '<p>' + escapeHtml(mission.desc) + '</p>' +
-      '<div class="welcome-actions" style="justify-content:flex-start; margin-top:12px;">' +
-        '<button type="button" onclick="startRpgMission(\'' + escapeHtml(mission.key) + '\')">開始任務</button>' +
-        '<button type="button" class="secondary" onclick="showRpgMapScreen()">返回地圖</button>' +
-      '</div>';
+    document.querySelectorAll('.rpg-map-marker').forEach(function (marker) {
+      marker.classList.toggle('is-selected', marker.dataset.rpgScenario === key);
+    });
 
-    preview.scrollIntoView({ behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth', block: 'nearest' });
+    const image = SCENARIO_IMAGES[mission.key] || 'images/school-map.jpg';
+    const positionClasses = getPreviewPositionClasses(mission);
+
+    preview.className = 'rpg-floating-preview ' + positionClasses;
+    preview.style.setProperty('--px', mission.x);
+    preview.style.setProperty('--py', mission.y);
+    preview.innerHTML =
+      '<div class="rpg-preview-topline">' +
+        '<div class="rpg-preview-tag">' + escapeHtml(mission.floor) + '｜' + escapeHtml(mission.room) + '</div>' +
+        '<button type="button" class="rpg-preview-close" onclick="closeRpgMissionPreview()" aria-label="關閉任務卡">×</button>' +
+      '</div>' +
+      '<div class="rpg-preview-body">' +
+        '<img class="rpg-preview-image" src="' + escapeHtml(image) + '?v=20260430-map" alt="' + escapeHtml(mission.title) + '" onerror="this.style.display=\'none\'">' +
+        '<div class="rpg-preview-content">' +
+          '<h3>' + escapeHtml(mission.icon + ' ' + mission.title) + '</h3>' +
+          '<p>' + escapeHtml(mission.desc) + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rpg-preview-actions">' +
+        '<button type="button" onclick="startRpgMission(\'' + escapeHtml(mission.key) + '\')">開始任務</button>' +
+        '<button type="button" class="secondary" onclick="closeRpgMissionPreview()">關閉</button>' +
+      '</div>';
+  }
+
+  function closeRpgMissionPreview() {
+    const preview = document.getElementById('rpgMissionPreview');
+    if (preview) preview.className = 'rpg-floating-preview hidden';
+    document.querySelectorAll('.rpg-map-marker').forEach(function (marker) {
+      marker.classList.remove('is-selected');
+    });
   }
 
   function startRpgMission(key) {
@@ -375,6 +567,7 @@
 
       const original = window[name];
       window[name] = function () {
+        closeRpgMissionPreview();
         const rpgScreen = document.getElementById('rpgMapScreen');
         if (rpgScreen) rpgScreen.classList.remove('active');
         return original.apply(this, arguments);
@@ -416,6 +609,7 @@
   window.showRpgMapScreen = showRpgMapScreen;
   window.startRpgMission = startRpgMission;
   window.showRpgMissionPreview = showRpgMissionPreview;
+  window.closeRpgMissionPreview = closeRpgMissionPreview;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initHeaderHomeLink);
