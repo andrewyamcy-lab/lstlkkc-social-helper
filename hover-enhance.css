@@ -1,59 +1,106 @@
 /* /hover-enhance.css */
-/* Stronger situation card pop-up hover animation */
+/* Mac Dock inspired situation card focus animation */
 
 .scenario-card {
+  position: relative;
   transition:
-    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 0.28s ease,
-    background 0.28s ease,
-    border-color 0.28s ease,
-    filter 0.28s ease;
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.32s ease,
+    background 0.32s ease,
+    border-color 0.32s ease,
+    filter 0.32s ease,
+    opacity 0.32s ease;
   transform-origin: center center;
   will-change: transform;
 }
 
-.scenario-card:hover {
-  transform: translateY(-10px) scale(1.035);
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 34px 76px rgba(29, 53, 87, 0.24),
-    0 14px 30px rgba(0, 122, 255, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  filter: brightness(1.03);
+/* When one situation card is hovered, make the whole grid feel like a Dock focus area. */
+.scenario-select-grid:has(.scenario-card:hover) .scenario-card {
+  transform: scale(0.96);
+  opacity: 0.78;
+  filter: saturate(0.92) brightness(0.98);
 }
 
-.scenario-card:hover .scenario-thumb {
-  transform: scale(1.025);
+/* Main hovered card: stronger Mac Dock pop-up effect. */
+.scenario-select-grid .scenario-card:hover {
+  z-index: 8;
+  transform: translateY(-18px) scale(1.105);
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.96);
+  filter: saturate(1.08) brightness(1.04);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    0 18px 36px rgba(29, 53, 87, 0.16);
+    0 42px 90px rgba(29, 53, 87, 0.28),
+    0 18px 38px rgba(0, 122, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+/* Nearby-card feeling: cards immediately after the hovered card stay slightly larger than the rest. */
+.scenario-select-grid .scenario-card:hover + .scenario-card {
+  transform: translateY(-8px) scale(1.025);
+  opacity: 0.92;
+  filter: saturate(1.02) brightness(1.01);
+}
+
+/* Nearby-card feeling for the card just before the hovered card. */
+.scenario-select-grid .scenario-card:has(+ .scenario-card:hover) {
+  transform: translateY(-8px) scale(1.025);
+  opacity: 0.92;
+  filter: saturate(1.02) brightness(1.01);
 }
 
 .scenario-thumb {
-  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease;
 }
 
-.scenario-card:hover .emoji {
-  transform: scale(1.12) rotate(-2deg);
+.scenario-card:hover .scenario-thumb {
+  transform: scale(1.045);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    0 22px 44px rgba(29, 53, 87, 0.18);
 }
 
 .scenario-card .emoji {
-  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scenario-card:hover .emoji {
+  transform: scale(1.22) translateY(-2px) rotate(-3deg);
+}
+
+/* Keyboard accessibility: focus gets the same clear pop-up feeling. */
+.scenario-card:focus-within {
+  z-index: 8;
+  transform: translateY(-14px) scale(1.07);
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(0, 122, 255, 0.35);
+  box-shadow:
+    0 36px 76px rgba(29, 53, 87, 0.24),
+    0 14px 30px rgba(0, 122, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 @media (hover: none) {
-  .scenario-card:hover,
+  .scenario-select-grid:has(.scenario-card:hover) .scenario-card,
+  .scenario-select-grid .scenario-card:hover,
+  .scenario-select-grid .scenario-card:hover + .scenario-card,
+  .scenario-select-grid .scenario-card:has(+ .scenario-card:hover),
   .scenario-card:hover .scenario-thumb,
   .scenario-card:hover .emoji {
     transform: none;
+    opacity: 1;
+    filter: none;
   }
 }
 
 body.reduced-motion .scenario-card,
 body.reduced-motion .scenario-card:hover,
 body.reduced-motion .scenario-thumb,
-body.reduced-motion .scenario-card .emoji {
+body.reduced-motion .scenario-card .emoji,
+body.reduced-motion .scenario-card:focus-within {
   transition: none !important;
   transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
 }
