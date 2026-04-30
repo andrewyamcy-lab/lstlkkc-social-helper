@@ -1,11 +1,12 @@
 // /scenarios/background-flow.js
 // 管理「先讀背景 → 開始答題」流程。
-// 注意：現時 extra-scenarios.js 已包含同類流程，本檔案會避免重複 patch。
+// Fix: pressing 「我已閱讀背景，開始答題」 now bypasses the background screen and goes directly to Question 1.
 
 (function () {
   let originalStartAsdGame = null;
   let activeScenarioKey = null;
   let isCleaningQuestionBox = false;
+  let bypassBackgroundOnce = false;
 
   function escapeHtml(value) {
     return String(value || '')
@@ -22,7 +23,7 @@
       return;
     }
 
-    ['coverScreen', 'badgeScreen', 'settingsScreen', 'situationScreen', 'gameScreen'].forEach((id) => {
+    ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'].forEach((id) => {
       const screen = document.getElementById(id);
       if (screen) screen.classList.toggle('active', id === screenId);
     });
@@ -92,7 +93,7 @@
 
     if (choices) {
       choices.innerHTML = `
-        <button class="choice-button start-question-button" onclick="window.startQuestionAfterBackground('${key}')">
+        <button class="choice-button start-question-button" onclick="window.startQuestionAfterBackground('${escapeHtml(key)}')">
           我已閱讀背景，開始答題
         </button>
       `;
@@ -101,13 +102,29 @@
     return true;
   }
 
-  window.startQuestionAfterBackground = function (key) {
-    if (typeof originalStartAsdGame === 'function') {
-      activeScenarioKey = key;
+  function startRealQuestionFlow(key) {
+    if (typeof originalStartAsdGame !== 'function') return;
+
+    activeScenarioKey = key;
+    bypassBackgroundOnce = true;
+
+    try {
       originalStartAsdGame(key);
-      setTimeout(stripBackgroundFromCurrentQuestion, 0);
-      setTimeout(stripBackgroundFromCurrentQuestion, 80);
+    } finally {
+      bypassBackgroundOnce = false;
     }
+
+    const tracker = document.getElementById('questionTracker');
+    if (tracker) tracker.classList.remove('is-waiting');
+
+    // The original game may render immediately or after another wrapper, so clean in a few short passes.
+    setTimeout(stripBackgroundFromCurrentQuestion, 0);
+    setTimeout(stripBackgroundFromCurrentQuestion, 80);
+    setTimeout(stripBackgroundFromCurrentQuestion, 180);
+  }
+
+  window.startQuestionAfterBackground = function (key) {
+    startRealQuestionFlow(key);
   };
 
   function getCurrentQuestionIndex(game) {
@@ -136,6 +153,9 @@
     const hasBackground = game.intro && boxText.includes(game.intro.slice(0, 14));
     const hasPrompt = boxText.includes(prompt);
     const looksLikeQuestionPage = hasPrompt && boxText.includes('第') && boxText.includes('題');
+
+    const tracker = document.getElementById('questionTracker');
+    if (tracker) tracker.classList.remove('is-waiting');
 
     if (!hasBackground || !looksLikeQuestionPage) return;
 
@@ -166,12 +186,17 @@
     originalStartAsdGame = window.startAsdGame;
 
     const patched = function (key) {
+      if (bypassBackgroundOnce) {
+        return originalStartAsdGame.apply(this, arguments);
+      }
+
       if (typeof refreshExtraScenarioUI === 'function') refreshExtraScenarioUI();
       if (typeof applyScenarioVisuals === 'function') applyScenarioVisuals();
       if (showBackgroundFirst(key)) return;
       return originalStartAsdGame.apply(this, arguments);
     };
 
+    patched.__backgroundFirstPatched = true;
     patched.__modularBackgroundPatched = true;
     window.startAsdGame = patched;
   }
@@ -187,6 +212,7 @@
 
   window.showBackgroundFirst = showBackgroundFirst;
   window.stripBackgroundFromCurrentQuestion = stripBackgroundFromCurrentQuestion;
+  window.initBackgroundFlow = initBackgroundFlow;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initBackgroundFlow);
