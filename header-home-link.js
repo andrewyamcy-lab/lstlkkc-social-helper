@@ -1,9 +1,8 @@
 // /header-home-link.js
-// Makes the site header clickable so users can return to the home page.
-// Adds an RPG 校園地圖 entry point using the real school map image.
+// Header home link + RPG 校園地圖 using the real school map image.
 
 (function () {
-  const SCHOOL_MAP_IMAGE = 'images/school-map.jpg?v=20260430-1';
+  const SCHOOL_MAP_IMAGE = 'images/school-map.jpg?v=20260430-2';
 
   const RPG_MISSIONS = [
     { key: 'start', icon: '🗣️', floor: '3/F', room: '301 課室', x: 24.8, y: 54.4, title: '課室：發起對話', desc: '主動和同學打招呼，開始簡單對話。' },
@@ -11,24 +10,17 @@
     { key: 'respond', icon: '💬', floor: '3/F', room: '303 課室', x: 29.4, y: 54.4, title: '放學前：作出回應', desc: '同學開心分享事情時，學習聆聽和回應。' },
     { key: 'lunch', icon: '🍱', floor: '3/F', room: '小食部', x: 77.0, y: 55.5, title: '午飯時間：加入同學', desc: '想加入同學一起吃飯時，學習自然地開口。' },
     { key: 'queueJump', icon: '🧃', floor: '3/F', room: '小食部', x: 79.0, y: 55.5, title: '小賣部排隊：有人打尖', desc: '排隊買食物時有人插隊，學習平靜提醒。' },
-
     { key: 'bumped', icon: '🚶', floor: '4/F', room: '樓梯 / 走廊', x: 69.6, y: 47.4, title: '轉堂被撞：控制反應', desc: '走廊很多人時被撞到，練習分辨意外和故意。' },
     { key: 'teacherReminder', icon: '📋', floor: '4/F', room: '課室', x: 26.0, y: 47.2, title: '老師提醒：接受指正', desc: '上課被老師提醒時，學習修正行為。' },
-
     { key: 'help', icon: '🙋', floor: '5/F', room: '教員室附近', x: 34.8, y: 39.0, title: '課堂中：向老師求助', desc: '聽不明白時，練習用清楚方式向老師求助。' },
-
     { key: 'groupwork', icon: '🤝', floor: '6/F', room: '小組教室', x: 33.5, y: 32.0, title: '小組：加入合作', desc: '在分組活動裡，找到時機加入和表達想法。' },
     { key: 'teasing', icon: '🛡️', floor: '6/F', room: '走廊', x: 47.2, y: 31.8, title: '被同學取笑：保持冷靜', desc: '被同學取笑說話方式時，學習表達不舒服和求助。' },
     { key: 'disagree', icon: '🧠', floor: '6/F', room: '小組教室', x: 50.0, y: 32.0, title: '意見不同：接受分歧', desc: '小組討論被否定時，學習彈性思考。' },
-
     { key: 'whatsappIgnored', icon: '📱', floor: '8/F', room: '電腦室', x: 51.0, y: 14.5, title: '班群訊息：沒有人回覆', desc: '問功課沒有人即時回覆，練習等待和清楚發問。' },
     { key: 'academicOnly', icon: '🎓', floor: '8/F', room: '圖書館', x: 58.0, y: 14.0, title: '學業問題：只想問功課', desc: '想集中學業問題時，學習清楚表達。' },
-
     { key: 'homework', icon: '📚', floor: '1/F', room: '101 課室', x: 21.0, y: 72.0, title: '放學後：確認功課', desc: '不確定功課內容時，學習向同學清楚確認。' },
     { key: 'copyHomework', icon: '📝', floor: '1/F', room: '課室', x: 25.0, y: 72.0, title: '同學叫你借功課：拒絕抄襲', desc: '同學想抄你的功課時，學習堅定但有禮貌地拒絕。' },
-
     { key: 'quietSpace', icon: '🌿', floor: '2/F', room: '輔導室 / 社工室', x: 51.0, y: 63.5, title: '小息太嘈：需要安靜空間', desc: '小息環境太嘈時，學習表達需要和安全離開。' },
-
     { key: 'refuse', icon: '🙅', floor: 'G/F', room: '操場', x: 94.2, y: 54.6, title: '小息：禮貌拒絕', desc: '被同學邀請玩遊戲時，清楚而友善地拒絕。' },
     { key: 'peGrouping', icon: '🏀', floor: 'G/F', room: '操場', x: 96.0, y: 55.8, title: '體育堂分組：未被邀請', desc: '分組時未被邀請，練習主動加入和求助。' },
     { key: 'lostItem', icon: '🗂️', floor: 'G/F', room: '校務處 / 走廊', x: 34.7, y: 39.8, title: '文件袋不見了：冷靜處理', desc: '遺失物品時，學習回想、求助和跟進。' },
@@ -55,8 +47,7 @@
       return;
     }
 
-    const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'rpgMapScreen'];
-    screenIds.forEach(function (id) {
+    ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'rpgMapScreen'].forEach(function (id) {
       const screen = document.getElementById(id);
       if (screen) screen.classList.toggle('active', id === 'coverScreen');
     });
@@ -89,6 +80,19 @@
         margin-bottom: 14px;
       }
       .rpg-mini-map-note { margin-top: 6px; color: var(--muted); font-size: 0.92rem; }
+      .rpg-map-instruction {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        margin: 0 0 12px 0;
+        background: linear-gradient(180deg, rgba(255, 214, 10, 0.30), rgba(255, 159, 10, 0.18));
+        border: 1px solid rgba(255, 159, 10, 0.35);
+        color: #7a4a00;
+        font-weight: 900;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.72), 0 10px 22px rgba(255,159,10,0.12);
+      }
       .rpg-real-map-scroll {
         width: 100%;
         overflow: auto;
@@ -123,58 +127,108 @@
         left: calc(var(--x) * 1%);
         top: calc(var(--y) * 1%);
         transform: translate(-50%, -50%);
-        width: 42px;
-        height: 42px;
-        border-radius: 999px;
+        width: 54px;
+        height: 54px;
+        border-radius: 18px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 1px;
         padding: 0;
-        font-size: 1.25rem;
-        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(230,242,255,0.96));
+        background: linear-gradient(180deg, #fff6c7 0%, #ffffff 45%, #e7f2ff 100%);
         color: var(--primary-dark);
-        border: 3px solid rgba(0,122,255,0.78);
-        box-shadow: 0 8px 22px rgba(0, 87, 217, 0.28), 0 0 0 6px rgba(0,122,255,0.15);
-        z-index: 2;
+        border: 4px solid #ffb000;
+        box-shadow:
+          0 14px 30px rgba(0, 87, 217, 0.34),
+          0 0 0 6px rgba(255, 176, 0, 0.25),
+          0 0 0 13px rgba(0, 122, 255, 0.15);
+        z-index: 4;
+        animation: rpgMarkerPulse 1.55s ease-in-out infinite;
       }
-      .rpg-map-marker::before { display: none; }
-      .rpg-map-marker:hover {
-        transform: translate(-50%, -50%) scale(1.13);
+      .rpg-map-marker::before {
+        content: "";
+        display: block;
+        position: absolute;
+        inset: -11px;
+        border-radius: 24px;
+        border: 3px solid rgba(255, 176, 0, 0.58);
+        background: transparent;
+        opacity: 0.9;
+        animation: rpgMarkerRing 1.55s ease-out infinite;
+        pointer-events: none;
+      }
+      .rpg-map-marker:hover,
+      .rpg-map-marker:focus-visible {
+        transform: translate(-50%, -50%) scale(1.18);
         background: #ffffff;
-        box-shadow: 0 12px 28px rgba(0, 87, 217, 0.34), 0 0 0 8px rgba(0,122,255,0.18);
+        z-index: 20;
+        box-shadow:
+          0 18px 36px rgba(0, 87, 217, 0.44),
+          0 0 0 8px rgba(255, 176, 0, 0.32),
+          0 0 0 17px rgba(0, 122, 255, 0.20);
+      }
+      .rpg-marker-icon {
+        font-size: 1.45rem;
+        line-height: 1;
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,0.10));
+      }
+      .rpg-marker-text {
+        display: block;
+        padding: 1px 5px;
+        border-radius: 999px;
+        background: #0057d9;
+        color: white;
+        font-size: 0.56rem;
+        line-height: 1.35;
+        font-weight: 950;
+        letter-spacing: 0.02em;
       }
       .rpg-map-marker::after {
         content: attr(data-label);
         position: absolute;
         left: 50%;
-        top: -36px;
+        top: -39px;
         transform: translateX(-50%);
         white-space: nowrap;
-        background: rgba(20, 32, 51, 0.92);
+        background: rgba(20, 32, 51, 0.95);
         color: white;
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         line-height: 1.2;
-        padding: 6px 9px;
+        padding: 7px 10px;
         border-radius: 999px;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.18s ease;
       }
-      .rpg-map-marker:hover::after { opacity: 1; }
+      .rpg-map-marker:hover::after,
+      .rpg-map-marker:focus-visible::after { opacity: 1; }
       .rpg-mission-preview {
         margin-top: 16px;
-        padding: 16px;
+        padding: 18px;
         border-radius: 24px;
-        background: rgba(255,255,255,0.72);
-        border: 1px solid rgba(255,255,255,0.68);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.76), 0 10px 24px rgba(29, 53, 87, 0.08);
+        background: rgba(255,255,255,0.86);
+        border: 2px solid rgba(0,122,255,0.26);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.86), 0 16px 34px rgba(29, 53, 87, 0.12);
         line-height: 1.65;
       }
       .rpg-mission-preview.hidden { display: none !important; }
+      @keyframes rpgMarkerPulse {
+        0%, 100% { filter: brightness(1); }
+        50% { filter: brightness(1.12); }
+      }
+      @keyframes rpgMarkerRing {
+        0% { transform: scale(0.78); opacity: 0.75; }
+        80% { transform: scale(1.35); opacity: 0; }
+        100% { transform: scale(1.35); opacity: 0; }
+      }
+      body.reduced-motion .rpg-map-marker,
+      body.reduced-motion .rpg-map-marker::before { animation: none !important; }
       @media (max-width: 640px) {
         .rpg-map-board { padding: 12px; }
         .rpg-real-map-wrap { min-width: 900px; }
-        .rpg-map-marker { width: 40px; height: 40px; font-size: 1.15rem; }
+        .rpg-map-marker { width: 52px; height: 52px; }
+        .rpg-marker-icon { font-size: 1.35rem; }
       }
     `;
     document.head.appendChild(style);
@@ -182,7 +236,10 @@
 
   function buildMissionMarkersHtml() {
     return RPG_MISSIONS.map(function (mission) {
-      return '<button type="button" class="rpg-map-marker" style="--x:' + mission.x + '; --y:' + mission.y + ';" data-rpg-scenario="' + escapeHtml(mission.key) + '" data-label="' + escapeHtml(mission.room) + '" aria-label="' + escapeHtml(mission.title) + '">' + escapeHtml(mission.icon) + '</button>';
+      return '<button type="button" class="rpg-map-marker" style="--x:' + mission.x + '; --y:' + mission.y + ';" data-rpg-scenario="' + escapeHtml(mission.key) + '" data-label="' + escapeHtml(mission.room + '｜' + mission.title) + '" aria-label="' + escapeHtml(mission.title) + '">' +
+        '<span class="rpg-marker-icon">' + escapeHtml(mission.icon) + '</span>' +
+        '<span class="rpg-marker-text">任務</span>' +
+      '</button>';
     }).join('');
   }
 
@@ -196,9 +253,10 @@
       '</div>' +
       '<div class="rpg-map-board">' +
         '<div class="rpg-map-title-row">' +
-          '<div><strong>任務地圖</strong><div class="rpg-mini-map-note">使用真正學校房間地圖。按地圖上的 Emoji 任務點開始 RPG 任務。</div></div>' +
+          '<div><strong>任務地圖</strong><div class="rpg-mini-map-note">使用真正學校房間地圖。按地圖上會發光的「任務」標記開始 RPG 任務。</div></div>' +
           '<button class="secondary" type="button" onclick="showSituationScreen()">改用情境列表</button>' +
         '</div>' +
+        '<div class="rpg-map-instruction">✨ 發光黃色標記 = 可以開始任務的位置</div>' +
         '<div class="rpg-real-map-scroll">' +
           '<div class="rpg-real-map-wrap" id="rpgRealMapWrap">' +
             '<img class="rpg-real-map-img" src="' + SCHOOL_MAP_IMAGE + '" alt="樂善堂梁銶琚書院學校房間地圖" onerror="document.getElementById(\'rpgRealMapWrap\').classList.add(\'map-missing\')">' +
