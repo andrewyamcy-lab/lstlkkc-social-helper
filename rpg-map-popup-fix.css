@@ -1,0 +1,32 @@
+/* /rpg-map-popup-fix.css */
+/* Extra RPG map popup positioning fixes loaded after hover-enhance.css. */
+
+/*
+  The WhatsApp mission is visually moved to 新街校門 by CSS override.
+  However, the JS still calculates its popup direction from the original mission data.
+  This forces the popup to open above-left of the gate marker, so it does not appear
+  awkwardly at the bottom/right edge of the map.
+*/
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview {
+  --px: 73.6 !important;
+  --py: 85.0 !important;
+  transform: translate(calc(-100% - 32px), -100%) !important;
+}
+
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview::before {
+  left: auto !important;
+  right: -15px !important;
+  top: calc(100% - 26px) !important;
+  transform: rotate(45deg) !important;
+  border-left: 0 !important;
+  border-bottom: 0 !important;
+  border-right: 3px solid rgba(255,176,0,0.76) !important;
+  border-top: 3px solid rgba(255,176,0,0.76) !important;
+}
+
+/* Also make the popup a little higher on small screens. */
+@media (max-width: 640px) {
+  #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview {
+    transform: translate(calc(-100% - 24px), -100%) !important;
+  }
+}
