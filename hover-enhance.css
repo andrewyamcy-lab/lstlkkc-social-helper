@@ -1,0 +1,59 @@
+/* /hover-enhance.css */
+/* Stronger situation card pop-up hover animation */
+
+.scenario-card {
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.28s ease,
+    background 0.28s ease,
+    border-color 0.28s ease,
+    filter 0.28s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.scenario-card:hover {
+  transform: translateY(-10px) scale(1.035);
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 34px 76px rgba(29, 53, 87, 0.24),
+    0 14px 30px rgba(0, 122, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  filter: brightness(1.03);
+}
+
+.scenario-card:hover .scenario-thumb {
+  transform: scale(1.025);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 18px 36px rgba(29, 53, 87, 0.16);
+}
+
+.scenario-thumb {
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.scenario-card:hover .emoji {
+  transform: scale(1.12) rotate(-2deg);
+}
+
+.scenario-card .emoji {
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: none) {
+  .scenario-card:hover,
+  .scenario-card:hover .scenario-thumb,
+  .scenario-card:hover .emoji {
+    transform: none;
+  }
+}
+
+body.reduced-motion .scenario-card,
+body.reduced-motion .scenario-card:hover,
+body.reduced-motion .scenario-thumb,
+body.reduced-motion .scenario-card .emoji {
+  transition: none !important;
+  transform: none !important;
+}
