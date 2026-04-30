@@ -1,12 +1,14 @@
 // /scenarios/background-flow.js
 // 管理「先讀背景 → 開始答題」流程。
-// Fix: pressing 「我已閱讀背景，開始答題」 now bypasses the background screen and goes directly to Question 1.
+// Stable version: background-flow owns the start wrapper and calls the real game only after the student clicks start.
 
 (function () {
   let originalStartAsdGame = null;
   let activeScenarioKey = null;
   let isCleaningQuestionBox = false;
   let bypassBackgroundOnce = false;
+
+  window.__backgroundFlowInstalled = true;
 
   function escapeHtml(value) {
     return String(value || '')
@@ -108,6 +110,11 @@
     activeScenarioKey = key;
     bypassBackgroundOnce = true;
 
+    // Randomize here directly, instead of relying on another wrapper around startAsdGame.
+    if (typeof window.randomizeGameAnswers === 'function') {
+      window.randomizeGameAnswers(key);
+    }
+
     try {
       originalStartAsdGame(key);
     } finally {
@@ -117,10 +124,10 @@
     const tracker = document.getElementById('questionTracker');
     if (tracker) tracker.classList.remove('is-waiting');
 
-    // The original game may render immediately or after another wrapper, so clean in a few short passes.
     setTimeout(stripBackgroundFromCurrentQuestion, 0);
     setTimeout(stripBackgroundFromCurrentQuestion, 80);
     setTimeout(stripBackgroundFromCurrentQuestion, 180);
+    setTimeout(stripBackgroundFromCurrentQuestion, 350);
   }
 
   window.startQuestionAfterBackground = function (key) {
@@ -202,6 +209,7 @@
   }
 
   function initBackgroundFlow() {
+    window.__backgroundFlowInstalled = true;
     installQuestionCleaner();
     patchStartGameForBackground();
     setTimeout(() => {
