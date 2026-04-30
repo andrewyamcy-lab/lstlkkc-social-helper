@@ -250,6 +250,7 @@
   <script src="scenario-total-sync.js?v=20260429-1"></script>
   <script src="answer-randomizer.js?v=20260430-1"></script>
   <script src="scenarios/background-flow.js?v=20260430-1"></script>
+  <script src="header-home-link.js?v=20260430-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -282,6 +283,7 @@
       if (typeof initAnswerRandomizer === 'function') setTimeout(initAnswerRandomizer, 400);
       if (typeof initBackgroundFlow === 'function') setTimeout(initBackgroundFlow, 450);
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 700);
+      if (typeof initHeaderHomeLink === 'function') setTimeout(initHeaderHomeLink, 800);
     });
   </script>
 </body>
