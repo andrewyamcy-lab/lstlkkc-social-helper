@@ -1,7 +1,8 @@
 // /scenarios/background-flow.js
 // Standalone stable flow:
 // choose scenario → read background only → click start → answer questions.
-// This file no longer calls the old wrapped startAsdGame after the background screen.
+// Updated: after choosing an answer, it automatically goes to the next question.
+// Feedback appears together at the end.
 
 (function () {
   let activeScenarioKey = '';
@@ -10,6 +11,7 @@
   let activeQuestionIndex = 0;
   let activeScore = 0;
   let answeredCurrentQuestion = false;
+  let answerReview = [];
 
   window.__backgroundFlowInstalled = true;
 
@@ -123,7 +125,7 @@
     if (title) title.textContent = '請閱讀題目，然後選擇最合適的回應';
     if (tracker) tracker.classList.remove('is-waiting');
     if (progress) progress.textContent = '正在完成「' + (activeGame && activeGame.title ? activeGame.title : '情境練習') + '」：第 ' + current + ' / ' + total + ' 題';
-    if (bar) bar.style.width = Math.round(((activeQuestionIndex) / total) * 100) + '%';
+    if (bar) bar.style.width = Math.round((activeQuestionIndex / total) * 100) + '%';
     updateQuestionPills('question');
   }
 
@@ -134,7 +136,7 @@
     const bar = document.getElementById('asdProgressBar');
 
     if (badge) badge.textContent = '完成';
-    if (title) title.textContent = '你已完成這個情境';
+    if (title) title.textContent = '你已完成這個情境，請查看回饋';
     if (progress) progress.textContent = '已完成「' + (activeGame && activeGame.title ? activeGame.title : '情境練習') + '」。';
     if (bar) bar.style.width = '100%';
     updateQuestionPills('done');
@@ -179,6 +181,7 @@
     activeQuestionIndex = 0;
     activeScore = 0;
     answeredCurrentQuestion = false;
+    answerReview = [];
 
     showScreen('gameScreen', 'game');
     clearSupportBoxes();
@@ -262,35 +265,46 @@
     const option = step.options[optionIndex];
     activeScore += option.score;
 
-    const choices = document.getElementById('asdChoices');
-    if (!choices) return;
-
-    const isGood = option.score >= 2;
-    const isOkay = option.score === 1;
-    const resultClass = isGood ? 'result-good' : 'result-improve';
-    const resultTitle = isGood ? '做得好！' : (isOkay ? '可以更好' : '下次可以試另一個方法');
-
-    Array.from(choices.querySelectorAll('button')).forEach(function (button) {
-      button.disabled = true;
+    answerReview.push({
+      questionNumber: activeQuestionIndex + 1,
+      prompt: step.prompt,
+      selectedText: option.text,
+      score: option.score,
+      note: option.note || '多想一想對方感受和合適界線。'
     });
 
-    const feedback = document.createElement('div');
-    feedback.className = resultClass;
-    feedback.innerHTML = '<strong>' + escapeHtml(resultTitle) + '</strong><br>' + escapeHtml(option.note || '多想一想對方感受和合適界線。');
-    choices.appendChild(feedback);
+    const choices = document.getElementById('asdChoices');
+    if (choices) {
+      Array.from(choices.querySelectorAll('button')).forEach(function (button) {
+        button.disabled = true;
+      });
+    }
 
-    const nextButton = document.createElement('button');
-    nextButton.type = 'button';
-    nextButton.className = 'choice-button start-question-button';
-    nextButton.textContent = activeQuestionIndex >= activeSteps.length - 1 ? '查看完成結果' : '下一題';
-    nextButton.addEventListener('click', function () {
+    // Move to the next question automatically. No 下一題 button.
+    setTimeout(function () {
       if (activeQuestionIndex >= activeSteps.length - 1) {
         renderFinish();
       } else {
         renderQuestion(activeQuestionIndex + 1);
       }
-    });
-    choices.appendChild(nextButton);
+    }, 260);
+  }
+
+  function buildReviewHtml() {
+    if (!answerReview.length) return '';
+
+    return '<div class="review-box" style="margin-top:14px; text-align:left;">' +
+      '<h3 style="margin-bottom:10px;">逐題回饋</h3>' +
+      answerReview.map(function (item) {
+        const tag = item.score >= 2 ? '做得好' : (item.score === 1 ? '可以更好' : '需要留意');
+        const cls = item.score >= 2 ? 'result-good' : 'result-improve';
+        return '<div class="' + cls + '" style="margin-bottom:10px;">' +
+          '<strong>第 ' + item.questionNumber + ' 題｜' + escapeHtml(tag) + '</strong><br>' +
+          '<span><strong>你的選擇：</strong>' + escapeHtml(item.selectedText) + '</span><br>' +
+          '<span><strong>回饋：</strong>' + escapeHtml(item.note) + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
   }
 
   function renderFinish() {
@@ -314,7 +328,8 @@
       box.innerHTML =
         '<div class="scene-badge">完成情境</div>' +
         '<h3>你完成了「' + escapeHtml(activeGame && activeGame.title ? activeGame.title : '情境練習') + '」</h3>' +
-        '<div class="summary-box">今次得分：<strong>' + activeScore + ' / ' + maxScore + '</strong><br>完成度：約 <strong>' + percent + '%</strong><br><br>記住：社交練習不是為了每次完美，而是慢慢學會更清楚、更平靜地表達自己。</div>';
+        '<div class="summary-box">今次得分：<strong>' + activeScore + ' / ' + maxScore + '</strong><br>完成度：約 <strong>' + percent + '%</strong><br><br>記住：社交練習不是為了每次完美，而是慢慢學會更清楚、更平靜地表達自己。</div>' +
+        buildReviewHtml();
     }
 
     if (choices) {
