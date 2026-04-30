@@ -3,6 +3,7 @@
 // choose scenario → read background only → click start → answer questions.
 // Updated: after choosing an answer, it automatically goes to the next question.
 // Feedback appears together at the end.
+// Final result uses 3-star rating instead of numeric score.
 
 (function () {
   let activeScenarioKey = '';
@@ -58,6 +59,27 @@
       cloned.options = shuffleArray(cloned.options);
       return cloned;
     });
+  }
+
+  function getStarRating(percent) {
+    if (percent >= 80) return 3;
+    if (percent >= 50) return 2;
+    return 1;
+  }
+
+  function buildStarsHtml(starCount) {
+    let html = '<div class="stars" aria-label="' + starCount + ' 星評級">';
+    for (let i = 1; i <= 3; i += 1) {
+      html += '<span class="' + (i <= starCount ? 'star-filled' : 'star-empty') + '">★</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function getStarMessage(starCount) {
+    if (starCount === 3) return '表現很好！你能夠清楚、平靜地選擇合適回應。';
+    if (starCount === 2) return '做得不錯！你已經掌握部分技巧，下次可以再留意語氣和界線。';
+    return '你已經完成練習，這是很好的開始。下次可以慢慢再試更合適的表達。';
   }
 
   function showScreen(screenId, stateName) {
@@ -313,6 +335,7 @@
 
     const maxScore = activeSteps.length * 2;
     const percent = maxScore ? Math.round((activeScore / maxScore) * 100) : 0;
+    const starCount = getStarRating(percent);
     const box = document.getElementById('asdBox');
     const choices = document.getElementById('asdChoices');
 
@@ -328,7 +351,11 @@
       box.innerHTML =
         '<div class="scene-badge">完成情境</div>' +
         '<h3>你完成了「' + escapeHtml(activeGame && activeGame.title ? activeGame.title : '情境練習') + '」</h3>' +
-        '<div class="summary-box">今次得分：<strong>' + activeScore + ' / ' + maxScore + '</strong><br>完成度：約 <strong>' + percent + '%</strong><br><br>記住：社交練習不是為了每次完美，而是慢慢學會更清楚、更平靜地表達自己。</div>' +
+        '<div class="summary-box">' +
+          '<strong>今次評級：</strong>' + buildStarsHtml(starCount) +
+          '<div style="margin-top:8px;">' + escapeHtml(getStarMessage(starCount)) + '</div>' +
+          '<br>記住：社交練習不是為了每次完美，而是慢慢學會更清楚、更平靜地表達自己。' +
+        '</div>' +
         buildReviewHtml();
     }
 
