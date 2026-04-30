@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>樂善堂梁銶琚書院｜校園地圖 RPG</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="school-map.css?v=20260430-1" />
+</head>
+<body class="map-rpg-body">
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <header>
+    <h1>樂善堂梁銶琚書院</h1>
+    <p>校園地圖 RPG 模式</p>
+  </header>
+
+  <div class="container map-container">
+    <section class="card map-card">
+      <div id="coverScreen" class="screen active map-screen">
+        <div class="map-hero animate-in">
+          <div class="tag">梁書校園探索模式</div>
+          <div class="hero-avatar">🗺️</div>
+          <h2>校園地圖 RPG</h2>
+          <p>點擊地圖上的房間或校園位置，進入相關社交情境。每一個地點都代表一個「章節」。</p>
+
+          <div class="map-actions">
+            <button type="button" onclick="showMapScreen()">查看地圖</button>
+            <button type="button" class="secondary" onclick="showChapterListScreen()">章節列表</button>
+            <button type="button" class="secondary" onclick="window.location.href='index.html'">返回普通模式</button>
+          </div>
+        </div>
+
+        <div class="map-layout">
+          <aside class="map-side-panel" aria-label="地圖說明">
+            <div class="panel-badge">RPG 任務提示</div>
+            <h3>玩法</h3>
+            <p>1. 選擇樓層或地點。<br>2. 點擊閃光房間。<br>3. 閱讀背景故事。<br>4. 開始答題完成章節。</p>
+
+            <div class="map-legend">
+              <span><b class="legend-dot main"></b> 課室情境</span>
+              <span><b class="legend-dot social"></b> 同學相處</span>
+              <span><b class="legend-dot help"></b> 求助 / 支援</span>
+              <span><b class="legend-dot sport"></b> 活動 / 體育</span>
+              <span><b class="legend-dot online"></b> 網上 / 學習</span>
+            </div>
+
+            <div id="mapInfoPanel" class="map-info-panel">
+              <div class="map-info-icon">✨</div>
+              <h3>選擇一個地點</h3>
+              <p>滑過或點擊房間，可以看到這個章節的任務。</p>
+            </div>
+          </aside>
+
+          <main class="school-map-stage" aria-label="學校房間地圖 RPG">
+            <div class="map-title-row">
+              <div>
+                <div class="tag">學校房間地圖</div>
+                <h3>選擇地點開始任務</h3>
+              </div>
+              <div class="map-filter-wrap" id="mapFilterWrap" aria-label="章節分類篩選"></div>
+            </div>
+            <div id="schoolRpgMap" class="school-rpg-map"></div>
+          </main>
+        </div>
+      </div>
+
+      <div id="situationScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">章節列表</div>
+          <div class="hero-avatar">📜</div>
+          <h2>20 個校園 RPG 章節</h2>
+          <p>你也可以不用地圖，直接從列表開始任何一個章節。</p>
+          <div id="chapterListGrid" class="chapter-list-grid"></div>
+          <div class="welcome-actions">
+            <button type="button" onclick="showCoverScreen()">返回校園地圖</button>
+            <button type="button" class="secondary" onclick="window.location.href='index.html'">返回普通模式</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="badgeScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">我的徽章</div>
+          <div class="hero-avatar">🏅</div>
+          <h2>我的徽章</h2>
+          <p>完成地圖上的章節後，你會得到對應徽章。</p>
+          <div class="settings-card" style="text-align:left; margin-top:18px;">
+            <div id="badgeGrid" class="badge-grid"></div>
+          </div>
+          <div class="welcome-actions">
+            <button type="button" onclick="showCoverScreen()">返回校園地圖</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="settingsScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">我的設定</div>
+          <div class="hero-avatar">⚙️</div>
+          <h2>我的設定</h2>
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3>輔助功能</h3>
+              <div class="toggle-row"><span>朗讀題目</span><input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" /></div>
+              <div class="toggle-row"><span>高對比畫面</span><input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" /></div>
+              <div class="toggle-row"><span>減少動畫</span><input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" /></div>
+            </div>
+            <div class="settings-card">
+              <h3>顯示設定</h3>
+              <div class="settings-buttons">
+                <button type="button" class="secondary" onclick="cycleFontSize()">調整字體大小</button>
+                <button type="button" class="secondary" onclick="toggleSpeech()">開關朗讀</button>
+              </div>
+            </div>
+          </div>
+          <div class="welcome-actions">
+            <button type="button" onclick="showCoverScreen()">返回校園地圖</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="phraseLibraryScreen" class="screen welcome-screen">
+        <div class="hero-card animate-in">
+          <div class="tag">社交句式庫</div>
+          <div class="hero-avatar">💬</div>
+          <h2>社交句式庫</h2>
+          <p>需要句式支援時，可以返回普通模式查看完整句式庫。</p>
+          <div class="welcome-actions">
+            <button type="button" onclick="showCoverScreen()">返回校園地圖</button>
+            <button type="button" class="secondary" onclick="window.location.href='index.html'">前往普通模式句式庫</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="gameScreen" class="screen">
+        <div class="tag">校園地圖 RPG 任務</div>
+        <h2>正在進行章節</h2>
+        <p>完成這個地點任務後，你可以返回地圖繼續探索其他校園位置。</p>
+        <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
+          <button type="button" onclick="showCoverScreen()">返回校園地圖</button>
+          <button type="button" class="secondary" onclick="showChapterListScreen()">章節列表</button>
+          <button type="button" class="secondary" onclick="showBadgeScreen()">我的徽章</button>
+          <button type="button" class="secondary" onclick="showSettingsScreen()">我的設定</button>
+        </div>
+
+        <div class="top-status">
+          <div class="status-box">
+            <div class="status-title">目前進度</div>
+            <div id="asdProgressText" class="small">請先從校園地圖選擇一個地點。</div>
+            <div class="progress-wrap"><div class="progress-bar" id="asdProgressBar"></div></div>
+          </div>
+          <div class="status-box">
+            <div class="status-title">我的表現</div>
+            <div id="gameStatusText" class="small">正在計算情境數量｜使用提示：0 次｜使用冷靜模式：0 次</div>
+            <div class="achievement-row" id="achievementRow"><div class="achievement-pill">地圖探索模式</div></div>
+          </div>
+        </div>
+
+        <div class="game-layout" style="grid-template-columns: 1fr; max-width: 780px; margin-left:auto; margin-right:auto;">
+          <div class="dialogue-area center-column">
+            <div class="question-tracker" id="questionTracker" aria-live="polite">
+              <div class="question-tracker-main">
+                <span class="question-badge-big" id="questionBadgeBig">背景故事</span>
+                <span class="question-tracker-title" id="questionTrackerTitle">請閱讀地點任務，然後開始答題</span>
+              </div>
+              <div class="question-pills" aria-label="題目進度">
+                <span class="question-pill" data-q="1">1</span>
+                <span class="question-pill" data-q="2">2</span>
+                <span class="question-pill" data-q="3">3</span>
+                <span class="question-pill" data-q="4">4</span>
+                <span class="question-pill" data-q="5">5</span>
+              </div>
+            </div>
+            <div class="dialogue-box animate-in" id="asdBox">這裡會顯示地點故事、問題和結果。</div>
+            <div id="sceneMeta" class="scene-meta hidden"></div>
+            <div id="hintBox" class="hint-box hidden"></div>
+            <div id="calmBox" class="calm-box hidden"></div>
+            <div id="reviewBoxInline" class="review-box hidden"></div>
+            <div class="choice-grid" id="asdChoices"></div>
+            <div class="action-row">
+              <button type="button" class="secondary" onclick="showHint()">看看提示</button>
+              <button type="button" class="secondary" onclick="showCalmMode()">先冷靜一下</button>
+              <button type="button" class="secondary" onclick="repeatCurrentText()">再讀一次題目</button>
+              <button type="button" onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>樂善堂梁銶琚書院（梁書）｜校園地圖 RPG 模式</footer>
+
+  <script src="script.js"></script>
+  <script src="extra-scenarios-light.js?v=20260429-2"></script>
+  <script src="extra-scenarios-add3.js?v=20260429-1"></script>
+  <script src="scenario-images-light.js?v=20260429-4"></script>
+  <script src="scenario-cleanup.js?v=20260429-4"></script>
+  <script src="scenario-filters.js?v=20260429-2"></script>
+  <script src="scenario-total-sync.js?v=20260429-1"></script>
+  <script src="answer-randomizer.js?v=20260430-1"></script>
+  <script src="scenarios/background-flow.js?v=20260430-1"></script>
+  <script src="header-home-link.js?v=20260430-1"></script>
+  <script src="school-map.js?v=20260430-1"></script>
+</body>
+</html>
