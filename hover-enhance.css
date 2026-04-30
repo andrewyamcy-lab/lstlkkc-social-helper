@@ -137,6 +137,87 @@
 #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="academicOnly"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
 #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="academicOnly"].is-selected) #rpgMissionPreview .rpg-preview-tag::after { content: "7/F｜704 課室"; font-size: 0.76rem; }
 
+/* RPG mission difficulty display. ★ = easy, ★★★ = most difficult. */
+.rpg-map-marker .rpg-marker-text {
+  font-size: 0 !important;
+  min-width: 33px;
+  padding: 2px 5px;
+  background: linear-gradient(180deg, #0057d9, #0040a3) !important;
+}
+.rpg-map-marker .rpg-marker-text::after {
+  content: "★";
+  font-size: 0.58rem;
+  letter-spacing: -0.06em;
+  color: #fff7b2;
+}
+
+.rpg-map-marker[data-rpg-scenario="start"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="homework"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="respond"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="refuse"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="academicOnly"] .rpg-marker-text::after {
+  content: "★";
+}
+
+.rpg-map-marker[data-rpg-scenario="conflict"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="help"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="groupwork"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="copyHomework"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="whatsappIgnored"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="lostItem"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="peGrouping"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="losingGame"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="teacherReminder"] .rpg-marker-text::after {
+  content: "★★";
+}
+
+.rpg-map-marker[data-rpg-scenario="teasing"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="disagree"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="quietSpace"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="queueJump"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="bumped"] .rpg-marker-text::after,
+.rpg-map-marker[data-rpg-scenario="lunch"] .rpg-marker-text::after {
+  content: "★★★";
+}
+
+.rpg-preview-content::after {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255, 176, 0, 0.16);
+  border: 1px solid rgba(255, 176, 0, 0.34);
+  color: #7a4a00;
+  font-weight: 900;
+  font-size: 0.78rem;
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="start"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="homework"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="respond"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="refuse"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="academicOnly"].is-selected) #rpgMissionPreview .rpg-preview-content::after {
+  content: "難度：★ 易";
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="conflict"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="help"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="groupwork"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="copyHomework"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="lostItem"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="peGrouping"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="losingGame"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teacherReminder"].is-selected) #rpgMissionPreview .rpg-preview-content::after {
+  content: "難度：★★ 中等";
+}
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="teasing"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="disagree"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="quietSpace"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="queueJump"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="bumped"].is-selected) #rpgMissionPreview .rpg-preview-content::after,
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="lunch"].is-selected) #rpgMissionPreview .rpg-preview-content::after {
+  content: "難度：★★★ 較難";
+}
+
 @media (hover: none) {
   .scenario-card:hover,
   .scenario-card:hover .scenario-thumb,
