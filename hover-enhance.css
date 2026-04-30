@@ -54,6 +54,12 @@
 #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="peGrouping"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
 #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="peGrouping"].is-selected) #rpgMissionPreview .rpg-preview-tag::after { content: "G/F｜G04 活動室"; font-size: 0.76rem; }
 
+.rpg-map-marker[data-rpg-scenario="whatsappIgnored"] { --x: 69.0 !important; --y: 88.5 !important; }
+.rpg-map-marker[data-rpg-scenario="whatsappIgnored"]::after { content: "新街校門｜班群訊息：沒有人回覆" !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview { --px: 69.0 !important; --py: 88.5 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-tag::after { content: "G/F｜新街校門"; font-size: 0.76rem; }
+
 /* 2/F classroom and 209 */
 .rpg-map-marker[data-rpg-scenario="homework"] { --x: 22.0 !important; --y: 64.0 !important; }
 .rpg-map-marker[data-rpg-scenario="homework"]::after { content: "201 課室｜放學後：確認功課" !important; }
@@ -137,12 +143,6 @@
 #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="quietSpace"].is-selected) #rpgMissionPreview .rpg-preview-tag::after { content: "6/F｜604 課室"; font-size: 0.76rem; }
 
 /* 7/F classroom */
-.rpg-map-marker[data-rpg-scenario="whatsappIgnored"] { --x: 22.0 !important; --y: 23.2 !important; }
-.rpg-map-marker[data-rpg-scenario="whatsappIgnored"]::after { content: "701 課室｜班群訊息：沒有人回覆" !important; }
-#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview { --px: 22.0 !important; --py: 23.2 !important; }
-#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-tag { font-size: 0 !important; }
-#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview .rpg-preview-tag::after { content: "7/F｜701 課室"; font-size: 0.76rem; }
-
 .rpg-map-marker[data-rpg-scenario="academicOnly"] { --x: 30.7 !important; --y: 23.2 !important; }
 .rpg-map-marker[data-rpg-scenario="academicOnly"]::after { content: "704 課室｜學業問題：只想問功課" !important; }
 #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="academicOnly"].is-selected) #rpgMissionPreview { --px: 30.7 !important; --py: 23.2 !important; }
