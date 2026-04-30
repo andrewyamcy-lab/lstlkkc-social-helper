@@ -60,6 +60,30 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
+/* RPG map location correction: move PE grouping mission to G04 活動室. */
+.rpg-map-marker[data-rpg-scenario="peGrouping"] {
+  --x: 54.7 !important;
+  --y: 80.8 !important;
+}
+
+.rpg-map-marker[data-rpg-scenario="peGrouping"]::after {
+  content: "G04 活動室｜體育堂分組：未被邀請" !important;
+}
+
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="peGrouping"].is-selected) #rpgMissionPreview {
+  --px: 54.7 !important;
+  --py: 80.8 !important;
+}
+
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="peGrouping"].is-selected) #rpgMissionPreview .rpg-preview-tag {
+  font-size: 0 !important;
+}
+
+#rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="peGrouping"].is-selected) #rpgMissionPreview .rpg-preview-tag::after {
+  content: "G/F｜G04 活動室";
+  font-size: 0.76rem;
+}
+
 @media (hover: none) {
   .scenario-card:hover,
   .scenario-card:hover .scenario-thumb,
