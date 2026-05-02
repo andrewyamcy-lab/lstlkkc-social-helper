@@ -9,20 +9,31 @@
   box-shadow: none;
 }
 
-#coverScreen {
+/* Critical fix: only show the RPG cover layout when coverScreen is active.
+   Otherwise it must not take up height, so other pages open directly without scrolling. */
+#coverScreen:not(.active) {
+  display: none !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+#coverScreen.active {
   position: relative;
   overflow: hidden;
   min-height: 82vh;
   border-radius: 32px;
   isolation: isolate;
   padding: 48px 24px;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   background: #061935;
 }
 
-#coverScreen::before {
+#coverScreen.active::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -35,7 +46,7 @@
   filter: saturate(1.08) contrast(1.04) brightness(0.92);
 }
 
-#coverScreen::after {
+#coverScreen.active::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -45,7 +56,7 @@
     linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.22));
 }
 
-#coverScreen .hero-card {
+#coverScreen.active .hero-card {
   position: relative;
   z-index: 2;
   width: min(520px, 92vw);
@@ -62,10 +73,9 @@
   backdrop-filter: blur(10px) saturate(1.15);
 }
 
-/* IMPORTANT: reset the old decorative pseudo-elements from style.css.
-   The old ::before shape was causing the huge yellow vertical bar. */
-#coverScreen .hero-card::before,
-#coverScreen .hero-card::after {
+/* Reset old decorative pseudo-elements from style.css. */
+#coverScreen.active .hero-card::before,
+#coverScreen.active .hero-card::after {
   display: none !important;
   content: none !important;
   width: 0 !important;
@@ -77,7 +87,7 @@
   transform: none !important;
 }
 
-#coverScreen .tag {
+#coverScreen.active .tag {
   background: rgba(255, 214, 10, 0.92);
   border: 0;
   color: #473000;
@@ -85,11 +95,11 @@
   box-shadow: 0 8px 20px rgba(0,0,0,0.20);
 }
 
-#coverScreen .tag::after {
+#coverScreen.active .tag::after {
   content: "｜梁書 RPG 校園社交任務";
 }
 
-#coverScreen .hero-avatar {
+#coverScreen.active .hero-avatar {
   width: 88px;
   height: 88px;
   margin: 14px auto 18px;
@@ -100,7 +110,7 @@
   animation: coverAvatarFloat 3.6s ease-in-out infinite;
 }
 
-#coverScreen h2 {
+#coverScreen.active h2 {
   color: #ffffff;
   font-size: clamp(1.7rem, 3vw, 2.35rem);
   line-height: 1.18;
@@ -108,14 +118,14 @@
   text-shadow: 0 3px 18px rgba(0, 0, 0, 0.48);
 }
 
-#coverScreen p {
+#coverScreen.active p {
   color: rgba(235, 246, 255, 0.88);
   font-size: 0.98rem;
   line-height: 1.75;
   margin-bottom: 22px;
 }
 
-#coverScreen .menu-actions {
+#coverScreen.active .menu-actions {
   display: grid;
   gap: 11px;
   max-width: 380px;
@@ -123,7 +133,7 @@
   margin-right: auto;
 }
 
-#coverScreen .menu-actions button {
+#coverScreen.active .menu-actions button {
   width: 100%;
   justify-content: center;
   border-radius: 12px;
@@ -139,7 +149,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.56);
 }
 
-#coverScreen .menu-actions button.secondary {
+#coverScreen.active .menu-actions button.secondary {
   color: #eaf4ff;
   background: linear-gradient(180deg, rgba(35, 63, 105, 0.92), rgba(17, 42, 82, 0.92));
   border-color: rgba(255,255,255,0.24);
@@ -149,8 +159,8 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.30);
 }
 
-#coverScreen .menu-actions button:hover,
-#coverScreen .menu-actions button:focus-visible {
+#coverScreen.active .menu-actions button:hover,
+#coverScreen.active .menu-actions button:focus-visible {
   transform: translateY(-4px);
   filter: brightness(1.08);
   box-shadow:
@@ -160,7 +170,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.64);
 }
 
-#coverScreen .menu-actions button:active {
+#coverScreen.active .menu-actions button:active {
   transform: translateY(4px);
   box-shadow:
     0 4px 0 rgba(0, 48, 120, 0.70),
@@ -169,18 +179,9 @@
 }
 
 @keyframes schoolCoverCameraMove {
-  0% {
-    transform: scale(1.06) translateX(-1.4%) translateY(0);
-    background-position: 50% 50%;
-  }
-  50% {
-    transform: scale(1.10) translateX(0.6%) translateY(-0.5%);
-    background-position: 54% 48%;
-  }
-  100% {
-    transform: scale(1.14) translateX(1.4%) translateY(-1%);
-    background-position: 58% 45%;
-  }
+  0% { transform: scale(1.06) translateX(-1.4%) translateY(0); background-position: 50% 50%; }
+  50% { transform: scale(1.10) translateX(0.6%) translateY(-0.5%); background-position: 54% 48%; }
+  100% { transform: scale(1.14) translateX(1.4%) translateY(-1%); background-position: 58% 45%; }
 }
 
 @keyframes coverAvatarFloat {
@@ -189,40 +190,29 @@
 }
 
 @media (max-width: 640px) {
-  .card:has(#coverScreen.active) {
-    border-radius: 24px;
-  }
+  .card:has(#coverScreen.active) { border-radius: 24px; }
 
-  #coverScreen {
+  #coverScreen.active {
     min-height: 78vh;
     padding: 38px 14px;
     border-radius: 24px;
   }
 
-  #coverScreen::before {
-    background-position: 42% center;
-  }
+  #coverScreen.active::before { background-position: 42% center; }
 
-  #coverScreen .hero-card {
+  #coverScreen.active .hero-card {
     width: min(420px, 94vw);
     padding: 28px 20px 30px;
   }
 
-  #coverScreen .hero-avatar {
-    width: 76px;
-    height: 76px;
-  }
+  #coverScreen.active .hero-avatar { width: 76px; height: 76px; }
 
-  #coverScreen p {
-    font-size: 0.92rem;
-  }
+  #coverScreen.active p { font-size: 0.92rem; }
 
-  #coverScreen .tag::after {
-    content: "";
-  }
+  #coverScreen.active .tag::after { content: ""; }
 }
 
-body.reduced-motion #coverScreen::before,
-body.reduced-motion #coverScreen .hero-avatar {
+body.reduced-motion #coverScreen.active::before,
+body.reduced-motion #coverScreen.active .hero-avatar {
   animation: none !important;
 }
