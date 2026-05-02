@@ -40,11 +40,10 @@
   background-size: cover;
   background-position: center center;
   transform: scale(1.06) translateX(-1.2%);
-  animation: schoolCoverCameraMove 22s ease-in-out infinite alternate;
+  animation: schoolCoverCameraMove 12s ease-in-out infinite alternate;
   filter: saturate(1.06) contrast(1.02) brightness(1.03);
 }
 
-/* Light overlay: keep the photo bright, but add readability behind the white glass card. */
 #coverScreen.active::after {
   content: "";
   position: absolute;
@@ -133,7 +132,29 @@
   margin-right: auto;
 }
 
+#coverScreen.active .menu-actions button,
+#coverScreen.active .menu-actions button::before,
+#coverScreen.active .menu-actions button::after {
+  box-sizing: border-box;
+}
+
+/* Reset old button pseudo-layer from the main stylesheet. */
+#coverScreen.active .menu-actions button::before,
+#coverScreen.active .menu-actions button::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  inset: auto !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 0 !important;
+}
+
 #coverScreen.active .menu-actions button {
+  position: relative;
   width: 100%;
   justify-content: center;
   border-radius: 16px;
@@ -141,7 +162,7 @@
   font-weight: 950;
   letter-spacing: 0.03em;
   color: #ffffff;
-  background: linear-gradient(180deg, #2f8cff, #006be8);
+  background: linear-gradient(180deg, #2f8cff, #006be8) !important;
   border: 1px solid rgba(255,255,255,0.58);
   box-shadow:
     0 8px 0 rgba(0, 87, 217, 0.70),
@@ -151,7 +172,7 @@
 
 #coverScreen.active .menu-actions button.secondary {
   color: #0057d9;
-  background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(234,246,255,0.74));
+  background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(234,246,255,0.74)) !important;
   border-color: rgba(255,255,255,0.82);
   box-shadow:
     0 6px 0 rgba(169, 205, 242, 0.86),
@@ -189,8 +210,8 @@
 
 @keyframes schoolCoverCameraMove {
   0% { transform: scale(1.06) translateX(-1.4%) translateY(0); background-position: 50% 50%; }
-  50% { transform: scale(1.10) translateX(0.6%) translateY(-0.5%); background-position: 54% 48%; }
-  100% { transform: scale(1.14) translateX(1.4%) translateY(-1%); background-position: 58% 45%; }
+  50% { transform: scale(1.10) translateX(0.8%) translateY(-0.6%); background-position: 54% 48%; }
+  100% { transform: scale(1.14) translateX(1.6%) translateY(-1.1%); background-position: 58% 45%; }
 }
 
 @keyframes coverAvatarFloat {
