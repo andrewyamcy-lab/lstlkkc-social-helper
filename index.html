@@ -255,6 +255,7 @@
   <script src="header-home-link.js?v=20260430-1"></script>
   <script src="rpg-start-fix.js?v=20260502-1"></script>
   <script src="badge-system-v2.js?v=20260502-1"></script>
+  <script src="situation-rpg-button.js?v=20260503-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -273,6 +274,7 @@
         if (typeof initAnswerRandomizer === 'function') setTimeout(initAnswerRandomizer, 210);
         if (typeof initBackgroundFlow === 'function') setTimeout(initBackgroundFlow, 230);
         if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 240);
+        if (typeof addRpgButtonToSituationList === 'function') setTimeout(addRpgButtonToSituationList, 260);
       }
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 300);
       window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
