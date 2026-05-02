@@ -1,13 +1,26 @@
 /* /cover-menu-bg.css */
-/* Minecraft-style moving cover background using the uploaded school photo. */
+/* Cleaner RPG / Minecraft-style cover menu using the uploaded school photo. */
+
+/* Let the homepage feel like a game screen, not a card inside another card. */
+.card:has(#coverScreen.active) {
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
 
 #coverScreen {
   position: relative;
   overflow: hidden;
-  min-height: 74vh;
-  border-radius: 30px;
+  min-height: 82vh;
+  border-radius: 32px;
   isolation: isolate;
-  padding: 34px 18px;
+  padding: 48px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #061935;
 }
 
 #coverScreen::before {
@@ -18,61 +31,77 @@
   background-image: url("images/school-cover.jpg");
   background-size: cover;
   background-position: center center;
-  transform: scale(1.08) translateX(-1.5%);
-  animation: schoolCoverCameraMove 18s ease-in-out infinite alternate;
-  filter: saturate(1.05) contrast(1.02);
+  transform: scale(1.06) translateX(-1.2%);
+  animation: schoolCoverCameraMove 22s ease-in-out infinite alternate;
+  filter: saturate(1.08) contrast(1.04) brightness(0.92);
 }
 
+/* Softer overlay: keep the photo visible but make menu readable. */
 #coverScreen::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(135deg, rgba(4, 18, 48, 0.64), rgba(0, 87, 217, 0.22) 52%, rgba(255, 255, 255, 0.08)),
-    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.24), transparent 38%),
-    radial-gradient(circle at 18% 82%, rgba(0, 122, 255, 0.22), transparent 34%);
-  backdrop-filter: blur(1px);
+    linear-gradient(90deg, rgba(3, 17, 42, 0.68) 0%, rgba(3, 17, 42, 0.36) 42%, rgba(0, 78, 165, 0.18) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.22));
 }
 
 #coverScreen .hero-card {
   position: relative;
   z-index: 2;
-  max-width: 660px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.84);
+  width: min(520px, 92vw);
+  margin: 0;
+  padding: 30px 30px 32px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(7, 22, 52, 0.74), rgba(8, 34, 77, 0.62));
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 26px;
   box-shadow:
-    0 34px 96px rgba(0, 31, 94, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px) saturate(1.15);
+    0 34px 96px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 1px 0 rgba(255,255,255,0.18) inset;
+  backdrop-filter: blur(10px) saturate(1.15);
 }
 
 #coverScreen .tag {
-  background: linear-gradient(180deg, rgba(0, 122, 255, 0.18), rgba(255, 214, 10, 0.18));
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 214, 10, 0.92);
+  border: 0;
+  color: #473000;
+  font-weight: 950;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.20);
 }
 
 #coverScreen .hero-avatar {
+  width: 88px;
+  height: 88px;
+  margin: 14px auto 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(220,237,255,0.90));
   box-shadow:
-    0 18px 42px rgba(0, 87, 217, 0.26),
-    0 0 0 10px rgba(255, 214, 10, 0.13);
-  animation: coverAvatarFloat 3.4s ease-in-out infinite;
+    0 18px 46px rgba(0, 0, 0, 0.28),
+    0 0 0 8px rgba(255, 214, 10, 0.16);
+  animation: coverAvatarFloat 3.6s ease-in-out infinite;
 }
 
 #coverScreen h2 {
-  color: var(--text);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  line-height: 1.18;
+  margin-bottom: 14px;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.48);
 }
 
 #coverScreen p {
-  color: rgba(29, 53, 87, 0.86);
+  color: rgba(235, 246, 255, 0.88);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  margin-bottom: 22px;
 }
 
 #coverScreen .menu-actions {
   display: grid;
-  gap: 12px;
-  max-width: 420px;
+  gap: 11px;
+  max-width: 380px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -80,67 +109,88 @@
 #coverScreen .menu-actions button {
   width: 100%;
   justify-content: center;
-  border-radius: 18px;
+  border-radius: 12px;
+  padding: 13px 18px;
   font-weight: 950;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  background: linear-gradient(180deg, #2f8cff, #0064db);
+  border: 1px solid rgba(255,255,255,0.34);
   box-shadow:
-    0 14px 30px rgba(0, 87, 217, 0.22),
+    0 10px 0 rgba(0, 48, 120, 0.70),
+    0 18px 34px rgba(0, 0, 0, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+#coverScreen .menu-actions button.secondary {
+  color: #eaf4ff;
+  background: linear-gradient(180deg, rgba(35, 63, 105, 0.92), rgba(17, 42, 82, 0.92));
+  border-color: rgba(255,255,255,0.24);
+  box-shadow:
+    0 8px 0 rgba(0, 18, 54, 0.78),
+    0 16px 30px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
 }
 
 #coverScreen .menu-actions button:hover,
 #coverScreen .menu-actions button:focus-visible {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-4px);
+  filter: brightness(1.08);
   box-shadow:
-    0 20px 42px rgba(0, 87, 217, 0.30),
-    0 0 0 5px rgba(255, 214, 10, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.66);
+    0 13px 0 rgba(0, 48, 120, 0.70),
+    0 24px 46px rgba(0, 0, 0, 0.32),
+    0 0 0 5px rgba(255, 214, 10, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.64);
 }
 
+#coverScreen .menu-actions button:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 4px 0 rgba(0, 48, 120, 0.70),
+    0 10px 22px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+/* Small RPG label, not blocking the photo. */
 #coverScreen .hero-card::before {
-  content: "✨ 🏫 ⭐ 🎮";
-  position: absolute;
-  top: -22px;
-  right: 22px;
-  z-index: 3;
-  font-size: 1.45rem;
-  letter-spacing: 0.12em;
-  opacity: 0.95;
-  filter: drop-shadow(0 8px 12px rgba(0, 31, 94, 0.22));
-  animation: coverFloatIcons 3.2s ease-in-out infinite;
-}
-
-#coverScreen .hero-card::after {
   content: "梁書 RPG 校園社交任務";
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
   position: absolute;
+  top: -18px;
   left: 50%;
-  bottom: -16px;
   transform: translateX(-50%);
-  padding: 7px 13px;
+  z-index: 3;
+  padding: 8px 15px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 214, 10, 0.92), rgba(255, 176, 0, 0.90));
-  color: #573700;
+  background: linear-gradient(180deg, #ffe46b, #ffb000);
+  color: #4d3300;
   font-weight: 950;
   font-size: 0.82rem;
   white-space: nowrap;
-  box-shadow: 0 12px 30px rgba(0, 31, 94, 0.18);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.24);
+}
+
+#coverScreen .hero-card::after {
+  content: "✨  選擇任務，開始校園冒險  ✨";
+  display: block;
+  margin-top: 18px;
+  color: rgba(255,255,255,0.76);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 @keyframes schoolCoverCameraMove {
   0% {
-    transform: scale(1.08) translateX(-1.8%) translateY(0);
-    background-position: center center;
+    transform: scale(1.06) translateX(-1.4%) translateY(0);
+    background-position: 50% 50%;
   }
   50% {
-    transform: scale(1.12) translateX(0.8%) translateY(-0.8%);
-    background-position: 52% 46%;
+    transform: scale(1.10) translateX(0.6%) translateY(-0.5%);
+    background-position: 54% 48%;
   }
   100% {
-    transform: scale(1.16) translateX(1.8%) translateY(-1.2%);
-    background-position: center top;
+    transform: scale(1.14) translateX(1.4%) translateY(-1%);
+    background-position: 58% 45%;
   }
 }
 
@@ -149,34 +199,37 @@
   50% { transform: translateY(-7px); }
 }
 
-@keyframes coverFloatIcons {
-  0%, 100% { transform: translateY(0) rotate(-1deg); }
-  50% { transform: translateY(-8px) rotate(1deg); }
-}
-
 @media (max-width: 640px) {
+  .card:has(#coverScreen.active) {
+    border-radius: 24px;
+  }
+
   #coverScreen {
     min-height: 78vh;
-    padding: 24px 10px;
-  }
-
-  #coverScreen .hero-card {
-    max-width: 94%;
-    padding: 24px 18px;
-  }
-
-  #coverScreen .hero-card::before {
-    right: 14px;
-    font-size: 1.1rem;
+    padding: 38px 14px;
+    border-radius: 24px;
   }
 
   #coverScreen::before {
     background-position: 42% center;
   }
+
+  #coverScreen .hero-card {
+    width: min(420px, 94vw);
+    padding: 28px 20px 30px;
+  }
+
+  #coverScreen .hero-avatar {
+    width: 76px;
+    height: 76px;
+  }
+
+  #coverScreen p {
+    font-size: 0.92rem;
+  }
 }
 
 body.reduced-motion #coverScreen::before,
-body.reduced-motion #coverScreen .hero-avatar,
-body.reduced-motion #coverScreen .hero-card::before {
+body.reduced-motion #coverScreen .hero-avatar {
   animation: none !important;
 }
