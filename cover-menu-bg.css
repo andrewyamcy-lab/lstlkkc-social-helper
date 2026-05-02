@@ -1,7 +1,6 @@
 /* /cover-menu-bg.css */
 /* Cleaner RPG / Minecraft-style cover menu using the uploaded school photo. */
 
-/* Let the homepage feel like a game screen, not a card inside another card. */
 .card:has(#coverScreen.active) {
   padding: 0;
   overflow: hidden;
@@ -36,7 +35,6 @@
   filter: saturate(1.08) contrast(1.04) brightness(0.92);
 }
 
-/* Softer overlay: keep the photo visible but make menu readable. */
 #coverScreen::after {
   content: "";
   position: absolute;
@@ -64,12 +62,31 @@
   backdrop-filter: blur(10px) saturate(1.15);
 }
 
+/* IMPORTANT: reset the old decorative pseudo-elements from style.css.
+   The old ::before shape was causing the huge yellow vertical bar. */
+#coverScreen .hero-card::before,
+#coverScreen .hero-card::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  inset: auto !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
 #coverScreen .tag {
   background: rgba(255, 214, 10, 0.92);
   border: 0;
   color: #473000;
   font-weight: 950;
   box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+}
+
+#coverScreen .tag::after {
+  content: "｜梁書 RPG 校園社交任務";
 }
 
 #coverScreen .hero-avatar {
@@ -151,34 +168,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
-/* Small RPG label, not blocking the photo. */
-#coverScreen .hero-card::before {
-  content: "梁書 RPG 校園社交任務";
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  padding: 8px 15px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ffe46b, #ffb000);
-  color: #4d3300;
-  font-weight: 950;
-  font-size: 0.82rem;
-  white-space: nowrap;
-  box-shadow: 0 14px 32px rgba(0,0,0,0.24);
-}
-
-#coverScreen .hero-card::after {
-  content: "✨  選擇任務，開始校園冒險  ✨";
-  display: block;
-  margin-top: 18px;
-  color: rgba(255,255,255,0.76);
-  font-size: 0.84rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
 @keyframes schoolCoverCameraMove {
   0% {
     transform: scale(1.06) translateX(-1.4%) translateY(0);
@@ -226,6 +215,10 @@
 
   #coverScreen p {
     font-size: 0.92rem;
+  }
+
+  #coverScreen .tag::after {
+    content: "";
   }
 }
 
