@@ -44,7 +44,7 @@
             <div class="settings-card" style="grid-column: 1 / -1;">
               <div class="panel-badge">已得到的徽章</div>
               <h3>我的練習成果</h3>
-              <p class="small">完成情境後，灰色徽章會變成彩色徽章。</p>
+              <p class="small">完成任務並取得 3 星表現，可以為相關徽章增加 1 星。徽章累積到 3 星後便會解鎖。</p>
               <div class="badge-grid" id="badgeGrid"></div>
             </div>
           </div>
@@ -254,6 +254,7 @@
   <script src="scenarios/background-flow.js?v=20260430-1"></script>
   <script src="header-home-link.js?v=20260430-1"></script>
   <script src="rpg-start-fix.js?v=20260502-1"></script>
+  <script src="badge-system-v2.js?v=20260502-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
