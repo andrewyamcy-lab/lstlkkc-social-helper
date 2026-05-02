@@ -1,5 +1,5 @@
 /* /cover-menu-bg.css */
-/* Cleaner RPG / Minecraft-style cover menu using the uploaded school photo. */
+/* White glass RPG cover menu using the uploaded school photo. */
 
 .card:has(#coverScreen.active) {
   padding: 0;
@@ -9,8 +9,6 @@
   box-shadow: none;
 }
 
-/* Critical fix: only show the RPG cover layout when coverScreen is active.
-   Otherwise it must not take up height, so other pages open directly without scrolling. */
 #coverScreen:not(.active) {
   display: none !important;
   min-height: 0 !important;
@@ -30,7 +28,7 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  background: #061935;
+  background: #eaf6ff;
 }
 
 #coverScreen.active::before {
@@ -43,37 +41,38 @@
   background-position: center center;
   transform: scale(1.06) translateX(-1.2%);
   animation: schoolCoverCameraMove 22s ease-in-out infinite alternate;
-  filter: saturate(1.08) contrast(1.04) brightness(0.92);
+  filter: saturate(1.06) contrast(1.02) brightness(1.03);
 }
 
+/* Light overlay: keep the photo bright, but add readability behind the white glass card. */
 #coverScreen.active::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(3, 17, 42, 0.68) 0%, rgba(3, 17, 42, 0.36) 42%, rgba(0, 78, 165, 0.18) 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.22));
+    linear-gradient(90deg, rgba(255,255,255,0.36) 0%, rgba(255,255,255,0.18) 48%, rgba(210,235,255,0.22) 100%),
+    radial-gradient(circle at 50% 24%, rgba(255,255,255,0.34), transparent 38%),
+    linear-gradient(180deg, rgba(0, 67, 145, 0.08), rgba(0, 67, 145, 0.14));
 }
 
 #coverScreen.active .hero-card {
   position: relative;
   z-index: 2;
-  width: min(520px, 92vw);
+  width: min(540px, 92vw);
   margin: 0;
-  padding: 30px 30px 32px;
+  padding: 30px 32px 32px;
   text-align: center;
-  background: linear-gradient(180deg, rgba(7, 22, 52, 0.74), rgba(8, 34, 77, 0.62));
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,251,255,0.66));
+  border: 1px solid rgba(255,255,255,0.86);
+  border-radius: 28px;
   box-shadow:
-    0 34px 96px rgba(0, 0, 0, 0.38),
-    0 0 0 1px rgba(255,255,255,0.06) inset,
-    0 1px 0 rgba(255,255,255,0.18) inset;
-  backdrop-filter: blur(10px) saturate(1.15);
+    0 34px 90px rgba(0, 48, 120, 0.22),
+    0 0 0 1px rgba(255,255,255,0.46) inset,
+    0 1px 0 rgba(255,255,255,0.95) inset;
+  backdrop-filter: blur(14px) saturate(1.18);
 }
 
-/* Reset old decorative pseudo-elements from style.css. */
 #coverScreen.active .hero-card::before,
 #coverScreen.active .hero-card::after {
   display: none !important;
@@ -88,11 +87,11 @@
 }
 
 #coverScreen.active .tag {
-  background: rgba(255, 214, 10, 0.92);
-  border: 0;
-  color: #473000;
+  background: rgba(255, 214, 10, 0.82);
+  border: 1px solid rgba(255,255,255,0.74);
+  color: #5b3b00;
   font-weight: 950;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+  box-shadow: 0 8px 20px rgba(0, 87, 217, 0.12);
 }
 
 #coverScreen.active .tag::after {
@@ -103,23 +102,24 @@
   width: 88px;
   height: 88px;
   margin: 14px auto 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(220,237,255,0.90));
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(226,241,255,0.92));
   box-shadow:
-    0 18px 46px rgba(0, 0, 0, 0.28),
-    0 0 0 8px rgba(255, 214, 10, 0.16);
+    0 18px 40px rgba(0, 87, 217, 0.18),
+    0 0 0 8px rgba(0, 122, 255, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.98);
   animation: coverAvatarFloat 3.6s ease-in-out infinite;
 }
 
 #coverScreen.active h2 {
-  color: #ffffff;
+  color: #13294b;
   font-size: clamp(1.7rem, 3vw, 2.35rem);
   line-height: 1.18;
   margin-bottom: 14px;
-  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.48);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.72);
 }
 
 #coverScreen.active p {
-  color: rgba(235, 246, 255, 0.88);
+  color: rgba(29, 53, 87, 0.86);
   font-size: 0.98rem;
   line-height: 1.75;
   margin-bottom: 22px;
@@ -128,7 +128,7 @@
 #coverScreen.active .menu-actions {
   display: grid;
   gap: 11px;
-  max-width: 380px;
+  max-width: 390px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -136,46 +136,55 @@
 #coverScreen.active .menu-actions button {
   width: 100%;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 13px 18px;
   font-weight: 950;
   letter-spacing: 0.03em;
   color: #ffffff;
-  background: linear-gradient(180deg, #2f8cff, #0064db);
-  border: 1px solid rgba(255,255,255,0.34);
+  background: linear-gradient(180deg, #2f8cff, #006be8);
+  border: 1px solid rgba(255,255,255,0.58);
   box-shadow:
-    0 10px 0 rgba(0, 48, 120, 0.70),
-    0 18px 34px rgba(0, 0, 0, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.56);
+    0 8px 0 rgba(0, 87, 217, 0.70),
+    0 16px 30px rgba(0, 87, 217, 0.22),
+    inset 0 1px 0 rgba(255,255,255,0.60);
 }
 
 #coverScreen.active .menu-actions button.secondary {
-  color: #eaf4ff;
-  background: linear-gradient(180deg, rgba(35, 63, 105, 0.92), rgba(17, 42, 82, 0.92));
-  border-color: rgba(255,255,255,0.24);
+  color: #0057d9;
+  background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(234,246,255,0.74));
+  border-color: rgba(255,255,255,0.82);
   box-shadow:
-    0 8px 0 rgba(0, 18, 54, 0.78),
-    0 16px 30px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+    0 6px 0 rgba(169, 205, 242, 0.86),
+    0 14px 28px rgba(0, 87, 217, 0.13),
+    inset 0 1px 0 rgba(255,255,255,0.96);
 }
 
 #coverScreen.active .menu-actions button:hover,
 #coverScreen.active .menu-actions button:focus-visible {
   transform: translateY(-4px);
-  filter: brightness(1.08);
+  filter: brightness(1.04);
   box-shadow:
-    0 13px 0 rgba(0, 48, 120, 0.70),
-    0 24px 46px rgba(0, 0, 0, 0.32),
+    0 11px 0 rgba(0, 87, 217, 0.68),
+    0 22px 42px rgba(0, 87, 217, 0.24),
+    0 0 0 5px rgba(255, 214, 10, 0.16),
+    inset 0 1px 0 rgba(255,255,255,0.74);
+}
+
+#coverScreen.active .menu-actions button.secondary:hover,
+#coverScreen.active .menu-actions button.secondary:focus-visible {
+  box-shadow:
+    0 9px 0 rgba(169, 205, 242, 0.90),
+    0 20px 38px rgba(0, 87, 217, 0.18),
     0 0 0 5px rgba(255, 214, 10, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.64);
+    inset 0 1px 0 rgba(255,255,255,0.98);
 }
 
 #coverScreen.active .menu-actions button:active {
   transform: translateY(4px);
   box-shadow:
-    0 4px 0 rgba(0, 48, 120, 0.70),
-    0 10px 22px rgba(0, 0, 0, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    0 3px 0 rgba(0, 87, 217, 0.70),
+    0 8px 18px rgba(0, 87, 217, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.54);
 }
 
 @keyframes schoolCoverCameraMove {
