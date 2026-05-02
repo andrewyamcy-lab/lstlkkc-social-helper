@@ -86,6 +86,17 @@
         border-color: rgba(255, 107, 0, 0.34);
         color: #9a3412;
       }
+
+      .situation-rpg-button-wrap {
+        display: flex;
+        justify-content: center;
+        margin: 18px 0 8px;
+      }
+
+      .situation-rpg-button-wrap button {
+        min-width: min(420px, 100%);
+        justify-content: center;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -124,6 +135,22 @@
       badge.className = 'scenario-difficulty-pill ' + difficultyClass;
       badge.innerHTML = '<span class="difficulty-stars">' + difficulty.stars + '</span><span>難度：' + difficulty.label + '</span>';
     });
+  }
+
+  function addRpgButtonToSituationList() {
+    injectDifficultyStyles();
+
+    const situationScreen = document.getElementById('situationScreen');
+    if (!situationScreen || document.getElementById('situationRpgMapButton')) return;
+
+    const grid = situationScreen.querySelector('.scenario-select-grid');
+    if (!grid) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'situation-rpg-button-wrap';
+    wrap.id = 'situationRpgMapButton';
+    wrap.innerHTML = '<button type="button" onclick="showRpgMapScreen()">🗺️ RPG 校園地圖</button>';
+    grid.insertAdjacentElement('beforebegin', wrap);
   }
 
   function getAvailableScenarioKeys() {
@@ -166,6 +193,7 @@
   }
 
   function syncScenarioTotal() {
+    addRpgButtonToSituationList();
     applyScenarioDifficultyBadges();
 
     const total = getAvailableScenarioKeys().length;
@@ -193,6 +221,7 @@
   window.syncScenarioTotal = syncScenarioTotal;
   window.initScenarioTotalSync = initScenarioTotalSync;
   window.applyScenarioDifficultyBadges = applyScenarioDifficultyBadges;
+  window.addRpgButtonToSituationList = addRpgButtonToSituationList;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initScenarioTotalSync);
