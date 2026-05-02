@@ -1,11 +1,32 @@
 /* /cover-menu-bg.css */
-/* White glass RPG cover menu using the uploaded school photo. */
+/* Full-page white glass RPG cover menu using the uploaded school photo. */
+
+body:has(#coverScreen.active) {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body:has(#coverScreen.active) > header,
+body:has(#coverScreen.active) > footer {
+  display: none !important;
+}
+
+body:has(#coverScreen.active) .container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
 
 .card:has(#coverScreen.active) {
   padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
   overflow: hidden;
   background: transparent;
   border: 0;
+  border-radius: 0;
   box-shadow: none;
 }
 
@@ -21,8 +42,9 @@
 #coverScreen.active {
   position: relative;
   overflow: hidden;
-  min-height: 82vh;
-  border-radius: 32px;
+  width: 100%;
+  min-height: 100vh;
+  border-radius: 0;
   isolation: isolate;
   padding: 48px 24px;
   display: flex !important;
@@ -219,12 +241,9 @@
 }
 
 @media (max-width: 640px) {
-  .card:has(#coverScreen.active) { border-radius: 24px; }
-
   #coverScreen.active {
-    min-height: 78vh;
-    padding: 38px 14px;
-    border-radius: 24px;
+    min-height: 100vh;
+    padding: 34px 14px;
   }
 
   #coverScreen.active::before { background-position: 42% center; }
