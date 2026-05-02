@@ -253,6 +253,7 @@
   <script src="answer-randomizer.js?v=20260430-1"></script>
   <script src="scenarios/background-flow.js?v=20260430-1"></script>
   <script src="header-home-link.js?v=20260430-1"></script>
+  <script src="rpg-start-fix.js?v=20260502-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
@@ -260,6 +261,8 @@
         const screen = document.getElementById(id);
         if (screen) screen.classList.toggle('active', id === screenId);
       });
+      const rpgScreen = document.getElementById('rpgMapScreen');
+      if (rpgScreen && screenId !== 'rpgMapScreen') rpgScreen.classList.remove('active');
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
       if (screenId === 'situationScreen') {
         if (typeof registerNewAdd3Scenarios === 'function') setTimeout(registerNewAdd3Scenarios, 60);
