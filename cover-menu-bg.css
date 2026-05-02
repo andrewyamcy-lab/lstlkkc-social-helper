@@ -1,0 +1,182 @@
+/* /cover-menu-bg.css */
+/* Minecraft-style moving cover background using the uploaded school photo. */
+
+#coverScreen {
+  position: relative;
+  overflow: hidden;
+  min-height: 74vh;
+  border-radius: 30px;
+  isolation: isolate;
+  padding: 34px 18px;
+}
+
+#coverScreen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("images/school-cover.jpg");
+  background-size: cover;
+  background-position: center center;
+  transform: scale(1.08) translateX(-1.5%);
+  animation: schoolCoverCameraMove 18s ease-in-out infinite alternate;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+#coverScreen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(135deg, rgba(4, 18, 48, 0.64), rgba(0, 87, 217, 0.22) 52%, rgba(255, 255, 255, 0.08)),
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.24), transparent 38%),
+    radial-gradient(circle at 18% 82%, rgba(0, 122, 255, 0.22), transparent 34%);
+  backdrop-filter: blur(1px);
+}
+
+#coverScreen .hero-card {
+  position: relative;
+  z-index: 2;
+  max-width: 660px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  box-shadow:
+    0 34px 96px rgba(0, 31, 94, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px) saturate(1.15);
+}
+
+#coverScreen .tag {
+  background: linear-gradient(180deg, rgba(0, 122, 255, 0.18), rgba(255, 214, 10, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
+
+#coverScreen .hero-avatar {
+  box-shadow:
+    0 18px 42px rgba(0, 87, 217, 0.26),
+    0 0 0 10px rgba(255, 214, 10, 0.13);
+  animation: coverAvatarFloat 3.4s ease-in-out infinite;
+}
+
+#coverScreen h2 {
+  color: var(--text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+#coverScreen p {
+  color: rgba(29, 53, 87, 0.86);
+}
+
+#coverScreen .menu-actions {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#coverScreen .menu-actions button {
+  width: 100%;
+  justify-content: center;
+  border-radius: 18px;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 14px 30px rgba(0, 87, 217, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+#coverScreen .menu-actions button:hover,
+#coverScreen .menu-actions button:focus-visible {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 20px 42px rgba(0, 87, 217, 0.30),
+    0 0 0 5px rgba(255, 214, 10, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.66);
+}
+
+#coverScreen .hero-card::before {
+  content: "✨ 🏫 ⭐ 🎮";
+  position: absolute;
+  top: -22px;
+  right: 22px;
+  z-index: 3;
+  font-size: 1.45rem;
+  letter-spacing: 0.12em;
+  opacity: 0.95;
+  filter: drop-shadow(0 8px 12px rgba(0, 31, 94, 0.22));
+  animation: coverFloatIcons 3.2s ease-in-out infinite;
+}
+
+#coverScreen .hero-card::after {
+  content: "梁書 RPG 校園社交任務";
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  bottom: -16px;
+  transform: translateX(-50%);
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 214, 10, 0.92), rgba(255, 176, 0, 0.90));
+  color: #573700;
+  font-weight: 950;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  box-shadow: 0 12px 30px rgba(0, 31, 94, 0.18);
+}
+
+@keyframes schoolCoverCameraMove {
+  0% {
+    transform: scale(1.08) translateX(-1.8%) translateY(0);
+    background-position: center center;
+  }
+  50% {
+    transform: scale(1.12) translateX(0.8%) translateY(-0.8%);
+    background-position: 52% 46%;
+  }
+  100% {
+    transform: scale(1.16) translateX(1.8%) translateY(-1.2%);
+    background-position: center top;
+  }
+}
+
+@keyframes coverAvatarFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes coverFloatIcons {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@media (max-width: 640px) {
+  #coverScreen {
+    min-height: 78vh;
+    padding: 24px 10px;
+  }
+
+  #coverScreen .hero-card {
+    max-width: 94%;
+    padding: 24px 18px;
+  }
+
+  #coverScreen .hero-card::before {
+    right: 14px;
+    font-size: 1.1rem;
+  }
+
+  #coverScreen::before {
+    background-position: 42% center;
+  }
+}
+
+body.reduced-motion #coverScreen::before,
+body.reduced-motion #coverScreen .hero-avatar,
+body.reduced-motion #coverScreen .hero-card::before {
+  animation: none !important;
+}
