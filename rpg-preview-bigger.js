@@ -1,6 +1,6 @@
 // /rpg-preview-bigger.js
 // Make the RPG map mission information box about 2x larger.
-// Also fixes edge popups such as 班群訊息：沒有人回覆 near 新街校門.
+// Also fixes edge popups such as 班群訊息：沒有人回覆 and 文件袋不見了.
 
 (function () {
   function injectBiggerPreviewStyle() {
@@ -123,8 +123,7 @@
         transform: translate(calc(-100% - 38px), 0) !important;
       }
 
-      /* Special fix: 📱 班群訊息：沒有人回覆 is moved to 新街校門 near the bottom-right edge.
-         With the larger card, it must open to the left and upward so it stays visible. */
+      /* Special fix: 📱 班群訊息：沒有人回覆 is moved to 新街校門 near the bottom-right edge. */
       #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview {
         left: 73.5% !important;
         top: 84.5% !important;
@@ -135,6 +134,25 @@
         left: auto !important;
         right: -21px !important;
         top: calc(100% - 38px) !important;
+        transform: rotate(45deg) !important;
+        border-left: 0 !important;
+        border-bottom: 0 !important;
+        border-right: 4px solid rgba(255,176,0,0.76) !important;
+        border-top: 4px solid rgba(255,176,0,0.76) !important;
+      }
+
+      /* Special fix: 🗂️ 文件袋不見了 is also close to the right edge after CSS repositioning.
+         Open the big card to the left side, aligned around the marker, so it is not cut off. */
+      #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="lostItem"].is-selected) #rpgMissionPreview {
+        left: 60.5% !important;
+        top: 30.5% !important;
+        transform: translate(calc(-100% - 44px), -18%) !important;
+      }
+
+      #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="lostItem"].is-selected) #rpgMissionPreview::before {
+        left: auto !important;
+        right: -21px !important;
+        top: 36px !important;
         transform: rotate(45deg) !important;
         border-left: 0 !important;
         border-bottom: 0 !important;
