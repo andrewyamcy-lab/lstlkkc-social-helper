@@ -1,5 +1,6 @@
 // /rpg-preview-bigger.js
 // Make the RPG map mission information box about 2x larger.
+// Also fixes edge popups such as 班群訊息：沒有人回覆 near 新街校門.
 
 (function () {
   function injectBiggerPreviewStyle() {
@@ -120,6 +121,25 @@
 
       #rpgRealMapWrap .rpg-floating-preview.left-side.top-side {
         transform: translate(calc(-100% - 38px), 0) !important;
+      }
+
+      /* Special fix: 📱 班群訊息：沒有人回覆 is moved to 新街校門 near the bottom-right edge.
+         With the larger card, it must open to the left and upward so it stays visible. */
+      #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview {
+        left: 73.5% !important;
+        top: 84.5% !important;
+        transform: translate(calc(-100% - 44px), -100%) !important;
+      }
+
+      #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview::before {
+        left: auto !important;
+        right: -21px !important;
+        top: calc(100% - 38px) !important;
+        transform: rotate(45deg) !important;
+        border-left: 0 !important;
+        border-bottom: 0 !important;
+        border-right: 4px solid rgba(255,176,0,0.76) !important;
+        border-top: 4px solid rgba(255,176,0,0.76) !important;
       }
 
       @media (max-width: 900px) {
