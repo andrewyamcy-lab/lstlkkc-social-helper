@@ -1,6 +1,7 @@
 // /rpg-preview-bigger.js
 // Make the RPG map mission information box about 2x larger.
 // Also fixes edge popups such as 班群訊息：沒有人回覆 and 文件袋不見了.
+// Also auto-loads RPG progress system.
 
 (function () {
   function injectBiggerPreviewStyle() {
@@ -102,7 +103,6 @@
         font-weight: 950 !important;
       }
 
-      /* Keep popup inside the visible map better on the far right / bottom. */
       #rpgRealMapWrap .rpg-floating-preview.left-side {
         transform: translate(calc(-100% - 38px), -50%) !important;
       }
@@ -123,7 +123,6 @@
         transform: translate(calc(-100% - 38px), 0) !important;
       }
 
-      /* Special fix: 📱 班群訊息：沒有人回覆 is moved to 新街校門 near the bottom-right edge. */
       #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="whatsappIgnored"].is-selected) #rpgMissionPreview {
         left: 73.5% !important;
         top: 84.5% !important;
@@ -141,8 +140,6 @@
         border-top: 4px solid rgba(255,176,0,0.76) !important;
       }
 
-      /* Special fix: 🗂️ 文件袋不見了 is also close to the right edge after CSS repositioning.
-         Open the big card to the left side, aligned around the marker, so it is not cut off. */
       #rpgRealMapWrap:has(.rpg-map-marker[data-rpg-scenario="lostItem"].is-selected) #rpgMissionPreview {
         left: 60.5% !important;
         top: 30.5% !important;
@@ -214,10 +211,20 @@
     document.head.appendChild(style);
   }
 
+  function loadRpgProgressSystem() {
+    if (document.getElementById('rpgProgressSystemScript')) return;
+    const script = document.createElement('script');
+    script.id = 'rpgProgressSystemScript';
+    script.src = 'rpg-progress-system.js?v=20260504-1';
+    document.body.appendChild(script);
+  }
+
   function init() {
     injectBiggerPreviewStyle();
+    loadRpgProgressSystem();
     setTimeout(injectBiggerPreviewStyle, 300);
     setTimeout(injectBiggerPreviewStyle, 1000);
+    setTimeout(loadRpgProgressSystem, 300);
   }
 
   if (document.readyState === 'loading') {
