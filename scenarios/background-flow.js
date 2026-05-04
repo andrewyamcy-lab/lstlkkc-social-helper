@@ -5,6 +5,7 @@
 // Feedback appears together at the end.
 // Final result uses 3-star rating instead of numeric score.
 // Final page includes a Try Again button.
+// Updated: background start button now says「開始挑戰」with RPG-style UI.
 
 (function () {
   let activeScenarioKey = '';
@@ -24,6 +25,108 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function injectMissionStartButtonStyles() {
+    if (document.getElementById('missionStartChallengeButtonStyle')) return;
+
+    const style = document.createElement('style');
+    style.id = 'missionStartChallengeButtonStyle';
+    style.textContent = `
+      #asdChoices .mission-start-challenge-btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: min(360px, 100%);
+        margin: 8px auto 0;
+        padding: 16px 26px;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.68);
+        color: #ffffff;
+        background: linear-gradient(180deg, #37a0ff 0%, #006be8 100%) !important;
+        font-size: 1.12rem;
+        font-weight: 950;
+        letter-spacing: 0.04em;
+        box-shadow:
+          0 9px 0 rgba(169, 205, 242, 0.92),
+          0 18px 34px rgba(0, 87, 217, 0.22),
+          inset 0 1px 0 rgba(255,255,255,0.62);
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      #asdChoices .mission-start-challenge-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30), transparent);
+        transform: translateX(-120%);
+        animation: missionStartShine 2.8s ease-in-out infinite;
+        z-index: -1;
+      }
+
+      #asdChoices .mission-start-challenge-btn::after {
+        display: none !important;
+        content: none !important;
+      }
+
+      #asdChoices .mission-start-challenge-btn:hover,
+      #asdChoices .mission-start-challenge-btn:focus-visible {
+        transform: translateY(-4px) scale(1.015);
+        filter: brightness(1.04);
+        box-shadow:
+          0 13px 0 rgba(169, 205, 242, 0.95),
+          0 24px 44px rgba(0, 87, 217, 0.28),
+          0 0 0 6px rgba(255, 214, 10, 0.16),
+          inset 0 1px 0 rgba(255,255,255,0.74);
+        outline: none;
+      }
+
+      #asdChoices .mission-start-challenge-btn:active {
+        transform: translateY(4px);
+        box-shadow:
+          0 4px 0 rgba(169, 205, 242, 0.92),
+          0 10px 20px rgba(0, 87, 217, 0.16),
+          inset 0 1px 0 rgba(255,255,255,0.42);
+      }
+
+      #asdChoices .mission-start-challenge-btn .mission-start-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.20);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+        font-size: 1.14rem;
+        line-height: 1;
+      }
+
+      #asdChoices .mission-start-challenge-btn .mission-start-text {
+        line-height: 1;
+      }
+
+      @keyframes missionStartShine {
+        0%, 42% { transform: translateX(-120%); }
+        72%, 100% { transform: translateX(120%); }
+      }
+
+      @media (max-width: 640px) {
+        #asdChoices .mission-start-challenge-btn {
+          width: 100%;
+          padding: 15px 20px;
+          font-size: 1.04rem;
+          border-radius: 18px;
+        }
+      }
+
+      body.reduced-motion #asdChoices .mission-start-challenge-btn::before {
+        animation: none !important;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   function cloneOption(option) {
@@ -54,7 +157,6 @@
 
   function prepareSteps(game) {
     if (!game || !Array.isArray(game.steps)) return [];
-
     return game.steps.map(function (step) {
       const cloned = cloneStep(step);
       cloned.options = shuffleArray(cloned.options);
@@ -114,9 +216,7 @@
         if (index < activeQuestionIndex) pill.classList.add('done');
         if (index === activeQuestionIndex) pill.classList.add('active');
       }
-      if (mode === 'done') {
-        pill.classList.add('done');
-      }
+      if (mode === 'done') pill.classList.add('done');
     });
   }
 
@@ -195,6 +295,8 @@
   }
 
   function showBackgroundFirst(key) {
+    injectMissionStartButtonStyles();
+
     const game = typeof asdGames !== 'undefined' ? asdGames[key] : null;
     if (!game || !game.intro || !Array.isArray(game.steps)) return false;
 
@@ -231,7 +333,12 @@
     }
 
     if (choices) {
-      choices.innerHTML = '<button type="button" class="choice-button start-question-button" id="startQuestionAfterBackgroundBtn">我已閱讀背景，開始答題</button>';
+      choices.innerHTML =
+        '<button type="button" class="choice-button start-question-button mission-start-challenge-btn" id="startQuestionAfterBackgroundBtn">' +
+          '<span class="mission-start-icon">🎮</span>' +
+          '<span class="mission-start-text">開始挑戰</span>' +
+        '</button>';
+
       const button = document.getElementById('startQuestionAfterBackgroundBtn');
       if (button) {
         button.addEventListener('click', function () {
@@ -303,13 +410,9 @@
       });
     }
 
-    // Move to the next question automatically. No 下一題 button.
     setTimeout(function () {
-      if (activeQuestionIndex >= activeSteps.length - 1) {
-        renderFinish();
-      } else {
-        renderQuestion(activeQuestionIndex + 1);
-      }
+      if (activeQuestionIndex >= activeSteps.length - 1) renderFinish();
+      else renderQuestion(activeQuestionIndex + 1);
     }, 260);
   }
 
@@ -372,9 +475,7 @@
         '<button type="button" class="choice-button secondary" onclick="showPhraseLibraryScreen()">前往社交句式庫</button>';
 
       const tryAgainBtn = document.getElementById('tryAgainCurrentScenarioBtn');
-      if (tryAgainBtn) {
-        tryAgainBtn.addEventListener('click', tryAgainCurrentScenario);
-      }
+      if (tryAgainBtn) tryAgainBtn.addEventListener('click', tryAgainCurrentScenario);
     }
   }
 
@@ -411,6 +512,7 @@
   }
 
   function initBackgroundFlow() {
+    injectMissionStartButtonStyles();
     patchStartGameForBackground();
   }
 
