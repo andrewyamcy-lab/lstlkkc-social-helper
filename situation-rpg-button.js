@@ -1,5 +1,6 @@
 // /situation-rpg-button.js
-// Add RPG map button to the situation list page.
+// Add ONE RPG map button to the situation list page.
+// Fix: remove duplicate RPG map buttons if scripts initialise more than once.
 
 (function () {
   function goToRpgMap() {
@@ -65,26 +66,55 @@
     document.head.appendChild(style);
   }
 
+  function removeDuplicateRpgButtons() {
+    const situationScreen = document.getElementById('situationScreen');
+    if (!situationScreen) return;
+
+    const switches = Array.from(situationScreen.querySelectorAll('.situation-rpg-switch, #situationRpgSwitch'));
+    switches.forEach(function (item, index) {
+      if (index > 0) item.remove();
+    });
+
+    const rpgButtons = Array.from(situationScreen.querySelectorAll('button')).filter(function (button) {
+      return (button.textContent || '').trim().includes('RPG 校園地圖');
+    });
+
+    rpgButtons.forEach(function (button, index) {
+      if (index > 0) {
+        const parentSwitch = button.closest('.situation-rpg-switch, #situationRpgSwitch');
+        if (parentSwitch) parentSwitch.remove();
+        else button.remove();
+      }
+    });
+  }
+
   function addRpgButtonToSituationList() {
     injectButtonStyle();
 
     const situationScreen = document.getElementById('situationScreen');
     if (!situationScreen) return;
 
-    if (document.getElementById('situationRpgSwitch')) return;
-
     const scenarioGrid = situationScreen.querySelector('.scenario-select-grid');
     if (!scenarioGrid) return;
 
-    const wrapper = document.createElement('div');
-    wrapper.id = 'situationRpgSwitch';
-    wrapper.className = 'situation-rpg-switch';
-    wrapper.innerHTML = '<button type="button" id="openRpgMapFromSituation">🗺️ RPG 校園地圖</button>';
+    removeDuplicateRpgButtons();
 
-    scenarioGrid.insertAdjacentElement('beforebegin', wrapper);
+    let wrapper = document.getElementById('situationRpgSwitch');
+    if (!wrapper || !situationScreen.contains(wrapper)) {
+      wrapper = document.createElement('div');
+      wrapper.id = 'situationRpgSwitch';
+      wrapper.className = 'situation-rpg-switch';
+      wrapper.innerHTML = '<button type="button" id="openRpgMapFromSituation">🗺️ RPG 校園地圖</button>';
+      scenarioGrid.insertAdjacentElement('beforebegin', wrapper);
+    }
 
-    const button = document.getElementById('openRpgMapFromSituation');
-    if (button) button.addEventListener('click', goToRpgMap);
+    const button = wrapper.querySelector('button');
+    if (button && !button.dataset.rpgClickBound) {
+      button.dataset.rpgClickBound = '1';
+      button.addEventListener('click', goToRpgMap);
+    }
+
+    removeDuplicateRpgButtons();
   }
 
   function initSituationRpgButton() {
@@ -95,6 +125,7 @@
   }
 
   window.addRpgButtonToSituationList = addRpgButtonToSituationList;
+  window.removeDuplicateRpgButtons = removeDuplicateRpgButtons;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSituationRpgButton);
