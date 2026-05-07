@@ -4,6 +4,8 @@
 // 開始 RPG 冒險 / 社交技能書 / 我的角色 / 查看我的徽章 / 我的設定
 
 (function () {
+  let coverObserver = null;
+
   function goToRpgMap() {
     if (typeof showRpgMapScreen === 'function') {
       showRpgMapScreen();
@@ -24,33 +26,76 @@
     });
   }
 
+  function goToSituationList() {
+    if (typeof showSituationScreen === 'function') {
+      showSituationScreen();
+      return;
+    }
+
+    document.querySelectorAll('.screen').forEach(function (screen) {
+      screen.classList.toggle('active', screen.id === 'situationScreen');
+    });
+  }
+
+  function makeCoverButton(text, className, onClick) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = text;
+    if (className) button.className = className;
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
   function cleanupCoverMenu() {
     const menu = document.querySelector('#coverScreen .menu-actions');
     if (!menu) return;
 
-    // Remove only the duplicated cover-page RPG map button.
-    Array.from(menu.querySelectorAll('button')).forEach(function (button) {
-      const text = (button.textContent || '').trim();
-      if (text.includes('RPG 校園地圖') || text.includes('RPG 冒險地圖')) {
-        button.remove();
+    // Rebuild the cover menu from scratch so late-loading scripts cannot leave
+    // a duplicated「RPG 校園地圖」button on the cover page.
+    menu.innerHTML = '';
+    menu.appendChild(makeCoverButton('開始 RPG 冒險', '', goToSituationList));
+    menu.appendChild(makeCoverButton('社交技能書', 'secondary', function () {
+      if (typeof showPhraseLibraryScreen === 'function') showPhraseLibraryScreen();
+    }));
+    menu.appendChild(makeCoverButton('我的角色', 'secondary', function () {
+      if (typeof showCharacterScreen === 'function') showCharacterScreen();
+    }));
+    menu.appendChild(makeCoverButton('查看我的徽章', 'secondary', function () {
+      if (typeof showBadgeScreen === 'function') showBadgeScreen();
+    }));
+    menu.appendChild(makeCoverButton('我的設定', 'secondary', function () {
+      if (typeof showSettingsScreen === 'function') showSettingsScreen();
+    }));
+  }
+
+  function watchCoverMenu() {
+    const menu = document.querySelector('#coverScreen .menu-actions');
+    if (!menu || coverObserver) return;
+
+    coverObserver = new MutationObserver(function () {
+      const hasWrongButton = Array.from(menu.querySelectorAll('button')).some(function (button) {
+        const text = (button.textContent || '').trim();
+        return text.includes('RPG 校園地圖') || text.includes('RPG 冒險地圖');
+      });
+
+      const buttonTexts = Array.from(menu.querySelectorAll('button')).map(function (button) {
+        return (button.textContent || '').trim();
+      });
+
+      const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定'];
+      const wrongOrderOrCount = buttonTexts.length !== expected.length || expected.some(function (text, index) {
+        return buttonTexts[index] !== text;
+      });
+
+      if (hasWrongButton || wrongOrderOrCount) {
+        coverObserver.disconnect();
+        coverObserver = null;
+        cleanupCoverMenu();
+        setTimeout(watchCoverMenu, 0);
       }
     });
 
-    // Keep the first cover button as the main RPG entrance.
-    const firstButton = menu.querySelector('button');
-    if (firstButton) {
-      firstButton.textContent = '開始 RPG 冒險';
-      firstButton.dataset.coverRpgStart = '1';
-    }
-
-    // Ensure wording is consistent.
-    Array.from(menu.querySelectorAll('button')).forEach(function (button) {
-      const text = (button.textContent || '').trim();
-      if (text === '社交句式庫') button.textContent = '社交技能書';
-      if (text === '查看我的徽章') button.textContent = '查看我的徽章';
-      if (text === '我的設定') button.textContent = '我的設定';
-      if (text === '我的角色') button.textContent = '我的角色';
-    });
+    coverObserver.observe(menu, { childList: true, subtree: true, characterData: true });
   }
 
   function injectButtonStyle() {
@@ -121,6 +166,7 @@
   function addRpgButtonToSituationList() {
     injectButtonStyle();
     cleanupCoverMenu();
+    watchCoverMenu();
 
     const situationScreen = document.getElementById('situationScreen');
     if (!situationScreen) return;
@@ -151,11 +197,13 @@
   function initSituationRpgButton() {
     addRpgButtonToSituationList();
     cleanupCoverMenu();
+    watchCoverMenu();
     setTimeout(addRpgButtonToSituationList, 150);
     setTimeout(addRpgButtonToSituationList, 500);
     setTimeout(addRpgButtonToSituationList, 1000);
     setTimeout(cleanupCoverMenu, 1200);
     setTimeout(cleanupCoverMenu, 1800);
+    setTimeout(cleanupCoverMenu, 2500);
   }
 
   window.addRpgButtonToSituationList = addRpgButtonToSituationList;
