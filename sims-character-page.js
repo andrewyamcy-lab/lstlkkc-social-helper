@@ -11,8 +11,8 @@
   const TOTAL_MISSIONS = 20;
 
   const CHARACTERS = {
-    girl: { label: '女學生', icon: '👧🏻', role: '社交練習生', video: 'videos/character-girl.mp4' },
-    boy: { label: '男學生', icon: '👦🏻', role: '社交練習生', video: 'videos/character-boy.mp4' }
+    girl: { name: '心心', label: '女學生', icon: '👧🏻', role: '社交練習生', video: 'videos/character-girl.mp4' },
+    boy: { name: '謙謙', label: '男學生', icon: '👦🏻', role: '社交練習生', video: 'videos/character-boy.mp4' }
   };
 
   const LEVELS = [
@@ -153,7 +153,7 @@
           <div class="sims-video-missing-msg">請上傳影片：<br><code>${esc(character.video)}</code></div>
         </div>
         <div class="sims-character-switch">
-          ${Object.keys(CHARACTERS).map((key) => `<button type="button" class="sims-switch-btn ${key === id ? 'selected' : ''}" onclick="window.setSimsCharacter('${key}')">${CHARACTERS[key].icon} ${CHARACTERS[key].label}</button>`).join('')}
+          ${Object.keys(CHARACTERS).map((key) => `<button type="button" class="sims-switch-btn ${key === id ? 'selected' : ''}" onclick="window.setSimsCharacter('${key}')">${CHARACTERS[key].icon} ${CHARACTERS[key].name}</button>`).join('')}
         </div>
       </div>`;
   }
@@ -231,7 +231,7 @@
           <div class="sims-left-panel">${videoHtml(id)}</div>
           <div class="sims-right-panel">
             <div class="sims-profile-card">
-              <div class="sims-name-row"><div><span class="sims-label">角色名稱</span><h3>梁書社交勇者</h3></div><div class="sims-level-badge">Lv. ${info.level}</div></div>
+              <div class="sims-name-row"><div><span class="sims-label">角色名稱</span><h3>${character.name}</h3></div><div class="sims-level-badge">Lv. ${info.level}</div></div>
               <div class="sims-info-grid">
                 <div><span>角色</span><strong>${character.label}</strong></div>
                 <div><span>稱號</span><strong>${info.title}</strong></div>
