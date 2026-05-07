@@ -20,20 +20,16 @@
       screen.classList.toggle('active', screen.id === 'rpgMapScreen');
     });
 
+    const rpgScreen = document.getElementById('rpgMapScreen');
+    if (rpgScreen) rpgScreen.classList.add('active');
+
+    if (typeof updateRpgMapProgressUI === 'function') {
+      setTimeout(updateRpgMapProgressUI, 80);
+    }
+
     window.scrollTo({
       top: 0,
       behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth'
-    });
-  }
-
-  function goToSituationList() {
-    if (typeof showSituationScreen === 'function') {
-      showSituationScreen();
-      return;
-    }
-
-    document.querySelectorAll('.screen').forEach(function (screen) {
-      screen.classList.toggle('active', screen.id === 'situationScreen');
     });
   }
 
@@ -53,7 +49,7 @@
     // Rebuild the cover menu from scratch so late-loading scripts cannot leave
     // a duplicated「RPG 校園地圖」button on the cover page.
     menu.innerHTML = '';
-    menu.appendChild(makeCoverButton('開始 RPG 冒險', '', goToSituationList));
+    menu.appendChild(makeCoverButton('開始 RPG 冒險', '', goToRpgMap));
     menu.appendChild(makeCoverButton('社交技能書', 'secondary', function () {
       if (typeof showPhraseLibraryScreen === 'function') showPhraseLibraryScreen();
     }));
