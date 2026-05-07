@@ -1,8 +1,45 @@
 // /rpg-start-fix.js
-// Fix: when starting a mission from the RPG map, hide the map and show only the game page.
+// Fix 1: when starting a mission from the RPG map, hide the map and show only the game page.
+// Fix 2: prevent refresh flicker where the mission page appears briefly before the cover page.
 
 (function () {
+  let userStartedMission = false;
+  let startupLockActive = true;
+
+  function showCoverDuringStartup() {
+    if (userStartedMission || !startupLockActive) return;
+
+    const cover = document.getElementById('coverScreen');
+    if (!cover) return;
+
+    document.querySelectorAll('.screen').forEach(function (screen) {
+      screen.classList.toggle('active', screen.id === 'coverScreen');
+    });
+
+    const rpgMap = document.getElementById('rpgMapScreen');
+    if (rpgMap) rpgMap.classList.remove('active');
+
+    try {
+      if (typeof appState !== 'undefined' && appState) appState.currentScreen = 'cover';
+    } catch (error) {}
+  }
+
+  function installStartupCoverGuard() {
+    // Force the correct initial screen before the slower window.load event.
+    showCoverDuringStartup();
+    setTimeout(showCoverDuringStartup, 0);
+    setTimeout(showCoverDuringStartup, 50);
+    setTimeout(showCoverDuringStartup, 150);
+    setTimeout(showCoverDuringStartup, 350);
+    setTimeout(function () {
+      startupLockActive = false;
+    }, 900);
+  }
+
   function hideRpgMapAndShowGame() {
+    userStartedMission = true;
+    startupLockActive = false;
+
     document.querySelectorAll('.screen').forEach(function (screen) {
       screen.classList.toggle('active', screen.id === 'gameScreen');
     });
@@ -46,6 +83,7 @@
   }
 
   function initRpgStartFix() {
+    installStartupCoverGuard();
     if (patchStartRpgMission()) return;
     setTimeout(patchStartRpgMission, 150);
     setTimeout(patchStartRpgMission, 450);
@@ -59,5 +97,8 @@
     initRpgStartFix();
   }
 
-  window.addEventListener('load', initRpgStartFix);
+  window.addEventListener('load', function () {
+    showCoverDuringStartup();
+    initRpgStartFix();
+  });
 })();
