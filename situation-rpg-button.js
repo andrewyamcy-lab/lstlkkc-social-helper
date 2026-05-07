@@ -3,7 +3,7 @@
 // Cover page cleanup: keep only
 // 開始 RPG 冒險 / 社交技能書 / 我的角色 / 查看我的徽章 / 我的設定
 // UI cleanup: keep only one visible progress bar on the RPG map panel.
-// EXP bar style: Minecraft-inspired pixel segmented green bar.
+// EXP bar style: Minecraft-inspired white pixel segmented green bar.
 
 (function () {
   let coverObserver = null;
@@ -14,9 +14,7 @@
       return;
     }
 
-    if (typeof ensureRpgMapScreen === 'function') {
-      ensureRpgMapScreen();
-    }
+    if (typeof ensureRpgMapScreen === 'function') ensureRpgMapScreen();
 
     document.querySelectorAll('.screen').forEach(function (screen) {
       screen.classList.toggle('active', screen.id === 'rpgMapScreen');
@@ -49,8 +47,6 @@
     const menu = document.querySelector('#coverScreen .menu-actions');
     if (!menu) return;
 
-    // Rebuild the cover menu from scratch so late-loading scripts cannot leave
-    // a duplicated「RPG 校園地圖」button on the cover page.
     menu.innerHTML = '';
     menu.appendChild(makeCoverButton('開始 RPG 冒險', '', goToRpgMap));
     menu.appendChild(makeCoverButton('社交技能書', 'secondary', function () {
@@ -72,18 +68,15 @@
     if (!menu || coverObserver) return;
 
     coverObserver = new MutationObserver(function () {
-      const hasWrongButton = Array.from(menu.querySelectorAll('button')).some(function (button) {
-        const text = (button.textContent || '').trim();
-        return text.includes('RPG 校園地圖') || text.includes('RPG 冒險地圖');
-      });
-
-      const buttonTexts = Array.from(menu.querySelectorAll('button')).map(function (button) {
+      const texts = Array.from(menu.querySelectorAll('button')).map(function (button) {
         return (button.textContent || '').trim();
       });
-
       const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定'];
-      const wrongOrderOrCount = buttonTexts.length !== expected.length || expected.some(function (text, index) {
-        return buttonTexts[index] !== text;
+      const hasWrongButton = texts.some(function (text) {
+        return text.includes('RPG 校園地圖') || text.includes('RPG 冒險地圖');
+      });
+      const wrongOrderOrCount = texts.length !== expected.length || expected.some(function (text, index) {
+        return texts[index] !== text;
       });
 
       if (hasWrongButton || wrongOrderOrCount) {
@@ -155,7 +148,7 @@
         margin-bottom: 0 !important;
       }
 
-      /* Minecraft-inspired EXP bar for RPG map and character page */
+      /* Minecraft-inspired EXP bar with WHITE pixel track */
       #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap,
       #characterScreen .rpg-exp-panel .rpg-progress-bar-wrap {
         position: relative !important;
@@ -165,16 +158,16 @@
         background:
           repeating-linear-gradient(
             90deg,
-            #141414 0 3px,
-            #242424 3px 18px,
-            #141414 18px 21px
+            #ffffff 0 3px,
+            #f4f8ff 3px 18px,
+            #dbe7f5 18px 21px
           ) !important;
-        border: 3px solid #101010 !important;
+        border: 3px solid #ffffff !important;
         box-shadow:
-          0 0 0 2px rgba(255,255,255,0.74),
-          0 5px 0 rgba(0,0,0,0.24),
-          inset 0 2px 0 rgba(255,255,255,0.12),
-          inset 0 -3px 0 rgba(0,0,0,0.42) !important;
+          0 0 0 2px rgba(0, 122, 255, 0.16),
+          0 5px 0 rgba(169, 205, 242, 0.52),
+          inset 0 2px 0 rgba(255,255,255,0.96),
+          inset 0 -3px 0 rgba(169,205,242,0.38) !important;
       }
 
       #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap::before,
@@ -185,7 +178,7 @@
         background:
           repeating-linear-gradient(
             90deg,
-            rgba(255,255,255,0.08) 0 1px,
+            rgba(0,122,255,0.10) 0 1px,
             transparent 1px 19px
           );
         pointer-events: none;
@@ -198,8 +191,8 @@
         position: absolute;
         inset: 0;
         box-shadow:
-          inset 0 3px 0 rgba(255,255,255,0.15),
-          inset 0 -4px 0 rgba(0,0,0,0.45);
+          inset 0 3px 0 rgba(255,255,255,0.92),
+          inset 0 -4px 0 rgba(169,205,242,0.30);
         pointer-events: none;
         z-index: 3;
       }
@@ -216,16 +209,16 @@
             #116b08 18px 21px
           ) !important;
         box-shadow:
-          inset 0 4px 0 rgba(255,255,255,0.38),
-          inset 0 -5px 0 rgba(0,0,0,0.28),
-          0 0 14px rgba(57,255,20,0.38) !important;
+          inset 0 4px 0 rgba(255,255,255,0.42),
+          inset 0 -5px 0 rgba(0,0,0,0.20),
+          0 0 14px rgba(57,255,20,0.34) !important;
       }
 
       #rpgProgressPanel .rpg-map-level-mini > span,
       #characterScreen .rpg-exp-head strong {
         color: #1f6f00 !important;
         font-weight: 950 !important;
-        text-shadow: 0 1px 0 rgba(255,255,255,0.78) !important;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.92) !important;
       }
     `;
     document.head.appendChild(style);
