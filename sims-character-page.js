@@ -147,7 +147,6 @@
     const character = CHARACTERS[id];
     return `
       <div class="sims-video-stage">
-        <div class="sims-diamond"></div>
         <div class="sims-video-frame">
           <video class="sims-character-video" src="${esc(character.video)}" autoplay muted loop playsinline preload="metadata" onerror="this.closest('.sims-video-frame').classList.add('video-missing')"></video>
           <div class="sims-video-missing-msg">請上傳影片：<br><code>${esc(character.video)}</code></div>
@@ -290,7 +289,7 @@
       .sims-left-panel { padding:16px; }
       .sims-right-panel { display:grid; gap:14px; }
       .sims-video-stage { position:relative; display:grid; gap:12px; }
-      .sims-diamond { position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(45deg); width:46px; height:46px; background:linear-gradient(135deg,#39ff14,#6efff4); border:4px solid rgba(255,255,255,.92); box-shadow:0 10px 24px rgba(57,255,20,.28), inset 0 1px 0 rgba(255,255,255,.70); z-index:3; }
+      .sims-diamond { display:none !important; }
       .sims-video-frame { position:relative; min-height:540px; border-radius:30px; overflow:hidden; background:radial-gradient(circle at 50% 75%, rgba(57,255,20,.18), transparent 22%), linear-gradient(180deg, rgba(255,255,255,.72), rgba(226,242,255,.70)); border:1px solid rgba(255,255,255,.84); box-shadow:inset 0 1px 0 rgba(255,255,255,.92), 0 18px 42px rgba(29,53,87,.14); }
       .sims-character-video { width:100%; height:100%; min-height:540px; object-fit:contain; display:block; }
       .sims-video-missing-msg { display:none; position:absolute; inset:24px; border-radius:22px; place-items:center; text-align:center; color:var(--muted); background:rgba(255,255,255,.72); border:1px dashed rgba(0,122,255,.32); line-height:1.8; }
