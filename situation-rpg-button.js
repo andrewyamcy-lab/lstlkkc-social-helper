@@ -2,6 +2,7 @@
 // Add ONE RPG map button to the situation list page.
 // Cover page cleanup: keep only
 // 開始 RPG 冒險 / 社交技能書 / 我的角色 / 查看我的徽章 / 我的設定
+// UI cleanup: keep only one visible progress bar on the RPG map panel.
 
 (function () {
   let coverObserver = null;
@@ -25,6 +26,7 @@
 
     if (typeof updateRpgMapProgressUI === 'function') {
       setTimeout(updateRpgMapProgressUI, 80);
+      setTimeout(cleanupRpgProgressBars, 120);
     }
 
     window.scrollTo({
@@ -137,6 +139,33 @@
     document.head.appendChild(style);
   }
 
+  function injectProgressBarCleanupStyle() {
+    if (document.getElementById('singleRpgProgressBarStyle')) return;
+
+    const style = document.createElement('style');
+    style.id = 'singleRpgProgressBarStyle';
+    style.textContent = `
+      /* Hide the second RPG map progress bar. The visible bar is now only EXP / level progress. */
+      #rpgProgressPanel > .rpg-progress-bar-wrap {
+        display: none !important;
+      }
+
+      #rpgProgressPanel .rpg-map-level-mini {
+        margin-bottom: 0 !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function cleanupRpgProgressBars() {
+    injectProgressBarCleanupStyle();
+    const panel = document.getElementById('rpgProgressPanel');
+    if (!panel) return;
+
+    const missionBar = panel.querySelector(':scope > .rpg-progress-bar-wrap');
+    if (missionBar) missionBar.setAttribute('aria-hidden', 'true');
+  }
+
   function removeDuplicateRpgButtons() {
     const situationScreen = document.getElementById('situationScreen');
     if (!situationScreen) return;
@@ -161,8 +190,10 @@
 
   function addRpgButtonToSituationList() {
     injectButtonStyle();
+    injectProgressBarCleanupStyle();
     cleanupCoverMenu();
     watchCoverMenu();
+    cleanupRpgProgressBars();
 
     const situationScreen = document.getElementById('situationScreen');
     if (!situationScreen) return;
@@ -194,17 +225,22 @@
     addRpgButtonToSituationList();
     cleanupCoverMenu();
     watchCoverMenu();
+    cleanupRpgProgressBars();
     setTimeout(addRpgButtonToSituationList, 150);
     setTimeout(addRpgButtonToSituationList, 500);
     setTimeout(addRpgButtonToSituationList, 1000);
     setTimeout(cleanupCoverMenu, 1200);
     setTimeout(cleanupCoverMenu, 1800);
     setTimeout(cleanupCoverMenu, 2500);
+    setTimeout(cleanupRpgProgressBars, 300);
+    setTimeout(cleanupRpgProgressBars, 900);
+    setTimeout(cleanupRpgProgressBars, 1600);
   }
 
   window.addRpgButtonToSituationList = addRpgButtonToSituationList;
   window.removeDuplicateRpgButtons = removeDuplicateRpgButtons;
   window.cleanupCoverMenu = cleanupCoverMenu;
+  window.cleanupRpgProgressBars = cleanupRpgProgressBars;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSituationRpgButton);
