@@ -3,6 +3,7 @@
 // Cover page cleanup: keep only
 // 開始 RPG 冒險 / 社交技能書 / 我的角色 / 查看我的徽章 / 我的設定
 // UI cleanup: keep only one visible progress bar on the RPG map panel.
+// EXP bar style: Minecraft-inspired pixel segmented green bar.
 
 (function () {
   let coverObserver = null;
@@ -152,6 +153,79 @@
 
       #rpgProgressPanel .rpg-map-level-mini {
         margin-bottom: 0 !important;
+      }
+
+      /* Minecraft-inspired EXP bar for RPG map and character page */
+      #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap,
+      #characterScreen .rpg-exp-panel .rpg-progress-bar-wrap {
+        position: relative !important;
+        height: 22px !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+        background:
+          repeating-linear-gradient(
+            90deg,
+            #141414 0 3px,
+            #242424 3px 18px,
+            #141414 18px 21px
+          ) !important;
+        border: 3px solid #101010 !important;
+        box-shadow:
+          0 0 0 2px rgba(255,255,255,0.74),
+          0 5px 0 rgba(0,0,0,0.24),
+          inset 0 2px 0 rgba(255,255,255,0.12),
+          inset 0 -3px 0 rgba(0,0,0,0.42) !important;
+      }
+
+      #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap::before,
+      #characterScreen .rpg-exp-panel .rpg-progress-bar-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        background:
+          repeating-linear-gradient(
+            90deg,
+            rgba(255,255,255,0.08) 0 1px,
+            transparent 1px 19px
+          );
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap::after,
+      #characterScreen .rpg-exp-panel .rpg-progress-bar-wrap::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        box-shadow:
+          inset 0 3px 0 rgba(255,255,255,0.15),
+          inset 0 -4px 0 rgba(0,0,0,0.45);
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap .rpg-progress-bar-fill,
+      #characterScreen .rpg-exp-panel .rpg-progress-bar-wrap .rpg-progress-bar-fill {
+        height: 100% !important;
+        border-radius: 0 !important;
+        background:
+          repeating-linear-gradient(
+            90deg,
+            #39ff14 0 14px,
+            #22c70d 14px 18px,
+            #116b08 18px 21px
+          ) !important;
+        box-shadow:
+          inset 0 4px 0 rgba(255,255,255,0.38),
+          inset 0 -5px 0 rgba(0,0,0,0.28),
+          0 0 14px rgba(57,255,20,0.38) !important;
+      }
+
+      #rpgProgressPanel .rpg-map-level-mini > span,
+      #characterScreen .rpg-exp-head strong {
+        color: #1f6f00 !important;
+        font-weight: 950 !important;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.78) !important;
       }
     `;
     document.head.appendChild(style);
