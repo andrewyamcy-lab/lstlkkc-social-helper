@@ -1,6 +1,7 @@
 // /situation-rpg-button.js
 // Add ONE RPG map button to the situation list page.
-// Also remove the duplicated RPG entrance from the cover page by restoring「開始練習」.
+// Cover page cleanup: keep only
+// 開始 RPG 冒險 / 社交技能書 / 我的角色 / 查看我的徽章 / 我的設定
 
 (function () {
   function goToRpgMap() {
@@ -23,27 +24,33 @@
     });
   }
 
-  function restoreCoverStartButton() {
+  function cleanupCoverMenu() {
     const menu = document.querySelector('#coverScreen .menu-actions');
     if (!menu) return;
 
-    const buttons = Array.from(menu.querySelectorAll('button'));
-    const coverRpgButton = buttons.find(function (button) {
+    // Remove only the duplicated cover-page RPG map button.
+    Array.from(menu.querySelectorAll('button')).forEach(function (button) {
       const text = (button.textContent || '').trim();
-      return text === '開始 RPG 冒險' || text.includes('開始 RPG 冒險');
+      if (text.includes('RPG 校園地圖') || text.includes('RPG 冒險地圖')) {
+        button.remove();
+      }
     });
 
-    if (!coverRpgButton || coverRpgButton.dataset.coverStartRestored === '1') return;
+    // Keep the first cover button as the main RPG entrance.
+    const firstButton = menu.querySelector('button');
+    if (firstButton) {
+      firstButton.textContent = '開始 RPG 冒險';
+      firstButton.dataset.coverRpgStart = '1';
+    }
 
-    const newButton = document.createElement('button');
-    newButton.type = 'button';
-    newButton.textContent = '開始練習';
-    newButton.dataset.coverStartRestored = '1';
-    newButton.addEventListener('click', function () {
-      if (typeof showSituationScreen === 'function') showSituationScreen();
+    // Ensure wording is consistent.
+    Array.from(menu.querySelectorAll('button')).forEach(function (button) {
+      const text = (button.textContent || '').trim();
+      if (text === '社交句式庫') button.textContent = '社交技能書';
+      if (text === '查看我的徽章') button.textContent = '查看我的徽章';
+      if (text === '我的設定') button.textContent = '我的設定';
+      if (text === '我的角色') button.textContent = '我的角色';
     });
-
-    coverRpgButton.replaceWith(newButton);
   }
 
   function injectButtonStyle() {
@@ -113,7 +120,7 @@
 
   function addRpgButtonToSituationList() {
     injectButtonStyle();
-    restoreCoverStartButton();
+    cleanupCoverMenu();
 
     const situationScreen = document.getElementById('situationScreen');
     if (!situationScreen) return;
@@ -143,17 +150,17 @@
 
   function initSituationRpgButton() {
     addRpgButtonToSituationList();
-    restoreCoverStartButton();
+    cleanupCoverMenu();
     setTimeout(addRpgButtonToSituationList, 150);
     setTimeout(addRpgButtonToSituationList, 500);
     setTimeout(addRpgButtonToSituationList, 1000);
-    setTimeout(restoreCoverStartButton, 1200);
-    setTimeout(restoreCoverStartButton, 1800);
+    setTimeout(cleanupCoverMenu, 1200);
+    setTimeout(cleanupCoverMenu, 1800);
   }
 
   window.addRpgButtonToSituationList = addRpgButtonToSituationList;
   window.removeDuplicateRpgButtons = removeDuplicateRpgButtons;
-  window.restoreCoverStartButton = restoreCoverStartButton;
+  window.cleanupCoverMenu = cleanupCoverMenu;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSituationRpgButton);
