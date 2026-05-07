@@ -257,9 +257,10 @@
   <script src="badge-system-v2.js?v=20260502-1"></script>
   <script src="situation-rpg-button.js?v=20260503-1"></script>
   <script src="rpg-preview-bigger.js?v=20260504-1"></script>
+  <script src="sims-character-page.js?v=20260507-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
-      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen'];
+      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'characterScreen'];
       screenIds.forEach((id) => {
         const screen = document.getElementById(id);
         if (screen) screen.classList.toggle('active', id === screenId);
