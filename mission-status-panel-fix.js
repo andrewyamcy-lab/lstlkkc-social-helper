@@ -4,6 +4,7 @@
 // Completed mission icons turn grey and map stars are capped to 3 stars.
 // Completed missions can be replayed, but the saved final result keeps the best score.
 // Updated: uses a MutationObserver so the status appears even after the left panel is re-rendered.
+// Updated: unfinished missions do not show a「未完成」status box.
 
 (function () {
   const STORAGE_KEY = 'asd_school_rpg_progress_v1';
@@ -55,11 +56,11 @@
     }
 
     return {
-      completed,
+      completed: false,
       className: 'not-completed',
-      title: '未完成',
-      detail: '完成 5 題後，這裡會顯示「已完成」。',
-      note: '完成後圖示會變成灰色，你仍然可以重新挑戰。',
+      title: '',
+      detail: '',
+      note: '',
       buttonText: '開始任務'
     };
   }
@@ -115,7 +116,6 @@
         line-height: 1.45;
       }
 
-      .rpg-side-status.not-completed .rpg-side-status-main { color: #5f6b7a; }
       .rpg-side-status.completed .rpg-side-status-main { color: #137300; }
       .rpg-side-status.three-star .rpg-side-status-main { color: #9a5a00; }
       .rpg-side-status.completed .rpg-side-status-dot { background: #34c759; box-shadow: 0 0 0 4px rgba(52,199,89,.16); }
@@ -218,7 +218,7 @@
     if (!panel || panel.querySelector('.rpg-side-card')) return;
     const empty = panel.querySelector('.rpg-side-empty');
     if (!empty || empty.querySelector('.rpg-side-empty-check-note')) return;
-    empty.insertAdjacentHTML('beforeend', '<p class="rpg-side-empty-check-note">你可以從地圖圖示知道進度：顯示灰色圖示代表已完成；星星最多 3 粒，★★★ 代表滿分完成。完成後仍可重玩，系統會保留最高分。</p>');
+    empty.insertAdjacentHTML('beforeend', '<p class="rpg-side-empty-check-note">完成後圖示會變成灰色；星星最多 3 粒，★★★ 代表滿分完成。完成後仍可重玩，系統會保留最高分。</p>');
   }
 
   function updateSidePanelStatus(key) {
@@ -234,9 +234,15 @@
     const missionKey = key || getSelectedMissionKey();
     if (!missionKey) return;
 
-    const status = statusForMission(missionKey);
     const old = card.querySelector('.rpg-side-status');
     if (old) old.remove();
+
+    const status = statusForMission(missionKey);
+    const startButton = card.querySelector('[data-rpg-side-start]');
+    if (startButton) startButton.textContent = status.buttonText;
+
+    // Do not show a「未完成」box. Only show status after the mission has been completed before.
+    if (!status.completed) return;
 
     const tagRow = card.querySelector('.rpg-side-tag-row');
     if (tagRow) {
@@ -248,9 +254,6 @@
         '</div>'
       );
     }
-
-    const startButton = card.querySelector('[data-rpg-side-start]');
-    if (startButton) startButton.textContent = status.buttonText;
   }
 
   function refreshSelectedPanel() {
