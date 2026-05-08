@@ -1,6 +1,7 @@
 // /mission-status-panel-fix.js
 // Shows clearly whether each RPG mission is finished.
 // Adds completion status to the left mission information panel and refreshes map markers from localStorage.
+// Updated: completed mission icons turn grey and map stars are capped to 3 stars.
 
 (function () {
   const STORAGE_KEY = 'asd_school_rpg_progress_v1';
@@ -15,15 +16,16 @@
   }
 
   function renderStars(stars) {
+    const safeStars = Math.max(0, Math.min(3, Number(stars || 0)));
     let out = '';
-    for (let i = 1; i <= 3; i += 1) out += i <= Number(stars || 0) ? '★' : '☆';
+    for (let i = 1; i <= 3; i += 1) out += i <= safeStars ? '★' : '☆';
     return out;
   }
 
   function statusForMission(key) {
     const progress = readProgress();
     const completed = !!(progress.completed || {})[key];
-    const stars = Number((progress.stars || {})[key] || 0);
+    const stars = Math.max(0, Math.min(3, Number((progress.stars || {})[key] || 0)));
     const score = Number((progress.scores || {})[key] || 0);
     const exp = Number((progress.expAwards || {})[key] || 0);
 
@@ -111,6 +113,46 @@
         color: var(--primary-dark) !important;
         font-weight: 850;
       }
+
+      /* Completed mission icon becomes grey. */
+      #rpgMapScreen.active .rpg-map-marker.is-completed,
+      #rpgMapScreen.active .rpg-map-marker.is-three-star {
+        background: linear-gradient(180deg, #f3f4f6 0%, #d7dce3 100%) !important;
+        border-color: #a8b3c2 !important;
+        color: #5f6b7a !important;
+        box-shadow:
+          0 8px 18px rgba(95,107,122,.22),
+          0 0 0 5px rgba(168,179,194,.18),
+          0 0 0 10px rgba(95,107,122,.10) !important;
+        animation: none !important;
+        filter: grayscale(1) saturate(.25) brightness(.96) !important;
+      }
+
+      #rpgMapScreen.active .rpg-map-marker.is-completed::before,
+      #rpgMapScreen.active .rpg-map-marker.is-three-star::before {
+        border-color: rgba(168,179,194,.55) !important;
+        animation: none !important;
+        opacity: .55 !important;
+      }
+
+      #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-text,
+      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-text,
+      #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-mini-stars,
+      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-mini-stars {
+        background: #6b7280 !important;
+        color: #ffffff !important;
+      }
+
+      /* The map is 3-star based, not 5-star based. */
+      #rpgMapScreen.active .rpg-marker-mini-stars {
+        display: block !important;
+        font-size: .58rem !important;
+        line-height: 1.15 !important;
+        white-space: nowrap !important;
+        letter-spacing: 0 !important;
+        max-width: none !important;
+        overflow: visible !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -120,17 +162,23 @@
     document.querySelectorAll('.rpg-map-marker[data-rpg-scenario]').forEach(function (marker) {
       const key = marker.dataset.rpgScenario;
       const completed = !!(progress.completed || {})[key];
-      const stars = Number((progress.stars || {})[key] || 0);
+      const stars = Math.max(0, Math.min(3, Number((progress.stars || {})[key] || 0)));
 
       marker.classList.toggle('is-completed', completed && stars < 3);
-      marker.classList.toggle('is-three-star', stars >= 3);
+      marker.classList.toggle('is-three-star', completed && stars >= 3);
+      marker.dataset.stars = String(stars);
+      marker.dataset.completed = completed ? 'true' : 'false';
 
       const label = marker.querySelector('.rpg-marker-text');
       if (label) {
-        if (stars >= 3) label.textContent = '★★★';
-        else if (completed) label.textContent = '完成';
+        if (completed) label.textContent = renderStars(stars);
         else label.textContent = '任務';
       }
+
+      // Some older scripts add a separate mini-star label. Remove it so the map never shows 5 stars.
+      marker.querySelectorAll('.rpg-marker-mini-stars').forEach(function (mini) {
+        mini.remove();
+      });
     });
   }
 
@@ -139,7 +187,7 @@
     if (!panel || panel.querySelector('.rpg-side-card')) return;
     const empty = panel.querySelector('.rpg-side-empty');
     if (!empty || empty.querySelector('.rpg-side-empty-check-note')) return;
-    empty.insertAdjacentHTML('beforeend', '<p class="rpg-side-empty-check-note">你可以從地圖圖示知道進度：顯示「完成」代表已完成；顯示「★★★」代表 3 星完成。</p>');
+    empty.insertAdjacentHTML('beforeend', '<p class="rpg-side-empty-check-note">你可以從地圖圖示知道進度：顯示灰色圖示代表已完成；星星最多 3 粒，★★★ 代表滿分完成。</p>');
   }
 
   function updateSidePanelStatus(key) {
@@ -179,6 +227,7 @@
       const key = marker.dataset.rpgScenario;
       setTimeout(function () { updateSidePanelStatus(key); updateMapMarkers(); }, 60);
       setTimeout(function () { updateSidePanelStatus(key); updateMapMarkers(); }, 250);
+      setTimeout(updateMapMarkers, 700);
       return;
     }
 
@@ -206,5 +255,6 @@
     run();
     setTimeout(run, 500);
     setTimeout(run, 1500);
+    setTimeout(run, 3000);
   });
 })();
