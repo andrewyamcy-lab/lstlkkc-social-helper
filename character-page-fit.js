@@ -4,6 +4,14 @@
 // The MP4 portrait ratio is preserved with aspect-ratio + object-fit: contain.
 
 (function () {
+  function loadVirtueAbilitySystem() {
+    if (document.querySelector('script[data-virtue-ability-system="true"]')) return;
+    const script = document.createElement('script');
+    script.src = 'virtue-ability-system.js?v=20260508-1';
+    script.dataset.virtueAbilitySystem = 'true';
+    document.body.appendChild(script);
+  }
+
   function injectCharacterPageFitStyle() {
     if (document.getElementById('characterPageFitStyle')) return;
 
@@ -266,10 +274,17 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectCharacterPageFitStyle);
+    document.addEventListener('DOMContentLoaded', function () {
+      injectCharacterPageFitStyle();
+      loadVirtueAbilitySystem();
+    });
   } else {
     injectCharacterPageFitStyle();
+    loadVirtueAbilitySystem();
   }
 
-  window.addEventListener('load', injectCharacterPageFitStyle);
+  window.addEventListener('load', function () {
+    injectCharacterPageFitStyle();
+    loadVirtueAbilitySystem();
+  });
 })();
