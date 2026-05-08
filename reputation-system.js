@@ -3,7 +3,7 @@
 // - Reputation starts at 50
 // - Lowest 0, highest 100
 // - Changes after completing each mission
-// - Shows a bar under the EXP bar on 我的角色 page
+// - Shows a simple EXP-style bar under the EXP bar on 我的角色 page
 
 (function () {
   const REPUTATION_KEY = 'asd_school_reputation_v1';
@@ -141,16 +141,16 @@
 
   function reputationRank(value) {
     const v = clamp(value);
-    if (v <= 9) return { title: '臭名遠播', mood: 'danger', desc: '要小心，這代表最近的社交選擇容易令別人不舒服。' };
-    if (v <= 24) return { title: '惡名昭彰', mood: 'danger', desc: '需要重新建立別人對你的信任。' };
-    if (v <= 39) return { title: '校園麻煩友', mood: 'warning', desc: '有些回應可能太衝動，建議先停一停再選擇。' };
-    if (v <= 49) return { title: '有待觀察', mood: 'warning', desc: '你正在調整中，下一個任務可以嘗試更友善的回應。' };
-    if (v <= 59) return { title: '普通學生', mood: 'neutral', desc: '聲譽保持平穩，繼續完成任務可以提升。' };
-    if (v <= 69) return { title: '友善同伴', mood: 'good', desc: '你的回應開始更穩定、友善。' };
-    if (v <= 79) return { title: '人緣不錯', mood: 'good', desc: '同學會較容易覺得你可靠和好相處。' };
-    if (v <= 89) return { title: '聲名鵲起', mood: 'great', desc: '你在校園社交任務中的表現越來越成熟。' };
-    if (v <= 99) return { title: '眾人信任', mood: 'great', desc: '你的選擇大多能照顧自己和別人的感受。' };
-    return { title: '梁書傳奇', mood: 'legend', desc: '你已達到最高聲譽，是真正的社交任務傳奇。' };
+    if (v <= 9) return { title: '臭名遠播', mood: 'danger' };
+    if (v <= 24) return { title: '惡名昭彰', mood: 'danger' };
+    if (v <= 39) return { title: '校園麻煩友', mood: 'warning' };
+    if (v <= 49) return { title: '有待觀察', mood: 'warning' };
+    if (v <= 59) return { title: '普通學生', mood: 'neutral' };
+    if (v <= 69) return { title: '友善同伴', mood: 'good' };
+    if (v <= 79) return { title: '人緣不錯', mood: 'good' };
+    if (v <= 89) return { title: '聲名鵲起', mood: 'great' };
+    if (v <= 99) return { title: '眾人信任', mood: 'great' };
+    return { title: '梁書傳奇', mood: 'legend' };
   }
 
   function applyMissionReputation(missionKey, score) {
@@ -241,18 +241,13 @@
     const last = state.history && state.history.length ? state.history[state.history.length - 1] : null;
     const changeText = last ? (Number(last.change) >= 0 ? '+' + Number(last.change) : String(Number(last.change))) : '—';
 
-    return '<div class="sims-reputation-wrap ' + esc(rank.mood) + '" id="simsReputationPanel">' +
-      '<div class="sims-reputation-info">' +
+    return '<div class="sims-exp-wrap sims-reputation-wrap ' + esc(rank.mood) + '" id="simsReputationPanel">' +
+      '<div class="sims-exp-info sims-reputation-info">' +
         '<strong>校園聲譽</strong>' +
         '<span>目前稱號：<b>' + esc(rank.title) + '</b></span>' +
       '</div>' +
-      '<div class="sims-reputation-bar" aria-label="校園聲譽"><div class="sims-reputation-fill" style="width:' + value + '%"></div></div>' +
-      '<div class="sims-reputation-footer">' +
-        '<span>臭名遠播</span>' +
-        '<strong>本次變化：' + esc(changeText) + '</strong>' +
-        '<span>梁書傳奇</span>' +
-      '</div>' +
-      '<p>' + esc(rank.desc) + '</p>' +
+      '<div class="sims-exp-bar sims-reputation-bar" aria-label="校園聲譽：' + value + '%"><div class="sims-exp-fill sims-reputation-fill" style="width:' + value + '%"></div></div>' +
+      '<div class="sims-reputation-mini"><span>臭名遠播</span><strong>本次變化：' + esc(changeText) + '</strong><span>梁書傳奇</span></div>' +
     '</div>';
   }
 
@@ -263,7 +258,7 @@
     const profilePanel = characterScreen.querySelector('.sims-profile-card');
     if (!profilePanel) return;
 
-    const expWrap = profilePanel.querySelector('.sims-exp-wrap');
+    const expWrap = profilePanel.querySelector('.sims-exp-wrap:not(.sims-reputation-wrap)');
     if (!expWrap) return;
 
     const old = profilePanel.querySelector('#simsReputationPanel');
@@ -297,35 +292,7 @@
     style.id = 'reputationSystemStyle';
     style.textContent = `
       .sims-reputation-wrap {
-        margin-top: 10px;
-        padding: 12px;
-        border-radius: 20px;
-        background: rgba(255,255,255,.62);
-        border: 1px solid rgba(255,255,255,.76);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 10px 22px rgba(29,53,87,.08);
-        display: grid;
-        gap: 8px;
-      }
-
-      .sims-reputation-info,
-      .sims-reputation-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      .sims-reputation-info strong {
-        color: var(--text);
-        font-weight: 950;
-      }
-
-      .sims-reputation-info span,
-      .sims-reputation-footer span,
-      .sims-reputation-wrap p {
-        color: var(--muted);
-        font-size: .82rem;
-        font-weight: 850;
+        margin-top: 10px !important;
       }
 
       .sims-reputation-info b {
@@ -333,63 +300,60 @@
       }
 
       .sims-reputation-bar {
-        height: 22px;
-        border-radius: 0;
-        overflow: hidden;
-        background: repeating-linear-gradient(90deg,#fff 0 3px,#f4f8ff 3px 18px,#dbe7f5 18px 21px);
-        border: 3px solid #fff;
-        box-shadow: 0 0 0 2px rgba(0,122,255,.14),0 5px 0 rgba(169,205,242,.46),inset 0 2px 0 rgba(255,255,255,.96),inset 0 -3px 0 rgba(169,205,242,.34);
+        margin-top: 0;
       }
 
       .sims-reputation-fill {
-        height: 100%;
-        border-radius: 0;
         transition: width .45s ease;
-        background: repeating-linear-gradient(90deg,#ff3b30 0 14px,#c9180d 14px 18px,#7a0d08 18px 21px);
-        box-shadow: inset 0 4px 0 rgba(255,255,255,.32), inset 0 -5px 0 rgba(0,0,0,.20), 0 0 14px rgba(255,59,48,.25);
+        background: repeating-linear-gradient(90deg,#64d2ff 0 14px,#2f8cff 14px 18px,#0057d9 18px 21px) !important;
+        box-shadow: inset 0 4px 0 rgba(255,255,255,.38), inset 0 -5px 0 rgba(0,0,0,.18), 0 0 14px rgba(47,140,255,.24) !important;
+      }
+
+      .sims-reputation-wrap.danger .sims-reputation-fill {
+        background: repeating-linear-gradient(90deg,#ff3b30 0 14px,#c9180d 14px 18px,#7a0d08 18px 21px) !important;
+        box-shadow: inset 0 4px 0 rgba(255,255,255,.32), inset 0 -5px 0 rgba(0,0,0,.20), 0 0 14px rgba(255,59,48,.25) !important;
       }
 
       .sims-reputation-wrap.warning .sims-reputation-fill {
-        background: repeating-linear-gradient(90deg,#ffb000 0 14px,#e28a00 14px 18px,#8a5200 18px 21px);
-        box-shadow: inset 0 4px 0 rgba(255,255,255,.36), inset 0 -5px 0 rgba(0,0,0,.18), 0 0 14px rgba(255,176,0,.26);
-      }
-
-      .sims-reputation-wrap.neutral .sims-reputation-fill {
-        background: repeating-linear-gradient(90deg,#64d2ff 0 14px,#2f8cff 14px 18px,#0057d9 18px 21px);
-        box-shadow: inset 0 4px 0 rgba(255,255,255,.38), inset 0 -5px 0 rgba(0,0,0,.18), 0 0 14px rgba(47,140,255,.24);
+        background: repeating-linear-gradient(90deg,#ffb000 0 14px,#e28a00 14px 18px,#8a5200 18px 21px) !important;
+        box-shadow: inset 0 4px 0 rgba(255,255,255,.36), inset 0 -5px 0 rgba(0,0,0,.18), 0 0 14px rgba(255,176,0,.26) !important;
       }
 
       .sims-reputation-wrap.good .sims-reputation-fill,
-      .sims-reputation-wrap.great .sims-reputation-fill,
-      .sims-reputation-wrap.legend .sims-reputation-fill {
-        background: repeating-linear-gradient(90deg,#39ff14 0 14px,#22c70d 14px 18px,#116b08 18px 21px);
-        box-shadow: inset 0 4px 0 rgba(255,255,255,.42), inset 0 -5px 0 rgba(0,0,0,.20), 0 0 14px rgba(57,255,20,.34);
-      }
-
-      .sims-reputation-wrap.legend .sims-reputation-info b {
-        color: #9a5a00;
+      .sims-reputation-wrap.great .sims-reputation-fill {
+        background: repeating-linear-gradient(90deg,#39ff14 0 14px,#22c70d 14px 18px,#116b08 18px 21px) !important;
+        box-shadow: inset 0 4px 0 rgba(255,255,255,.42), inset 0 -5px 0 rgba(0,0,0,.20), 0 0 14px rgba(57,255,20,.34) !important;
       }
 
       .sims-reputation-wrap.legend .sims-reputation-fill {
-        background: repeating-linear-gradient(90deg,#fff5c2 0 12px,#ffb000 12px 18px,#9a5a00 18px 21px);
+        background: repeating-linear-gradient(90deg,#fff5c2 0 12px,#ffb000 12px 18px,#9a5a00 18px 21px) !important;
       }
 
-      .sims-reputation-footer strong {
+      .sims-reputation-mini {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: .78rem;
+        font-weight: 850;
+      }
+
+      .sims-reputation-mini span:last-child {
+        text-align: right;
+      }
+
+      .sims-reputation-mini strong {
         color: var(--primary-dark);
-        font-size: .82rem;
         white-space: nowrap;
       }
 
-      .sims-reputation-wrap p {
-        margin: 0;
-        line-height: 1.45;
-      }
-
       @media (max-width: 640px) {
-        .sims-reputation-info,
-        .sims-reputation-footer {
-          align-items: flex-start;
-          flex-direction: column;
+        .sims-reputation-mini {
+          grid-template-columns: 1fr;
+        }
+        .sims-reputation-mini span:last-child {
+          text-align: left;
         }
       }
     `;
