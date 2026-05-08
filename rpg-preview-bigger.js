@@ -1,5 +1,6 @@
 // /rpg-preview-bigger.js
-// Make the RPG map mission information box about 2x larger.
+// Make the RPG map mission information box larger.
+// Updated: mission preview image keeps its original ratio instead of being cropped.
 // Also fixes edge popups such as 班群訊息：沒有人回覆 and 文件袋不見了.
 // Also auto-loads RPG progress system.
 
@@ -13,8 +14,8 @@
     style.textContent = `
       /* Bigger RPG information popup */
       #rpgRealMapWrap .rpg-floating-preview {
-        width: 560px !important;
-        max-width: 560px !important;
+        width: 640px !important;
+        max-width: 640px !important;
         padding: 22px !important;
         border-radius: 34px !important;
         border-width: 4px !important;
@@ -60,15 +61,18 @@
       }
 
       #rpgRealMapWrap .rpg-preview-body {
-        grid-template-columns: 170px 1fr !important;
+        grid-template-columns: 230px 1fr !important;
         gap: 18px !important;
         align-items: start !important;
       }
 
       #rpgRealMapWrap .rpg-preview-image {
-        width: 170px !important;
-        height: 140px !important;
+        width: 230px !important;
+        height: auto !important;
+        max-height: 180px !important;
         aspect-ratio: auto !important;
+        object-fit: contain !important;
+        display: block !important;
         border-radius: 24px !important;
         border-width: 3px !important;
       }
@@ -159,18 +163,20 @@
 
       @media (max-width: 900px) {
         #rpgRealMapWrap .rpg-floating-preview {
-          width: 500px !important;
-          max-width: 500px !important;
+          width: 560px !important;
+          max-width: 560px !important;
           padding: 20px !important;
         }
 
         #rpgRealMapWrap .rpg-preview-body {
-          grid-template-columns: 150px 1fr !important;
+          grid-template-columns: 200px 1fr !important;
         }
 
         #rpgRealMapWrap .rpg-preview-image {
-          width: 150px !important;
-          height: 124px !important;
+          width: 200px !important;
+          height: auto !important;
+          max-height: 160px !important;
+          object-fit: contain !important;
         }
 
         #rpgRealMapWrap .rpg-preview-content h3 {
@@ -184,19 +190,21 @@
 
       @media (max-width: 640px) {
         #rpgRealMapWrap .rpg-floating-preview {
-          width: 430px !important;
-          max-width: 430px !important;
+          width: 480px !important;
+          max-width: 480px !important;
           padding: 18px !important;
         }
 
         #rpgRealMapWrap .rpg-preview-body {
-          grid-template-columns: 128px 1fr !important;
+          grid-template-columns: 170px 1fr !important;
           gap: 14px !important;
         }
 
         #rpgRealMapWrap .rpg-preview-image {
-          width: 128px !important;
-          height: 108px !important;
+          width: 170px !important;
+          height: auto !important;
+          max-height: 135px !important;
+          object-fit: contain !important;
         }
 
         #rpgRealMapWrap .rpg-preview-content h3 {
