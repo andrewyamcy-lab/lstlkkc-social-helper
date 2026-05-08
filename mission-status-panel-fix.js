@@ -3,9 +3,11 @@
 // Adds completion status to the left mission information panel and refreshes map markers from localStorage.
 // Completed mission icons turn grey and map stars are capped to 3 stars.
 // Completed missions can be replayed, but the saved final result keeps the best score.
+// Updated: uses a MutationObserver so the status appears even after the left panel is re-rendered.
 
 (function () {
   const STORAGE_KEY = 'asd_school_rpg_progress_v1';
+  let statusObserver = null;
 
   function readProgress() {
     try {
@@ -200,6 +202,17 @@
     });
   }
 
+  function getSelectedMissionKey() {
+    const selected = document.querySelector('#rpgMapScreen.active .rpg-map-marker.is-selected[data-rpg-scenario]');
+    if (selected && selected.dataset.rpgScenario) return selected.dataset.rpgScenario;
+
+    const panel = document.getElementById('rpgSideMissionPanel');
+    const button = panel ? panel.querySelector('[data-rpg-side-start]') : null;
+    if (button) return button.getAttribute('data-rpg-side-start') || '';
+
+    return '';
+  }
+
   function addEmptyPanelNote() {
     const panel = document.getElementById('rpgSideMissionPanel');
     if (!panel || panel.querySelector('.rpg-side-card')) return;
@@ -218,7 +231,7 @@
       return;
     }
 
-    const missionKey = key || (document.querySelector('.rpg-map-marker.is-selected[data-rpg-scenario]') || {}).dataset?.rpgScenario;
+    const missionKey = key || getSelectedMissionKey();
     if (!missionKey) return;
 
     const status = statusForMission(missionKey);
@@ -240,13 +253,31 @@
     if (startButton) startButton.textContent = status.buttonText;
   }
 
+  function refreshSelectedPanel() {
+    updateMapMarkers();
+    updateSidePanelStatus(getSelectedMissionKey());
+  }
+
+  function observeSidePanel() {
+    const panel = document.getElementById('rpgSideMissionPanel');
+    if (!panel || statusObserver) return;
+
+    statusObserver = new MutationObserver(function () {
+      if (panel.querySelector('.rpg-side-card') && !panel.querySelector('.rpg-side-status')) {
+        setTimeout(refreshSelectedPanel, 0);
+      }
+    });
+
+    statusObserver.observe(panel, { childList: true, subtree: true });
+  }
+
   function handleClick(event) {
     const marker = event.target.closest && event.target.closest('#rpgMapScreen.active .rpg-map-marker[data-rpg-scenario]');
     if (marker) {
       const key = marker.dataset.rpgScenario;
-      setTimeout(function () { updateSidePanelStatus(key); updateMapMarkers(); }, 60);
-      setTimeout(function () { updateSidePanelStatus(key); updateMapMarkers(); }, 250);
-      setTimeout(updateMapMarkers, 700);
+      setTimeout(function () { updateSidePanelStatus(key); updateMapMarkers(); observeSidePanel(); }, 80);
+      setTimeout(function () { updateSidePanelStatus(key); updateMapMarkers(); observeSidePanel(); }, 300);
+      setTimeout(refreshSelectedPanel, 700);
       return;
     }
 
@@ -260,6 +291,8 @@
     injectStyle();
     updateMapMarkers();
     addEmptyPanelNote();
+    observeSidePanel();
+    setTimeout(refreshSelectedPanel, 250);
   }
 
   document.addEventListener('click', handleClick, true);
