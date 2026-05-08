@@ -1,6 +1,6 @@
 // /mission-result-review-fix.js
 // Stable compact final result panel after each mission.
-// Shows: ability change + result summary on top, full-width 逐題回饋 below.
+// Shows: ability change + result summary on top, full-width expandable 逐題回饋 below.
 
 (function () {
   const SESSION_KEY = 'asd_school_mission_review_session_v1';
@@ -109,7 +109,7 @@
   function starMessage(stars) {
     if (stars >= 3) return '表現很好，可以進入下一個任務。';
     if (stars === 2) return '做得不錯，重玩可挑戰 3 星。';
-    return '已完成任務，可看看下面哪幾題需要留意。';
+    return '已完成任務，可點開下面題目看看哪幾題需要留意。';
   }
 
   function getBestAnswer(step) {
@@ -191,14 +191,21 @@
   }
 
   function renderReviewRows(items) {
-    return items.map(function (item) {
+    return items.map(function (item, index) {
       const label = labelForScore(item.score);
-      const best = item.score >= 2 || !item.bestAnswer ? '' : '<div class="mission-result-best"><strong>建議：</strong>' + esc(shortenText(item.bestAnswer, 38)) + '</div>';
-      return '<div class="mission-result-row ' + label.className + '">' +
-        '<div class="mission-result-row-head"><strong>第 ' + esc(item.questionNumber) + ' 題｜' + label.icon + ' ' + esc(label.text) + '</strong><span>' + esc(item.score) + '/2</span></div>' +
-        '<div class="mission-result-brief"><strong>你選：</strong>' + esc(shortenText(item.selectedText, 46)) + '</div>' +
-        '<div class="mission-result-brief"><strong>回饋：</strong>' + esc(shortenText(item.note, 56)) + '</div>' + best +
-      '</div>';
+      const best = item.score >= 2 || !item.bestAnswer ? '' : '<div class="mission-result-best"><strong>建議：</strong>' + esc(item.bestAnswer) + '</div>';
+      const isFirstProblem = item.score < 2 && !items.slice(0, index).some(function (prev) { return Number(prev.score || 0) < 2; });
+      return '<details class="mission-result-row ' + label.className + '" ' + (isFirstProblem ? 'open' : '') + '>' +
+        '<summary class="mission-result-row-head">' +
+          '<strong>第 ' + esc(item.questionNumber) + ' 題｜' + label.icon + ' ' + esc(label.text) + '</strong>' +
+          '<span>' + esc(item.score) + '/2</span>' +
+        '</summary>' +
+        '<div class="mission-result-detail">' +
+          '<div class="mission-result-brief"><strong>你選：</strong>' + esc(shortenText(item.selectedText, 90)) + '</div>' +
+          '<div class="mission-result-brief"><strong>回饋：</strong>' + esc(item.note) + '</div>' +
+          best +
+        '</div>' +
+      '</details>';
     }).join('');
   }
 
@@ -228,7 +235,7 @@
         '<div class="mission-result-score"><strong>' + score + ' / ' + maxScore + '</strong><span>' + esc(starMessage(stars)) + '</span></div>' +
       '</div>' +
       '<div class="mission-result-review-card">' +
-        '<div class="mission-result-review-title"><h3>逐題回饋</h3><span>快速查看哪題做得好 / 要改善</span></div>' +
+        '<div class="mission-result-review-title"><h3>逐題回饋</h3><span>點擊每一題打開 / 收起詳細回饋</span></div>' +
         '<div class="mission-result-row-grid">' + renderReviewRows(items) + '</div>' +
       '</div>';
 
@@ -334,21 +341,70 @@
         display: grid !important;
         grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
         gap: 10px !important;
+        align-items: start !important;
       }
 
       .mission-result-row {
-        display: grid; gap: 5px; padding: 12px 12px; min-height: 170px;
-        border-radius: 16px; background: rgba(255,255,255,.74); border: 1px solid rgba(255,255,255,.86);
-        line-height: 1.35; font-weight: 760; min-width: 0;
+        display: block;
+        padding: 0;
+        border-radius: 16px;
+        background: rgba(255,255,255,.74);
+        border: 1px solid rgba(255,255,255,.86);
+        line-height: 1.35;
+        font-weight: 760;
+        min-width: 0;
+        overflow: hidden;
       }
-      .mission-result-row-head { display: flex; justify-content: space-between; align-items: center; gap: 7px; }
-      .mission-result-row-head strong { font-size: .82rem; }
-      .mission-result-row-head span { flex: 0 0 auto; padding: 3px 6px; border-radius: 999px; background: rgba(255,255,255,.9); color: var(--primary-dark); font-size: .75rem; font-weight: 950; }
-      .mission-result-brief, .mission-result-best { font-size: .82rem; color: var(--muted); overflow-wrap: anywhere; line-height: 1.42; }
+
+      .mission-result-row summary { list-style: none; cursor: pointer; }
+      .mission-result-row summary::-webkit-details-marker { display: none; }
+
+      .mission-result-row-head {
+        min-height: 72px;
+        padding: 12px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .mission-result-row-head strong { font-size: .84rem; }
+      .mission-result-row-head span {
+        flex: 0 0 auto;
+        padding: 3px 6px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.9);
+        color: var(--primary-dark);
+        font-size: .75rem;
+        font-weight: 950;
+      }
+
+      .mission-result-row-head::after {
+        content: '＋';
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        display: inline-grid;
+        place-items: center;
+        background: rgba(0,122,255,.10);
+        color: var(--primary-dark);
+        font-weight: 950;
+        flex: 0 0 auto;
+      }
+
+      .mission-result-row[open] .mission-result-row-head::after { content: '－'; }
+
+      .mission-result-detail {
+        display: grid;
+        gap: 7px;
+        padding: 0 12px 12px;
+      }
+
+      .mission-result-brief, .mission-result-best { font-size: .84rem; color: var(--muted); overflow-wrap: anywhere; line-height: 1.45; }
       .mission-result-row.good { box-shadow: inset 4px 0 0 rgba(52,199,89,.78); }
       .mission-result-row.ok { box-shadow: inset 4px 0 0 rgba(255,176,0,.78); }
       .mission-result-row.bad { box-shadow: inset 4px 0 0 rgba(255,59,48,.70); }
-      .mission-result-best { padding: 6px 8px; border-radius: 12px; background: rgba(52,199,89,.10); color: #137300; }
+      .mission-result-best { padding: 7px 9px; border-radius: 12px; background: rgba(52,199,89,.10); color: #137300; }
 
       #gameScreen.active.mission-finish-mode #asdChoices { grid-area: choices !important; width: 100% !important; box-sizing: border-box !important; }
 
@@ -356,7 +412,7 @@
         #gameScreen.active.mission-finish-mode .dialogue-area.center-column { grid-template-columns: 1fr !important; grid-template-areas: "ability" "result" "review" "choices" !important; }
         #gameScreen.active.mission-finish-mode .mission-result-summary-card { grid-template-columns: 1fr !important; }
         #gameScreen.active.mission-finish-mode .mission-result-row-grid { grid-template-columns: 1fr !important; }
-        .mission-result-row { min-height: 0 !important; }
+        .mission-result-row-head { min-height: 0 !important; }
       }
     `;
     document.head.appendChild(style);
