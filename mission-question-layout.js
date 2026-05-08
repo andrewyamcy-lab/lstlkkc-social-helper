@@ -4,7 +4,7 @@
 // - wider centered background box
 // - left side = 16:9 mission image
 // - right side = question + answers
-// - A / B / C / D answer labels
+// - A / B / C / D answer labels WITHOUT changing the button's real text or click handler
 // - skill/save buttons in one line
 
 (function () {
@@ -43,9 +43,9 @@
       #gameScreen.active.mission-question-mode > p,
       #gameScreen.active.mission-question-mode .top-status,
       #gameScreen.active.mission-question-mode #sceneMeta,
-      #gameScreen.active.mission-question-mode #hintBox,
-      #gameScreen.active.mission-question-mode #calmBox,
-      #gameScreen.active.mission-question-mode #reviewBoxInline {
+      #gameScreen.active.mission-question-mode #hintBox.hidden,
+      #gameScreen.active.mission-question-mode #calmBox.hidden,
+      #gameScreen.active.mission-question-mode #reviewBoxInline.hidden {
         display: none !important;
       }
 
@@ -131,7 +131,6 @@
         min-width: 28px !important;
       }
 
-      /* Use the real image box created by scenario-images-light.js */
       #gameScreen.active.mission-question-mode #gameScenarioImageBox {
         grid-area: image !important;
         display: block !important;
@@ -165,7 +164,6 @@
         display: none !important;
       }
 
-      /* Hide the original text box visually; it is still used as the data source for the question panel. */
       #gameScreen.active.mission-question-mode #asdBox {
         display: none !important;
       }
@@ -230,7 +228,8 @@
         line-height: 1.38 !important;
       }
 
-      #gameScreen.active.mission-question-mode #asdChoices .choice-letter {
+      #gameScreen.active.mission-question-mode #asdChoices button[data-choice-letter]::before {
+        content: attr(data-choice-letter) !important;
         width: 28px !important;
         height: 28px !important;
         min-width: 28px !important;
@@ -244,12 +243,6 @@
         box-shadow: inset 0 1px 0 rgba(255,255,255,.5) !important;
       }
 
-      #gameScreen.active.mission-question-mode #asdChoices .choice-text {
-        flex: 1 !important;
-        display: block !important;
-      }
-
-      /* Put all skill/save buttons in one line. */
       #gameScreen.active.mission-question-mode .action-row {
         grid-area: actions !important;
         display: grid !important;
@@ -322,11 +315,9 @@
   }
 
   function ensureQuestionTextPanel() {
-    const dialogueArea = document.querySelector('#gameScreen.active .dialogue-area.center-column');
     const asdBox = document.getElementById('asdBox');
     const asdChoices = document.getElementById('asdChoices');
-
-    if (!dialogueArea || !asdBox || !asdChoices) return;
+    if (!asdBox || !asdChoices) return;
 
     let panel = document.getElementById('missionQuestionText');
     if (!panel) {
@@ -352,17 +343,14 @@
       (body ? '<div class="mission-question-body">' + escapeHtml(body) + '</div>' : '');
   }
 
-  function decorateAnswersABCD() {
+  function addAnswerLettersWithoutChangingButtons() {
     const choices = document.querySelectorAll('#gameScreen.active.mission-question-mode #asdChoices button');
     const letters = ['A', 'B', 'C', 'D'];
 
     choices.forEach(function (btn, index) {
-      const baseText = btn.dataset.baseText || btn.textContent.trim();
-      btn.dataset.baseText = baseText;
-
-      btn.innerHTML =
-        '<span class="choice-letter">' + (letters[index] || '') + '</span>' +
-        '<span class="choice-text">' + escapeHtml(baseText) + '</span>';
+      // Important: do NOT change innerHTML / textContent.
+      // The original answer logic depends on the original button and its original text.
+      btn.dataset.choiceLetter = letters[index] || '';
     });
   }
 
@@ -402,7 +390,7 @@
     if (active) {
       ensureImageBoxIsVisible();
       ensureQuestionTextPanel();
-      decorateAnswersABCD();
+      addAnswerLettersWithoutChangingButtons();
     }
   }
 
@@ -432,9 +420,8 @@
   }
 
   document.addEventListener('click', function () {
-    setTimeout(updateMissionQuestionMode, 60);
-    setTimeout(updateMissionQuestionMode, 180);
-    setTimeout(updateMissionQuestionMode, 360);
+    setTimeout(updateMissionQuestionMode, 80);
+    setTimeout(updateMissionQuestionMode, 250);
   }, true);
 
   if (document.readyState === 'loading') {
