@@ -1,13 +1,12 @@
 // /mission-result-review-fix.js
-// Adds a clear final result panel after each mission:
-// - star rating
-// - score
-// - per-question review: good / can improve / needs attention
-// This file is intentionally loaded last so newer RPG UI scripts cannot hide the result review.
+// Stable compact final result panel after each mission.
+// Fixes:
+// - no repeated remove/reinsert flicker
+// - no image on ending page
+// - shorter ending page with compact 5-question feedback
 
 (function () {
   const SESSION_KEY = 'asd_school_mission_review_session_v1';
-  const PROGRESS_KEY = 'asd_school_rpg_progress_v1';
   const TOTAL_QUESTIONS = 5;
   const THREE_STAR_SCORE = 8;
 
@@ -15,7 +14,7 @@
   let currentScore = 0;
   let reviewItems = [];
   let answeredKeys = new Set();
-  let renderScheduled = false;
+  let renderTimer = null;
 
   function esc(value) {
     return String(value || '')
@@ -115,9 +114,9 @@
   }
 
   function starMessage(stars) {
-    if (stars >= 3) return '非常好！你大部分回應都清楚、平靜，而且有照顧到自己和別人的感受。';
-    if (stars === 2) return '做得不錯！你已經掌握基本方向，下次可以再留意語氣、界線和回應的完整度。';
-    return '你已完成任務，這是好的開始。可以重看逐題回饋，再試一次挑戰更高星數。';
+    if (stars >= 3) return '表現很好，可以進入下一個任務。';
+    if (stars === 2) return '做得不錯，重玩可挑戰 3 星。';
+    return '已完成任務，可看看下面哪幾題需要留意。';
   }
 
   function getBestAnswer(step) {
@@ -155,6 +154,8 @@
     currentScore = 0;
     reviewItems = [];
     answeredKeys = new Set();
+    const old = document.getElementById('missionResultReviewBox');
+    if (old) old.remove();
     saveSession();
   }
 
@@ -165,7 +166,6 @@
     const choices = document.getElementById('asdChoices');
     if (!choices || !choices.contains(button)) return;
 
-    // Ignore non-answer buttons on intro/final screens.
     const screen = document.getElementById('gameScreen');
     if (!screen || !screen.classList.contains('mission-question-mode')) return;
 
@@ -189,7 +189,6 @@
 
     reviewItems.push({
       questionNumber: q,
-      prompt: step && step.prompt ? step.prompt : '第 ' + q + ' 題',
       selectedText: option.text || (button.textContent || ''),
       score: score,
       note: option.note || '可以再想想對方感受、語氣和界線。',
@@ -200,20 +199,25 @@
     if (reviewItems.length >= TOTAL_QUESTIONS) scheduleRender();
   }
 
+  function shortenText(text, limit) {
+    const value = String(text || '').trim();
+    if (value.length <= limit) return value;
+    return value.slice(0, limit) + '…';
+  }
+
   function renderReviewRows(items) {
     return items.map(function (item) {
       const label = labelForScore(item.score);
       const best = item.score >= 2 || !item.bestAnswer ? '' :
-        '<div class="mission-result-best"><strong>較理想做法：</strong>' + esc(item.bestAnswer) + '</div>';
+        '<div class="mission-result-best"><strong>建議：</strong>' + esc(shortenText(item.bestAnswer, 34)) + '</div>';
 
       return '<div class="mission-result-row ' + label.className + '">' +
         '<div class="mission-result-row-head">' +
           '<strong>第 ' + esc(item.questionNumber) + ' 題｜' + label.icon + ' ' + esc(label.text) + '</strong>' +
-          '<span>' + esc(item.score) + ' / 2</span>' +
+          '<span>' + esc(item.score) + '/2</span>' +
         '</div>' +
-        '<div class="mission-result-question">' + esc(item.prompt) + '</div>' +
-        '<div><strong>你的選擇：</strong>' + esc(item.selectedText) + '</div>' +
-        '<div><strong>回饋：</strong>' + esc(item.note) + '</div>' +
+        '<div class="mission-result-brief"><strong>你選：</strong>' + esc(shortenText(item.selectedText, 42)) + '</div>' +
+        '<div class="mission-result-brief"><strong>回饋：</strong>' + esc(shortenText(item.note, 52)) + '</div>' +
         best +
       '</div>';
     }).join('');
@@ -229,47 +233,44 @@
     const score = Number((session && session.score) || currentScore || items.reduce(function (sum, item) { return sum + Number(item.score || 0); }, 0));
     const maxScore = TOTAL_QUESTIONS * 2;
     const stars = scoreToStars(score);
+    const panelKey = String((session && session.missionKey) || currentMissionKey || '') + ':' + score + ':' + items.length;
 
     const old = document.getElementById('missionResultReviewBox');
+    if (old && old.dataset.panelKey === panelKey) return;
     if (old) old.remove();
 
     const panel = document.createElement('div');
     panel.id = 'missionResultReviewBox';
-    panel.className = 'mission-result-review-box animate-in';
+    panel.dataset.panelKey = panelKey;
+    panel.className = 'mission-result-review-box';
     panel.innerHTML =
       '<div class="mission-result-summary-card">' +
-        '<div class="panel-badge">任務結果</div>' +
-        '<h3>今次評級：' + starHtml(stars) + '</h3>' +
-        '<div class="mission-result-score"><strong>總分：' + score + ' / ' + maxScore + '</strong><span>' + esc(starMessage(stars)) + '</span></div>' +
+        '<div class="mission-result-summary-left">' +
+          '<div class="panel-badge">任務結果</div>' +
+          '<h3>今次評級：' + starHtml(stars) + '</h3>' +
+        '</div>' +
+        '<div class="mission-result-score"><strong>' + score + ' / ' + maxScore + '</strong><span>' + esc(starMessage(stars)) + '</span></div>' +
       '</div>' +
       '<div class="mission-result-review-card">' +
-        '<h3>逐題回饋</h3>' +
-        '<p>下面會顯示每一題你答得好或需要改善的地方。</p>' +
-        renderReviewRows(items) +
+        '<div class="mission-result-review-title"><h3>逐題回饋</h3><span>快速查看哪題做得好 / 要改善</span></div>' +
+        '<div class="mission-result-row-grid">' + renderReviewRows(items) + '</div>' +
       '</div>';
 
-    const dialogueArea = document.querySelector('#gameScreen.active .dialogue-area.center-column') || document.querySelector('#gameScreen .dialogue-area.center-column');
     const choices = document.getElementById('asdChoices');
-    const abilityBox = document.getElementById('virtueChangeBox');
-
-    if (abilityBox && abilityBox.parentNode) {
-      abilityBox.insertAdjacentElement('afterend', panel);
-    } else if (choices && choices.parentNode) {
+    if (choices && choices.parentNode) {
       choices.parentNode.insertBefore(panel, choices);
-    } else if (dialogueArea) {
-      dialogueArea.appendChild(panel);
+    } else {
+      const dialogueArea = document.querySelector('#gameScreen.active .dialogue-area.center-column') || document.querySelector('#gameScreen .dialogue-area.center-column');
+      if (dialogueArea) dialogueArea.appendChild(panel);
     }
   }
 
   function scheduleRender() {
-    if (renderScheduled) return;
-    renderScheduled = true;
-    setTimeout(function () {
-      renderScheduled = false;
+    if (renderTimer) clearTimeout(renderTimer);
+    renderTimer = setTimeout(function () {
+      renderTimer = null;
       renderPanel(loadSession());
-    }, 950);
-    setTimeout(function () { renderPanel(loadSession()); }, 1500);
-    setTimeout(function () { renderPanel(loadSession()); }, 2400);
+    }, 900);
   }
 
   function injectStyles() {
@@ -278,114 +279,149 @@
     style.id = 'missionResultReviewFixStyle';
     style.textContent = `
       #gameScreen.active.mission-finish-mode .dialogue-area.center-column {
-        max-width: 1180px !important;
+        max-width: 980px !important;
+      }
+
+      #gameScreen.active.mission-finish-mode #gameScenarioImageBox,
+      #gameScreen.active.mission-finish-mode .game-scenario-image-wrap,
+      #gameScreen.active.mission-finish-mode #asdBox .game-scenario-image-wrap {
+        display: none !important;
       }
 
       .mission-result-review-box {
         width: 100%;
         box-sizing: border-box;
         display: grid;
-        gap: 14px;
-        margin: 12px 0 14px;
+        gap: 10px;
+        margin: 10px 0 12px;
       }
 
       .mission-result-summary-card,
       .mission-result-review-card {
-        padding: 16px 18px;
-        border-radius: 24px;
+        padding: 13px 15px;
+        border-radius: 22px;
         background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(239,248,255,.82));
         border: 1px solid rgba(255,255,255,.9);
-        box-shadow: 0 16px 34px rgba(29,53,87,.10), inset 0 1px 0 rgba(255,255,255,.96);
+        box-shadow: 0 12px 26px rgba(29,53,87,.09), inset 0 1px 0 rgba(255,255,255,.96);
+      }
+
+      .mission-result-summary-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(180px, 230px);
+        gap: 12px;
+        align-items: center;
       }
 
       .mission-result-summary-card h3,
       .mission-result-review-card h3 {
-        margin: 6px 0 8px;
+        margin: 5px 0 0;
         color: var(--text);
       }
 
       .mission-result-stars {
         display: inline-flex;
-        gap: 3px;
+        gap: 2px;
         vertical-align: middle;
-        margin-left: 6px;
-        font-size: 1.45rem;
+        margin-left: 4px;
+        font-size: 1.25rem;
         letter-spacing: 1px;
       }
 
-      .mission-result-stars .filled { color: #ffb000; text-shadow: 0 3px 10px rgba(255,176,0,.25); }
+      .mission-result-stars .filled { color: #ffb000; text-shadow: 0 3px 10px rgba(255,176,0,.22); }
       .mission-result-stars .empty { color: #b8c3d1; }
 
       .mission-result-score {
         display: grid;
-        gap: 5px;
-        padding: 12px 14px;
-        border-radius: 18px;
+        gap: 3px;
+        padding: 10px 12px;
+        border-radius: 16px;
         background: rgba(0,122,255,.08);
         color: var(--primary-dark);
         font-weight: 850;
+        text-align: center;
       }
 
-      .mission-result-score span {
-        color: var(--muted);
-        font-size: .92rem;
-        line-height: 1.45;
+      .mission-result-score strong { font-size: 1.12rem; }
+      .mission-result-score span { color: var(--muted); font-size: .82rem; line-height: 1.3; }
+
+      .mission-result-review-title {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
       }
 
-      .mission-result-review-card > p {
-        margin: 0 0 12px;
+      .mission-result-review-title span {
         color: var(--muted);
         font-weight: 800;
+        font-size: .82rem;
+      }
+
+      .mission-result-row-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
       }
 
       .mission-result-row {
         display: grid;
-        gap: 6px;
-        margin-top: 10px;
-        padding: 12px 14px;
-        border-radius: 18px;
-        background: rgba(255,255,255,.72);
+        gap: 5px;
+        padding: 10px 11px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.74);
         border: 1px solid rgba(255,255,255,.86);
-        line-height: 1.5;
+        line-height: 1.35;
         font-weight: 760;
+        min-width: 0;
       }
 
       .mission-result-row-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 7px;
       }
 
+      .mission-result-row-head strong { font-size: .82rem; }
       .mission-result-row-head span {
         flex: 0 0 auto;
-        padding: 4px 8px;
+        padding: 3px 6px;
         border-radius: 999px;
         background: rgba(255,255,255,.9);
         color: var(--primary-dark);
+        font-size: .75rem;
         font-weight: 950;
       }
 
-      .mission-result-question {
+      .mission-result-brief,
+      .mission-result-best {
+        font-size: .76rem;
         color: var(--muted);
-        font-size: .9rem;
+        overflow-wrap: anywhere;
       }
 
-      .mission-result-row.good { box-shadow: inset 5px 0 0 rgba(52,199,89,.78); }
-      .mission-result-row.ok { box-shadow: inset 5px 0 0 rgba(255,176,0,.78); }
-      .mission-result-row.bad { box-shadow: inset 5px 0 0 rgba(255,59,48,.70); }
+      .mission-result-row.good { box-shadow: inset 4px 0 0 rgba(52,199,89,.78); }
+      .mission-result-row.ok { box-shadow: inset 4px 0 0 rgba(255,176,0,.78); }
+      .mission-result-row.bad { box-shadow: inset 4px 0 0 rgba(255,59,48,.70); }
 
       .mission-result-best {
-        padding: 8px 10px;
-        border-radius: 14px;
+        padding: 6px 8px;
+        border-radius: 12px;
         background: rgba(52,199,89,.10);
         color: #137300;
       }
 
-      @media (min-width: 981px) {
-        #gameScreen.active.mission-finish-mode .mission-result-review-box {
-          grid-column: 2 / 3;
-        }
+      @media (max-width: 1100px) {
+        .mission-result-row-grid { grid-template-columns: 1fr; }
+        .mission-result-row-head strong { font-size: .92rem; }
+        .mission-result-brief, .mission-result-best { font-size: .86rem; }
+      }
+
+      @media (max-width: 720px) {
+        .mission-result-summary-card { grid-template-columns: 1fr; }
+        .mission-result-score { text-align: left; }
+        .mission-result-review-title { display: grid; }
       }
     `;
     document.head.appendChild(style);
@@ -415,13 +451,16 @@
     const screen = document.getElementById('gameScreen');
     if (!screen || screen.__missionResultReviewObserver) return;
 
-    const observer = new MutationObserver(function () {
-      if (screen.classList.contains('active') && screen.classList.contains('mission-finish-mode')) {
+    const observer = new MutationObserver(function (mutations) {
+      const becameFinish = mutations.some(function (mutation) {
+        return mutation.type === 'attributes' && mutation.attributeName === 'class';
+      });
+      if (becameFinish && screen.classList.contains('active') && screen.classList.contains('mission-finish-mode')) {
         scheduleRender();
       }
     });
 
-    observer.observe(screen, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
     screen.__missionResultReviewObserver = observer;
   }
 
@@ -429,9 +468,8 @@
     injectStyles();
     patchStartFunctions();
     watchFinishScreen();
-    if (document.getElementById('gameScreen') && document.getElementById('gameScreen').classList.contains('mission-finish-mode')) {
-      scheduleRender();
-    }
+    const screen = document.getElementById('gameScreen');
+    if (screen && screen.classList.contains('mission-finish-mode')) scheduleRender();
   }
 
   document.addEventListener('click', recordAnswer, true);
@@ -445,6 +483,5 @@
   window.addEventListener('load', function () {
     install();
     setTimeout(install, 500);
-    setTimeout(install, 1500);
   });
 })();
