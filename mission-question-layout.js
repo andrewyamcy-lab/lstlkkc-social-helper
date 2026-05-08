@@ -1,16 +1,18 @@
 // /mission-question-layout.js
 // Layout fix for the REAL mission question page (not the preview page).
-// Fixes:
-// - wider centered background box
-// - left side = 16:9 mission image
-// - right side = question + answers
-// - A / B / C / D answer labels WITHOUT changing the button's real text or click handler
-// - skill/save buttons in one line
+// Updated: removed A/B/C/D labels because they caused lag.
+// This file now only handles layout and the copied question panel.
 
 (function () {
+  let styleInjected = false;
+  let observed = false;
+  let scheduled = false;
+
   function injectMissionQuestionStyle() {
-    const old = document.getElementById('missionQuestionLayoutStyle');
-    if (old) old.remove();
+    if (styleInjected || document.getElementById('missionQuestionLayoutStyle')) {
+      styleInjected = true;
+      return;
+    }
 
     const style = document.createElement('style');
     style.id = 'missionQuestionLayoutStyle';
@@ -219,28 +221,12 @@
       #gameScreen.active.mission-question-mode #asdChoices button {
         min-height: 64px !important;
         display: flex !important;
-        align-items: flex-start !important;
-        gap: 10px !important;
+        align-items: center !important;
         text-align: left !important;
         border-radius: 18px !important;
         padding: 12px 14px !important;
         font-size: .92rem !important;
         line-height: 1.38 !important;
-      }
-
-      #gameScreen.active.mission-question-mode #asdChoices button[data-choice-letter]::before {
-        content: attr(data-choice-letter) !important;
-        width: 28px !important;
-        height: 28px !important;
-        min-width: 28px !important;
-        border-radius: 50% !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-weight: 950 !important;
-        background: rgba(255,255,255,.34) !important;
-        border: 1px solid rgba(255,255,255,.52) !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.5) !important;
       }
 
       #gameScreen.active.mission-question-mode .action-row {
@@ -296,6 +282,7 @@
     `;
 
     document.head.appendChild(style);
+    styleInjected = true;
   }
 
   function escapeHtml(text) {
@@ -343,21 +330,11 @@
       (body ? '<div class="mission-question-body">' + escapeHtml(body) + '</div>' : '');
   }
 
-  function addAnswerLettersWithoutChangingButtons() {
-    const choices = document.querySelectorAll('#gameScreen.active.mission-question-mode #asdChoices button');
-    const letters = ['A', 'B', 'C', 'D'];
-
-    choices.forEach(function (btn, index) {
-      // Important: do NOT change innerHTML / textContent.
-      // The original answer logic depends on the original button and its original text.
-      btn.dataset.choiceLetter = letters[index] || '';
+  function removeAnswerLetters() {
+    document.querySelectorAll('#gameScreen.active.mission-question-mode #asdChoices button[data-choice-letter]').forEach(function (btn) {
+      delete btn.dataset.choiceLetter;
+      btn.removeAttribute('data-choice-letter');
     });
-  }
-
-  function ensureImageBoxIsVisible() {
-    const box = document.getElementById('gameScenarioImageBox');
-    if (!box) return;
-    box.classList.remove('hidden');
   }
 
   function isMissionQuestionMode() {
@@ -388,23 +365,26 @@
     if (!active && panel) panel.remove();
 
     if (active) {
-      ensureImageBoxIsVisible();
       ensureQuestionTextPanel();
-      addAnswerLettersWithoutChangingButtons();
+      removeAnswerLetters();
     }
+  }
+
+  function scheduleUpdate() {
+    if (scheduled) return;
+    scheduled = true;
+    window.requestAnimationFrame(function () {
+      scheduled = false;
+      updateMissionQuestionMode();
+    });
   }
 
   function observeGameScreen() {
     const screen = document.getElementById('gameScreen');
-    if (!screen || screen.dataset.missionQuestionObserved) return;
-    screen.dataset.missionQuestionObserved = '1';
+    if (!screen || observed) return;
+    observed = true;
 
-    const observer = new MutationObserver(function () {
-      setTimeout(updateMissionQuestionMode, 0);
-      setTimeout(updateMissionQuestionMode, 120);
-      setTimeout(updateMissionQuestionMode, 260);
-    });
-
+    const observer = new MutationObserver(scheduleUpdate);
     observer.observe(screen, {
       childList: true,
       subtree: true,
@@ -419,11 +399,6 @@
     updateMissionQuestionMode();
   }
 
-  document.addEventListener('click', function () {
-    setTimeout(updateMissionQuestionMode, 80);
-    setTimeout(updateMissionQuestionMode, 250);
-  }, true);
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', run);
   } else {
@@ -432,7 +407,6 @@
 
   window.addEventListener('load', function () {
     run();
-    setTimeout(run, 400);
-    setTimeout(run, 1200);
+    setTimeout(updateMissionQuestionMode, 500);
   });
 })();
