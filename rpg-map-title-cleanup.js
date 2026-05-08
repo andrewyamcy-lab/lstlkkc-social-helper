@@ -1,6 +1,7 @@
 // /rpg-map-title-cleanup.js
 // Removes the extra「任務地圖」description section.
 // Moves「改用情境列表」to the top-right corner of the map area.
+// Also fixes the left-side overlap between the map intro card and mission info panel.
 
 (function () {
   function injectMapTitleCleanupStyle() {
@@ -33,7 +34,12 @@
         display: none !important;
       }
 
-      /* Keep only the button and make it float on the map */
+      /* Hide the yellow instruction pill to keep the left side clean. */
+      #rpgMapScreen.active .rpg-map-instruction {
+        display: none !important;
+      }
+
+      /* Keep only the button and make it float on the top-right of the map */
       #rpgMapScreen.active .rpg-map-title-row button {
         display: inline-flex !important;
         align-items: center !important;
@@ -58,11 +64,28 @@
         box-shadow: 0 16px 34px rgba(29,53,87,.20), inset 0 1px 0 rgba(255,255,255,.98) !important;
       }
 
-      /* Make sure the removed title row no longer takes up left-panel space */
       @media (min-width: 1101px) {
         #rpgMapScreen.active .rpg-map-title-row {
           grid-column: 2 !important;
           grid-row: 1 !important;
+        }
+
+        /* The map board sits behind the header in the same grid row.
+           Push the side mission panel down so it starts below the intro card. */
+        #rpgMapScreen.active #rpgSideMissionPanel {
+          grid-column: 1 !important;
+          grid-row: 1 / 4 !important;
+          align-self: stretch !important;
+          margin-top: 172px !important;
+          height: calc(100% - 172px) !important;
+          max-height: calc(100% - 172px) !important;
+          overflow: auto !important;
+          z-index: 30 !important;
+        }
+
+        #rpgMapScreen.active .rpg-real-map-scroll {
+          grid-column: 2 !important;
+          grid-row: 1 / 4 !important;
         }
       }
 
