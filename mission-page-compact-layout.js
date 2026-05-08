@@ -2,7 +2,7 @@
 // Redesign only the「任務進行頁」mission preview / background page.
 // Required layout:
 // - Same wide visual width as the RPG map page
-// - Left side: mission photo
+// - Left side: mission photo in original 16:9 ratio
 // - Right side: 情境、地點、目標、小提醒、開始任務 button
 // - Bottom: 返回任務列表 / 社交技能書 / 我的徽章 / 我的設定 / 返回開始頁 in one line
 // - Hide skill buttons on the preview page; they appear only inside the real mission/question page
@@ -25,10 +25,11 @@
         max-width: var(--mission-intro-wide) !important;
         margin-left: auto !important;
         margin-right: auto !important;
-        padding: 18px !important;
+        padding: 26px 28px !important;
         display: flex !important;
         flex-direction: column !important;
-        gap: 14px !important;
+        gap: 16px !important;
+        overflow: visible !important;
       }
 
       #gameScreen.active.mission-intro-mode > .tag,
@@ -52,32 +53,32 @@
         width: 100% !important;
         max-width: none !important;
         margin: 0 auto !important;
+        overflow: visible !important;
       }
 
       #gameScreen.active.mission-intro-mode .dialogue-area.center-column {
         width: 100% !important;
         max-width: none !important;
         display: grid !important;
-        grid-template-columns: minmax(420px, 49%) minmax(420px, 1fr) !important;
+        grid-template-columns: minmax(520px, 52%) minmax(430px, 1fr) !important;
         grid-template-areas:
           "photo info"
           "photo start" !important;
-        gap: 18px !important;
-        align-items: stretch !important;
+        gap: 20px !important;
+        align-items: start !important;
+        overflow: visible !important;
       }
 
-      /* Left side: photo only */
+      /* Left side: photo only, fixed to 16:9 ratio */
       #gameScreen.active.mission-intro-mode #asdBox {
         grid-area: photo !important;
         margin: 0 !important;
         padding: 14px !important;
         border-radius: 26px !important;
-        min-height: 470px !important;
-        height: min(58vh, 560px) !important;
+        min-height: 0 !important;
+        height: auto !important;
         overflow: hidden !important;
-        display: flex !important;
-        align-items: stretch !important;
-        justify-content: center !important;
+        display: block !important;
       }
 
       #gameScreen.active.mission-intro-mode #asdBox .scene-badge,
@@ -89,14 +90,18 @@
       #gameScreen.active.mission-intro-mode #asdBox .game-scenario-image-wrap {
         display: block !important;
         width: 100% !important;
-        height: 100% !important;
+        aspect-ratio: 16 / 9 !important;
+        height: auto !important;
         margin: 0 !important;
+        overflow: hidden !important;
+        border-radius: 20px !important;
       }
 
       #gameScreen.active.mission-intro-mode #asdBox .game-scenario-image-wrap img {
         width: 100% !important;
         height: 100% !important;
         max-height: none !important;
+        aspect-ratio: 16 / 9 !important;
         object-fit: cover !important;
         object-position: center center !important;
         border-radius: 20px !important;
@@ -115,12 +120,13 @@
         background: rgba(255,255,255,.72) !important;
         border: 1px solid rgba(255,255,255,.84) !important;
         box-shadow: 0 18px 42px rgba(29,53,87,.10), inset 0 1px 0 rgba(255,255,255,.95) !important;
-        align-self: stretch !important;
+        align-self: start !important;
+        overflow: visible !important;
       }
 
       #gameScreen.active.mission-intro-mode #sceneMeta .mission-intro-title-card,
       #gameScreen.active.mission-intro-mode #sceneMeta .meta-box {
-        min-height: 126px !important;
+        min-height: 122px !important;
         padding: 15px 16px !important;
         border-radius: 18px !important;
         background: rgba(255,255,255,.78) !important;
@@ -146,7 +152,7 @@
 
       #gameScreen.active.mission-intro-mode #sceneMeta .mission-intro-title-card .mission-intro-title-text {
         display: block !important;
-        font-size: 1.35rem !important;
+        font-size: 1.3rem !important;
         line-height: 1.25 !important;
         font-weight: 950 !important;
         color: var(--text) !important;
@@ -159,6 +165,7 @@
         align-items: stretch !important;
         justify-content: stretch !important;
         margin: 0 !important;
+        overflow: visible !important;
       }
 
       #gameScreen.active.mission-intro-mode #asdChoices .mission-start-challenge-btn {
@@ -185,6 +192,8 @@
         background: rgba(255,255,255,.66) !important;
         border: 1px solid rgba(255,255,255,.82) !important;
         box-shadow: 0 12px 28px rgba(29,53,87,.08), inset 0 1px 0 rgba(255,255,255,.92) !important;
+        position: relative !important;
+        z-index: 3 !important;
       }
 
       #gameScreen.active.mission-intro-mode > .welcome-actions button {
@@ -201,6 +210,10 @@
           --mission-intro-wide: min(100%, calc(100vw - 24px));
         }
 
+        #gameScreen.active.mission-intro-mode {
+          padding: 18px !important;
+        }
+
         #gameScreen.active.mission-intro-mode .dialogue-area.center-column {
           grid-template-columns: 1fr !important;
           grid-template-areas:
@@ -209,15 +222,8 @@
             "start" !important;
         }
 
-        #gameScreen.active.mission-intro-mode #asdBox {
-          min-height: 260px !important;
-          height: auto !important;
-          max-height: none !important;
-        }
-
         #gameScreen.active.mission-intro-mode #asdBox .game-scenario-image-wrap img {
-          height: auto !important;
-          object-fit: contain !important;
+          object-fit: cover !important;
         }
 
         #gameScreen.active.mission-intro-mode #sceneMeta {
