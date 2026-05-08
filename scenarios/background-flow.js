@@ -1,7 +1,7 @@
 // /scenarios/background-flow.js
 // Stable mission flow controller.
 // Flow: choose scenario → read background → start challenge → answer questions → final result.
-// Important fix: answer clicks are now handled by event delegation on #asdChoices,
+// Important fix: answer clicks are handled by event delegation on #asdChoices,
 // so UI layout changes, A/B/C/D labels, or inner spans will not break the next-question action.
 
 (function () {
@@ -14,6 +14,8 @@
   let answerReview = [];
 
   window.__backgroundFlowInstalled = true;
+
+  const ANSWER_FEEDBACK_DELAY_MS = 1300;
 
   const imageMap = {
     start: 'images/start-conversation.jpg',
@@ -431,7 +433,7 @@
     setTimeout(function () {
       if (activeQuestionIndex >= activeSteps.length - 1) renderFinish();
       else renderQuestion(activeQuestionIndex + 1);
-    }, 260);
+    }, ANSWER_FEEDBACK_DELAY_MS);
   }
 
   function buildReviewHtml() {
