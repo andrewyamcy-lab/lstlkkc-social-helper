@@ -1,10 +1,15 @@
 // /mission-question-final-fix.js
-// Final fix for the REAL mission answering page.
-// Fixes missing image, centered front layout, background coverage, one-line skill buttons,
-// and makes skill feedback visible when the 3 skill buttons are pressed.
+// Final visual fix for the REAL mission answering page.
+// Performance update:
+// - Do NOT remove/recreate the large CSS <style> on every click.
+// - Do NOT run several delayed full layout passes after every answer click.
+// - Only ensure the image exists when the question page changes.
 
 (function () {
   const IMAGE_VERSION = '2026-04-29-v4';
+  let styleInjected = false;
+  let observed = false;
+  let scheduled = false;
 
   const scenarioImageMap = {
     start: 'images/start-conversation.jpg',
@@ -37,9 +42,11 @@
     return src + '?v=' + encodeURIComponent(IMAGE_VERSION);
   }
 
-  function injectStyle() {
-    const old = document.getElementById('missionQuestionFinalFixStyle');
-    if (old) old.remove();
+  function injectStyleOnce() {
+    if (styleInjected || document.getElementById('missionQuestionFinalFixStyle')) {
+      styleInjected = true;
+      return;
+    }
 
     const style = document.createElement('style');
     style.id = 'missionQuestionFinalFixStyle';
@@ -211,6 +218,7 @@
     `;
 
     document.head.appendChild(style);
+    styleInjected = true;
   }
 
   function getCurrentScenarioKey() {
@@ -263,16 +271,40 @@
     box.innerHTML = '<img src="' + withVersion(src) + '" alt="校園社交練習情境圖" loading="lazy">';
   }
 
-  function run() {
-    injectStyle();
-    ensureQuestionImage();
+  function scheduleEnsureImage() {
+    if (scheduled) return;
+    scheduled = true;
+    window.requestAnimationFrame(function () {
+      scheduled = false;
+      ensureQuestionImage();
+    });
   }
 
-  document.addEventListener('click', function () {
-    setTimeout(run, 80);
-    setTimeout(run, 250);
-    setTimeout(run, 600);
-  }, true);
+  function observeGameScreen() {
+    const screen = document.getElementById('gameScreen');
+    if (!screen || observed) return;
+    observed = true;
+
+    const observer = new MutationObserver(function (mutations) {
+      const shouldCheck = mutations.some(function (mutation) {
+        return mutation.type === 'childList' || mutation.attributeName === 'class';
+      });
+      if (shouldCheck) scheduleEnsureImage();
+    });
+
+    observer.observe(screen, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
+
+  function run() {
+    injectStyleOnce();
+    observeGameScreen();
+    ensureQuestionImage();
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', run);
@@ -282,7 +314,6 @@
 
   window.addEventListener('load', function () {
     run();
-    setTimeout(run, 500);
-    setTimeout(run, 1500);
+    setTimeout(ensureQuestionImage, 500);
   });
 })();
