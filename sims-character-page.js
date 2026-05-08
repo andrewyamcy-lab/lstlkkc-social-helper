@@ -1,5 +1,6 @@
 // /sims-character-page.js
 // Life-simulation style「我的角色」page using MP4 videos.
+// New layout: left video + right tabs: 角色 / 能力值 / 性格特質 / 冒險紀錄.
 // Required files:
 //   videos/character-girl.mp4
 //   videos/character-boy.mp4
@@ -8,12 +9,20 @@
   const RPG_KEY = 'asd_school_rpg_progress_v1';
   const BADGE_KEY = 'asd_school_badges_v2';
   const SELECTED_KEY = 'asd_school_selected_character_v1';
+  const TAB_KEY = 'asd_school_character_tab_v1';
   const TOTAL_MISSIONS = 20;
 
   const CHARACTERS = {
     girl: { name: '心心', label: '女學生', icon: '👧🏻', role: '社交練習生', video: 'videos/character-girl.mp4' },
     boy: { name: '謙謙', label: '男學生', icon: '👦🏻', role: '社交練習生', video: 'videos/character-boy.mp4' }
   };
+
+  const TABS = [
+    { id: 'profile', label: '角色', icon: '🪪' },
+    { id: 'skills', label: '能力值', icon: '📊' },
+    { id: 'traits', label: '性格特質', icon: '✨' },
+    { id: 'records', label: '冒險紀錄', icon: '📜' }
+  ];
 
   const LEVELS = [
     { level: 1, exp: 0, title: '新手冒險者' },
@@ -75,7 +84,7 @@
     const base = current.exp;
     const nextExp = next ? next.exp : current.exp;
     const percent = next ? Math.min(100, Math.round(((exp - base) / Math.max(1, nextExp - base)) * 100)) : 100;
-    return { level: current.level, title: current.title, totalExp: exp, nextExp, nextLevel: next && next.level, percent, isMax: !next };
+    return { level: current.level, title: current.title, totalExp: exp, nextExp, percent, isMax: !next };
   }
 
   function completedCount(p) {
@@ -111,9 +120,20 @@
     return CHARACTERS[localStorage.getItem(SELECTED_KEY)] ? localStorage.getItem(SELECTED_KEY) : 'girl';
   }
 
+  function selectedTab() {
+    const tab = localStorage.getItem(TAB_KEY) || 'profile';
+    return TABS.some((item) => item.id === tab) ? tab : 'profile';
+  }
+
   function setCharacter(id) {
     if (!CHARACTERS[id]) return;
     localStorage.setItem(SELECTED_KEY, id);
+    renderCharacterScreen();
+  }
+
+  function setTab(tabId) {
+    if (!TABS.some((item) => item.id === tabId)) return;
+    localStorage.setItem(TAB_KEY, tabId);
     renderCharacterScreen();
   }
 
@@ -165,7 +185,7 @@
       </div>`;
   }
 
-  function skillsHtml(scores) {
+  function skillRows(scores) {
     return Object.keys(STAT_META).map((key) => {
       const meta = STAT_META[key];
       const value = Number(scores[key] || 0);
@@ -179,7 +199,7 @@
     }).join('');
   }
 
-  function traitsHtml(scores) {
+  function traitCards(scores) {
     return Object.keys(STAT_META).map((key) => {
       const meta = STAT_META[key];
       const unlocked = Number(scores[key] || 0) >= 3;
@@ -191,8 +211,8 @@
     }).join('');
   }
 
-  function recentHtml(p) {
-    const keys = Object.keys(p.completed).filter((key) => p.completed[key]).slice(-5).reverse();
+  function recentRecords(p) {
+    const keys = Object.keys(p.completed).filter((key) => p.completed[key]).slice(-8).reverse();
     if (!keys.length) return '<div class="sims-empty-note">未完成任務。開始第一個 RPG 任務後，這裡會顯示你的冒險紀錄。</div>';
     return keys.map((key) => {
       const stars = Number(p.stars[key] || 0);
@@ -200,6 +220,69 @@
       for (let i = 1; i <= 3; i += 1) starText += i <= stars ? '★' : '☆';
       return `<div class="sims-mission-item"><span>${esc(missionTitle(key))}</span><strong>${starText}</strong></div>`;
     }).join('');
+  }
+
+  function summaryGrid(completed, threeStar, badges) {
+    return `
+      <div class="sims-summary-grid">
+        <div><strong>${completed} / ${TOTAL_MISSIONS}</strong><span>任務完成</span></div>
+        <div><strong>${threeStar} / ${TOTAL_MISSIONS}</strong><span>3 星任務</span></div>
+        <div><strong>${badges.stars} / 15</strong><span>徽章星數</span></div>
+      </div>`;
+  }
+
+  function tabsHtml(activeTab) {
+    return `<div class="sims-tabs">${TABS.map((tab) => `
+      <button type="button" class="sims-tab-btn ${tab.id === activeTab ? 'active' : ''}" onclick="window.setSimsCharacterTab('${tab.id}')">${tab.icon} ${tab.label}</button>
+    `).join('')}</div>`;
+  }
+
+  function tabPanelHtml(activeTab, data) {
+    const { character, info, moodNow, completed, threeStar, badges, scores, p } = data;
+
+    if (activeTab === 'skills') {
+      return `
+        <div class="sims-panel sims-tab-panel">
+          <div class="panel-badge">能力值</div><h3>社交能力值</h3>
+          <p class="sims-panel-note">完成不同任務會提升相應能力。</p>
+          <div class="sims-skill-list">${skillRows(scores)}</div>
+        </div>`;
+    }
+
+    if (activeTab === 'traits') {
+      return `
+        <div class="sims-panel sims-tab-panel">
+          <div class="panel-badge">性格特質</div><h3>已解鎖 Traits</h3>
+          <p class="sims-panel-note">每項能力累積到 3 分後會解鎖一個特質。</p>
+          <div class="sims-trait-grid">${traitCards(scores)}</div>
+        </div>`;
+    }
+
+    if (activeTab === 'records') {
+      return `
+        <div class="sims-panel sims-tab-panel">
+          <div class="panel-badge">冒險紀錄</div><h3>最近完成任務</h3>
+          <p class="sims-panel-note">這裡記錄最近完成的 RPG 任務。</p>
+          <div class="sims-mission-list">${recentRecords(p)}</div>
+        </div>`;
+    }
+
+    return `
+      <div class="sims-profile-card sims-tab-panel">
+        <div class="sims-name-row"><div><span class="sims-label">角色名稱</span><h3>${character.name}</h3></div><div class="sims-level-badge">Lv. ${info.level}</div></div>
+        <div class="sims-info-grid">
+          <div><span>角色</span><strong>${character.label}</strong></div>
+          <div><span>稱號</span><strong>${info.title}</strong></div>
+          <div><span>類型</span><strong>${character.role}</strong></div>
+          <div><span>徽章</span><strong>${badges.unlocked} / 5</strong></div>
+        </div>
+        ${expBar(info)}
+        <div class="sims-mood-card sims-inline-mood">
+          <div class="sims-mood-icon">${moodNow.icon}</div>
+          <div><span class="sims-label">今日狀態</span><h3>${moodNow.title}</h3><p>${moodNow.text}</p></div>
+        </div>
+        ${summaryGrid(completed, threeStar, badges)}
+      </div>`;
   }
 
   function renderCharacterScreen() {
@@ -217,53 +300,28 @@
     const id = selectedId();
     const character = CHARACTERS[id];
     const moodNow = mood(info, completed, threeStar);
+    const activeTab = selectedTab();
     const content = document.getElementById('characterScreenContent') || screen;
 
     content.innerHTML = `
-      <div class="sims-character-page animate-in">
+      <div class="sims-character-page sims-character-tab-page animate-in">
         <div class="sims-topbar">
           <div><div class="tag">我的角色</div><h2>梁書社交模擬人生</h2><p>完成校園任務，提升社交能力，解鎖更多性格特質。</p></div>
           <button type="button" class="secondary" onclick="showCoverScreen && showCoverScreen()">返回開始頁</button>
         </div>
 
-        <div class="sims-main-grid">
+        <div class="sims-main-grid sims-tab-layout">
           <div class="sims-left-panel">${videoHtml(id)}</div>
-          <div class="sims-right-panel">
-            <div class="sims-profile-card">
-              <div class="sims-name-row"><div><span class="sims-label">角色名稱</span><h3>${character.name}</h3></div><div class="sims-level-badge">Lv. ${info.level}</div></div>
-              <div class="sims-info-grid">
-                <div><span>角色</span><strong>${character.label}</strong></div>
-                <div><span>稱號</span><strong>${info.title}</strong></div>
-                <div><span>類型</span><strong>${character.role}</strong></div>
-                <div><span>徽章</span><strong>${badges.unlocked} / 5</strong></div>
-              </div>
-              ${expBar(info)}
-            </div>
-
-            <div class="sims-mood-card">
-              <div class="sims-mood-icon">${moodNow.icon}</div>
-              <div><span class="sims-label">今日狀態</span><h3>${moodNow.title}</h3><p>${moodNow.text}</p></div>
-            </div>
-
-            <div class="sims-summary-grid">
-              <div><strong>${completed} / ${TOTAL_MISSIONS}</strong><span>任務完成</span></div>
-              <div><strong>${threeStar} / ${TOTAL_MISSIONS}</strong><span>3 星任務</span></div>
-              <div><strong>${badges.stars} / 15</strong><span>徽章星數</span></div>
+          <div class="sims-right-panel sims-tab-right">
+            ${tabsHtml(activeTab)}
+            ${tabPanelHtml(activeTab, { character, info, moodNow, completed, threeStar, badges, scores, p })}
+            <div class="welcome-actions sims-actions sims-tab-actions">
+              <button type="button" onclick="window.openRpgMap && window.openRpgMap()">開始 RPG 冒險</button>
+              <button type="button" class="secondary" onclick="showSituationScreen && showSituationScreen()">任務列表</button>
+              <button type="button" class="secondary" onclick="showBadgeScreen && showBadgeScreen()">徽章圖鑑</button>
+              <button type="button" class="secondary" onclick="showPhraseLibraryScreen && showPhraseLibraryScreen()">社交技能書</button>
             </div>
           </div>
-        </div>
-
-        <div class="sims-bottom-grid">
-          <div class="sims-panel"><div class="panel-badge">能力值</div><h3>社交能力值</h3><div class="sims-skill-list">${skillsHtml(scores)}</div></div>
-          <div class="sims-panel"><div class="panel-badge">性格特質</div><h3>已解鎖 Traits</h3><div class="sims-trait-grid">${traitsHtml(scores)}</div></div>
-          <div class="sims-panel"><div class="panel-badge">冒險紀錄</div><h3>最近完成任務</h3><div class="sims-mission-list">${recentHtml(p)}</div></div>
-        </div>
-
-        <div class="welcome-actions sims-actions">
-          <button type="button" onclick="window.openRpgMap && window.openRpgMap()">開始 RPG 冒險</button>
-          <button type="button" class="secondary" onclick="showSituationScreen && showSituationScreen()">任務列表</button>
-          <button type="button" class="secondary" onclick="showBadgeScreen && showBadgeScreen()">徽章圖鑑</button>
-          <button type="button" class="secondary" onclick="showPhraseLibraryScreen && showPhraseLibraryScreen()">社交技能書</button>
         </div>
       </div>`;
   }
@@ -283,38 +341,43 @@
       .sims-topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:18px; }
       .sims-topbar h2 { margin:0 0 6px; font-size:clamp(1.7rem,3vw,2.45rem); }
       .sims-topbar p { margin:0; color:var(--muted); font-weight:700; }
-      .sims-main-grid { display:grid; grid-template-columns:minmax(320px,.95fr) minmax(320px,1.05fr); gap:20px; align-items:stretch; }
+      .sims-main-grid { display:grid; grid-template-columns:minmax(320px,.82fr) minmax(420px,1.18fr); gap:20px; align-items:stretch; }
       .sims-left-panel,.sims-profile-card,.sims-mood-card,.sims-panel,.sims-summary-grid>div,.sims-trait,.sims-mission-item { backdrop-filter:blur(var(--glass-blur)) saturate(170%); -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(170%); border:1px solid rgba(255,255,255,.78); background:rgba(255,255,255,.58); box-shadow:var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.86); }
       .sims-left-panel,.sims-profile-card,.sims-mood-card,.sims-panel { border-radius:28px; padding:18px; }
       .sims-left-panel { padding:16px; }
-      .sims-right-panel { display:grid; gap:14px; }
+      .sims-right-panel { display:grid; gap:14px; align-content:start; }
       .sims-video-stage { position:relative; display:grid; gap:12px; }
       .sims-diamond { display:none !important; }
-      .sims-video-frame { position:relative; min-height:540px; border-radius:30px; overflow:hidden; background:radial-gradient(circle at 50% 75%, rgba(57,255,20,.18), transparent 22%), linear-gradient(180deg, rgba(255,255,255,.72), rgba(226,242,255,.70)); border:1px solid rgba(255,255,255,.84); box-shadow:inset 0 1px 0 rgba(255,255,255,.92), 0 18px 42px rgba(29,53,87,.14); }
-      .sims-character-video { width:100%; height:100%; min-height:540px; object-fit:contain; display:block; }
+      .sims-video-frame { position:relative; aspect-ratio:9/16; width:min(100%,420px); margin:0 auto; min-height:0; border-radius:30px; overflow:hidden; background:radial-gradient(circle at 50% 75%, rgba(57,255,20,.18), transparent 22%), linear-gradient(180deg, rgba(255,255,255,.72), rgba(226,242,255,.70)); border:1px solid rgba(255,255,255,.84); box-shadow:inset 0 1px 0 rgba(255,255,255,.92), 0 18px 42px rgba(29,53,87,.14); }
+      .sims-character-video { width:100%; height:100%; min-height:0; object-fit:contain; object-position:center center; display:block; }
       .sims-video-missing-msg { display:none; position:absolute; inset:24px; border-radius:22px; place-items:center; text-align:center; color:var(--muted); background:rgba(255,255,255,.72); border:1px dashed rgba(0,122,255,.32); line-height:1.8; }
       .sims-video-frame.video-missing .sims-character-video { display:none; }
       .sims-video-frame.video-missing .sims-video-missing-msg { display:grid; }
       .sims-character-switch { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
       .sims-switch-btn { border-radius:20px; background:rgba(255,255,255,.56); color:var(--primary-dark); box-shadow:inset 0 1px 0 rgba(255,255,255,.82), 0 10px 24px rgba(29,53,87,.08); }
       .sims-switch-btn.selected { color:#083b00; background:linear-gradient(180deg, rgba(57,255,20,.42), rgba(255,255,255,.72)); box-shadow:0 0 0 4px rgba(57,255,20,.18), inset 0 1px 0 rgba(255,255,255,.92), 0 14px 30px rgba(57,255,20,.12); }
+      .sims-tabs { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:9px; }
+      .sims-tab-btn { border-radius:18px; padding:11px 10px; font-weight:950; color:var(--primary-dark); background:rgba(255,255,255,.62); box-shadow:inset 0 1px 0 rgba(255,255,255,.88), 0 10px 22px rgba(29,53,87,.08); }
+      .sims-tab-btn.active { color:#083b00; background:linear-gradient(180deg, rgba(57,255,20,.40), rgba(255,255,255,.76)); box-shadow:0 0 0 4px rgba(57,255,20,.16), inset 0 1px 0 rgba(255,255,255,.92), 0 14px 28px rgba(57,255,20,.11); }
+      .sims-tab-panel { min-height:390px; display:grid; align-content:start; gap:10px; }
       .sims-name-row,.sims-exp-info,.sims-skill-row,.sims-mission-item { display:flex; align-items:center; justify-content:space-between; gap:12px; }
       .sims-label,.sims-info-grid span,.sims-summary-grid span,.sims-trait small { color:var(--muted); font-size:.84rem; font-weight:850; }
       .sims-name-row h3,.sims-mood-card h3 { margin:2px 0 0; font-size:1.42rem; }
       .sims-level-badge { min-width:72px; min-height:52px; border-radius:18px; display:grid; place-items:center; font-weight:950; color:#083b00; background:linear-gradient(180deg, rgba(57,255,20,.44), rgba(255,255,255,.76)); box-shadow:inset 0 1px 0 rgba(255,255,255,.92), 0 10px 22px rgba(57,255,20,.14); }
-      .sims-info-grid,.sims-summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:14px; }
+      .sims-info-grid,.sims-summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:10px; }
+      .sims-summary-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
       .sims-info-grid div,.sims-summary-grid div { display:grid; gap:4px; padding:12px; border-radius:18px; background:rgba(255,255,255,.62); border:1px solid rgba(255,255,255,.74); }
-      .sims-exp-wrap { margin-top:14px; display:grid; gap:8px; }
+      .sims-exp-wrap { margin-top:10px; display:grid; gap:8px; }
       .sims-exp-info strong { color:#1f6f00; }
       .sims-exp-info span { color:var(--muted); font-weight:850; }
       .sims-exp-bar { height:22px; border-radius:0; overflow:hidden; background:repeating-linear-gradient(90deg,#fff 0 3px,#f4f8ff 3px 18px,#dbe7f5 18px 21px); border:3px solid #fff; box-shadow:0 0 0 2px rgba(0,122,255,.16),0 5px 0 rgba(169,205,242,.52),inset 0 2px 0 rgba(255,255,255,.96),inset 0 -3px 0 rgba(169,205,242,.38); }
       .sims-exp-fill { height:100%; background:repeating-linear-gradient(90deg,#39ff14 0 14px,#22c70d 14px 18px,#116b08 18px 21px); box-shadow:inset 0 4px 0 rgba(255,255,255,.42), inset 0 -5px 0 rgba(0,0,0,.20), 0 0 14px rgba(57,255,20,.34); }
+      .sims-inline-mood { margin-top:10px; box-shadow:none; }
       .sims-mood-card { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center; }
-      .sims-mood-icon { width:64px; height:64px; border-radius:22px; display:grid; place-items:center; font-size:2rem; background:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 12px 24px rgba(29,53,87,.10); }
-      .sims-mood-card p { margin:4px 0 0; color:var(--muted); }
-      .sims-bottom-grid { display:grid; grid-template-columns:1.15fr .9fr .95fr; gap:16px; margin-top:18px; }
-      .sims-panel h3 { margin-bottom:10px; }
+      .sims-mood-icon { width:58px; height:58px; border-radius:20px; display:grid; place-items:center; font-size:1.8rem; background:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 12px 24px rgba(29,53,87,.10); }
+      .sims-mood-card p,.sims-panel-note { margin:4px 0 0; color:var(--muted); line-height:1.55; }
       .sims-skill-list,.sims-trait-grid,.sims-mission-list { display:grid; gap:10px; }
+      .sims-trait-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .sims-skill-name { display:flex; align-items:center; gap:8px; min-width:106px; }
       .sims-skill-bar { flex:1; height:16px; border-radius:999px; background:rgba(169,205,242,.42); overflow:hidden; box-shadow:inset 0 2px 5px rgba(29,53,87,.10); }
       .sims-skill-fill { height:100%; border-radius:inherit; background:linear-gradient(90deg,#39ff14,#00c48c,#64d2ff); }
@@ -326,9 +389,10 @@
       .sims-mission-item { padding:12px; border-radius:18px; }
       .sims-mission-item strong { color:#ff9f0a; white-space:nowrap; }
       .sims-empty-note { color:var(--muted); line-height:1.7; }
-      .sims-actions { margin-top:18px; }
-      @media (max-width:1100px){ .sims-main-grid,.sims-bottom-grid{grid-template-columns:1fr;} .sims-video-frame,.sims-character-video{min-height:460px;} }
-      @media (max-width:640px){ .sims-character-page{padding:16px;} .sims-topbar,.sims-name-row,.sims-exp-info{flex-direction:column;align-items:flex-start;} .sims-info-grid,.sims-summary-grid{grid-template-columns:1fr;} .sims-skill-row{align-items:stretch;flex-direction:column;} .sims-skill-name{min-width:0;} .sims-skill-value{width:auto;text-align:left;} .sims-character-switch{grid-template-columns:1fr;} .sims-video-frame,.sims-character-video{min-height:380px;} }
+      .sims-actions { margin-top:0; }
+      .sims-tab-actions { justify-content:flex-start; }
+      @media (max-width:1100px){ .sims-main-grid{grid-template-columns:1fr;} .sims-video-frame{width:min(100%,360px);} .sims-tab-panel{min-height:auto;} .sims-tabs{grid-template-columns:repeat(2,minmax(0,1fr));} }
+      @media (max-width:640px){ .sims-character-page{padding:16px;} .sims-topbar,.sims-name-row,.sims-exp-info{flex-direction:column;align-items:flex-start;} .sims-info-grid,.sims-summary-grid,.sims-trait-grid{grid-template-columns:1fr;} .sims-skill-row{align-items:stretch;flex-direction:column;} .sims-skill-name{min-width:0;} .sims-skill-value{width:auto;text-align:left;} .sims-character-switch,.sims-tabs{grid-template-columns:1fr;} }
     `;
     document.head.appendChild(style);
   }
@@ -339,6 +403,7 @@
     window.renderCharacterScreen = renderCharacterScreen;
     window.showCharacterScreen = showCharacterScreen;
     window.setSimsCharacter = setCharacter;
+    window.setSimsCharacterTab = setTab;
     window.renderSimsCharacterScreen = renderCharacterScreen;
   }
 
