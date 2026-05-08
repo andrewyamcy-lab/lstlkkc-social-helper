@@ -1,7 +1,8 @@
 // /mission-status-panel-fix.js
 // Shows clearly whether each RPG mission is finished.
 // Adds completion status to the left mission information panel and refreshes map markers from localStorage.
-// Updated: completed mission icons turn grey and map stars are capped to 3 stars.
+// Completed mission icons turn grey and map stars are capped to 3 stars.
+// Fix: completed markers hide the old difficulty-star ::after, so 3 stars will not become 5 stars.
 
 (function () {
   const STORAGE_KEY = 'asd_school_rpg_progress_v1';
@@ -114,7 +115,6 @@
         font-weight: 850;
       }
 
-      /* Completed mission icon becomes grey. */
       #rpgMapScreen.active .rpg-map-marker.is-completed,
       #rpgMapScreen.active .rpg-map-marker.is-three-star {
         background: linear-gradient(180deg, #f3f4f6 0%, #d7dce3 100%) !important;
@@ -135,23 +135,33 @@
         opacity: .55 !important;
       }
 
+      /* Hide the old difficulty-star pseudo-element from hover-enhance.css. */
       #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-text,
-      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-text,
-      #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-mini-stars,
-      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-mini-stars {
+      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-text {
+        display: block !important;
+        min-width: 0 !important;
+        width: auto !important;
+        max-width: none !important;
+        padding: 2px 5px !important;
+        font-size: .78rem !important;
+        line-height: 1.05 !important;
+        letter-spacing: -0.08em !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
         background: #6b7280 !important;
         color: #ffffff !important;
       }
 
-      /* The map is 3-star based, not 5-star based. */
-      #rpgMapScreen.active .rpg-marker-mini-stars {
-        display: block !important;
-        font-size: .58rem !important;
-        line-height: 1.15 !important;
-        white-space: nowrap !important;
-        letter-spacing: 0 !important;
-        max-width: none !important;
-        overflow: visible !important;
+      #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-text::after,
+      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-text::after {
+        content: none !important;
+        display: none !important;
+        font-size: 0 !important;
+      }
+
+      #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-mini-stars,
+      #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-mini-stars {
+        display: none !important;
       }
     `;
     document.head.appendChild(style);
@@ -170,12 +180,8 @@
       marker.dataset.completed = completed ? 'true' : 'false';
 
       const label = marker.querySelector('.rpg-marker-text');
-      if (label) {
-        if (completed) label.textContent = renderStars(stars);
-        else label.textContent = '任務';
-      }
+      if (label) label.textContent = completed ? renderStars(stars) : '任務';
 
-      // Some older scripts add a separate mini-star label. Remove it so the map never shows 5 stars.
       marker.querySelectorAll('.rpg-marker-mini-stars').forEach(function (mini) {
         mini.remove();
       });
