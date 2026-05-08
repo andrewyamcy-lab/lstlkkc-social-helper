@@ -1,6 +1,8 @@
 // /virtue-ability-system.js
 // 能力值 system based on 6大美德 + 24性格強項.
 // Visible wording uses「能力值」, not「六大美德」.
+// Important: the temporary horizontal 能力值 bars have been removed.
+// The 能力值 tab now shows only a loading panel until virtue-radar-style.js replaces it with the RPG radar chart.
 
 (function () {
   const VIRTUE_KEY = 'asd_school_virtue_stats_v1';
@@ -45,7 +47,6 @@
   function getGames() {
     try {
       if (window.asdGames) return window.asdGames;
-      // asdGames is declared as const in script.js; it is readable by later scripts in this page.
       // eslint-disable-next-line no-undef
       if (typeof asdGames !== 'undefined') return asdGames;
     } catch (error) {}
@@ -72,8 +73,12 @@
     return next;
   }
 
-  function abilityLabel(value) { if (value >= 80) return '能力強項'; if (value >= 60) return '表現良好'; if (value >= 40) return '基礎穩定'; return '需要練習'; }
-  function strengthStatus(value, index, total) { if (value >= 90) return '已完全解鎖'; if (value >= 75 && index < Math.ceil(total * 0.75)) return '已解鎖'; if (value >= 60 && index < Math.ceil(total * 0.45)) return '已解鎖'; return '未解鎖'; }
+  function strengthStatus(value, index, total) {
+    if (value >= 90) return '已完全解鎖';
+    if (value >= 75 && index < Math.ceil(total * 0.75)) return '已解鎖';
+    if (value >= 60 && index < Math.ceil(total * 0.45)) return '已解鎖';
+    return '未解鎖';
+  }
 
   function progress() { const p = readJson(RPG_KEY, {}); return { completed: p.completed || {}, stars: p.stars || {}, expAwards: p.expAwards || {} }; }
   function badges() { const b = readJson(BADGE_KEY, {}); const p = b.progress || {}; return { stars: Object.keys(p).reduce((s, k) => s + Math.min(3, Number(p[k] || 0)), 0), unlocked: Object.keys(p).filter((k) => Number(p[k] || 0) >= 3).length }; }
@@ -94,9 +99,8 @@
   }
 
   function abilityPanel() {
-    const stats = getVirtueStats();
-    const rows = Object.keys(VIRTUES).map((key) => { const v = VIRTUES[key], value = stats[key]; return `<div class="virtue-row"><div class="virtue-name"><span>${v.icon}</span><strong>${v.name}</strong></div><div class="virtue-bar"><div class="virtue-fill" style="width:${value}%"></div></div><div class="virtue-score"><strong>${value}</strong><small>${abilityLabel(value)}</small></div></div>`; }).join('');
-    return `<div class="sims-panel sims-tab-panel virtue-tab-panel"><div class="panel-badge">能力值</div><h3>能力值</h3><p class="sims-panel-note">能力值以六個方向呈現，每項預設為 50。完成問題後會根據你的選擇上升或下降。</p><div class="virtue-list">${rows}</div></div>`;
+    getVirtueStats();
+    return `<div class="sims-panel sims-tab-panel virtue-tab-panel ability-radar-loading-panel"><div class="panel-badge">能力值</div><h3>能力值雷達圖</h3><p class="sims-panel-note">正在載入 RPG 能力值雷達圖……</p><div class="sims-loading-strip"><span></span></div></div>`;
   }
 
   function strengthPanel() {
@@ -131,6 +135,14 @@
     const old = right && right.querySelector('.sims-tab-panel');
     if (old) old.outerHTML = buildPanel(tabId);
     else if (right) { const actions = right.querySelector('.sims-tab-actions'); if (actions) actions.insertAdjacentHTML('beforebegin', buildPanel(tabId)); }
+
+    if (tabId === 'skills') {
+      setTimeout(function () {
+        if (window.__radarSavedVirtueSetter && window.setSimsCharacterTab) return;
+        const evt = new CustomEvent('virtueAbilityNeedsRadar');
+        window.dispatchEvent(evt);
+      }, 20);
+    }
   }
 
   function forceCorrectOpenTab() {
@@ -202,7 +214,7 @@
     if (document.getElementById('virtueAbilityStyle')) return;
     const style = document.createElement('style');
     style.id = 'virtueAbilityStyle';
-    style.textContent = `.virtue-list{display:grid;gap:10px}.virtue-row{display:grid;grid-template-columns:110px 1fr 92px;align-items:center;gap:10px;padding:11px 12px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:inset 0 1px 0 rgba(255,255,255,.86)}.virtue-name{display:flex;align-items:center;gap:8px;font-weight:950}.virtue-bar{height:15px;border-radius:999px;overflow:hidden;background:rgba(169,205,242,.4);box-shadow:inset 0 2px 5px rgba(29,53,87,.1)}.virtue-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#39ff14,#00c48c,#64d2ff);box-shadow:inset 0 3px 0 rgba(255,255,255,.38)}.virtue-score{display:grid;text-align:right;line-height:1.15}.virtue-score strong{font-size:1rem;color:var(--primary-dark)}.virtue-score small{color:var(--muted);font-weight:850;font-size:.74rem}.strength-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.strength-group{padding:11px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78)}.strength-heading{display:flex;align-items:center;gap:8px}.strength-heading small{margin-left:auto;color:var(--muted);font-weight:850}.strength-group p{color:var(--muted);margin:6px 0 8px;line-height:1.45;font-size:.86rem}.strength-chip-wrap{display:flex;flex-wrap:wrap;gap:6px}.strength-chip{display:inline-grid;gap:2px;padding:6px 8px;border-radius:999px;font-size:.82rem;font-weight:850;background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.82)}.strength-chip small{font-size:.68rem;color:var(--muted)}.strength-chip.locked{opacity:.56;filter:grayscale(.6)}.virtue-change-box{margin:12px 0;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(240,249,255,.78));border:1px solid rgba(255,255,255,.9);box-shadow:0 12px 26px rgba(29,53,87,.1),inset 0 1px 0 rgba(255,255,255,.96)}.virtue-change-box strong{display:block;margin-bottom:8px;color:var(--primary-dark)}.virtue-change-list{display:flex;flex-wrap:wrap;gap:8px}.virtue-change-pill{padding:7px 10px;border-radius:999px;font-weight:950;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.88)}.virtue-change-pill.up{color:#137300;box-shadow:0 0 0 3px rgba(57,255,20,.1)}.virtue-change-pill.down{color:#b42318;box-shadow:0 0 0 3px rgba(255,59,48,.08)}@media(max-width:760px){.virtue-row{grid-template-columns:1fr}.virtue-score{text-align:left}.strength-grid{grid-template-columns:1fr}}`;
+    style.textContent = `.ability-radar-loading-panel{min-height:520px!important;place-content:center!important;text-align:left!important}.sims-loading-strip{height:18px;border-radius:999px;overflow:hidden;background:rgba(169,205,242,.35);margin-top:14px}.sims-loading-strip span{display:block;height:100%;width:42%;border-radius:inherit;background:linear-gradient(90deg,#39ff14,#00c48c,#64d2ff);animation:simsLoadingMove 1.15s ease-in-out infinite alternate}@keyframes simsLoadingMove{from{transform:translateX(0)}to{transform:translateX(135%)}}.strength-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.strength-group{padding:11px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78)}.strength-heading{display:flex;align-items:center;gap:8px}.strength-heading small{margin-left:auto;color:var(--muted);font-weight:850}.strength-group p{color:var(--muted);margin:6px 0 8px;line-height:1.45;font-size:.86rem}.strength-chip-wrap{display:flex;flex-wrap:wrap;gap:6px}.strength-chip{display:inline-grid;gap:2px;padding:6px 8px;border-radius:999px;font-size:.82rem;font-weight:850;background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.82)}.strength-chip small{font-size:.68rem;color:var(--muted)}.strength-chip.locked{opacity:.56;filter:grayscale(.6)}.virtue-change-box{margin:12px 0;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(240,249,255,.78));border:1px solid rgba(255,255,255,.9);box-shadow:0 12px 26px rgba(29,53,87,.1),inset 0 1px 0 rgba(255,255,255,.96)}.virtue-change-box strong{display:block;margin-bottom:8px;color:var(--primary-dark)}.virtue-change-list{display:flex;flex-wrap:wrap;gap:8px}.virtue-change-pill{padding:7px 10px;border-radius:999px;font-weight:950;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.88)}.virtue-change-pill.up{color:#137300;box-shadow:0 0 0 3px rgba(57,255,20,.1)}.virtue-change-pill.down{color:#b42318;box-shadow:0 0 0 3px rgba(255,59,48,.08)}@media(max-width:760px){.strength-grid{grid-template-columns:1fr}}`;
     document.head.appendChild(style);
   }
 
