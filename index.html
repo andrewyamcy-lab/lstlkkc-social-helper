@@ -29,6 +29,7 @@
             <button onclick="showSituationScreen()">開始練習</button>
             <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
             <button class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
+            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -52,6 +53,7 @@
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
             <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
+            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -91,6 +93,7 @@
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
             <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
+            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
           </div>
         </div>
       </div>
@@ -114,6 +117,7 @@
           <div class="welcome-actions">
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button onclick="showSituationScreen()">前往情境選擇</button>
+            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -139,6 +143,7 @@
             <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
             <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
             <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
+            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
             <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           </div>
         </div>
@@ -152,6 +157,7 @@
           <button onclick="showSituationScreen()">選擇其他情境</button>
           <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
           <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
+          <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
           <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
           <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
         </div>
@@ -214,11 +220,11 @@
   <script src="mission-character-button-fix.js?v=20260508-1"></script>
   <script src="mission-question-layout.js?v=20260508-1"></script>
   <script src="mission-question-final-fix.js?v=20260508-1"></script>
-  <script src="mission-ui-cleanup.js?v=20260508-1"></script>
+  <script src="mission-ui-cleanup.js?v=20260508-2"></script>
   <script src="mission-result-review-fix.js?v=20260508-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
-      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'characterScreen'];
+      const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'characterScreen', 'missionResultHistoryScreen'];
       screenIds.forEach((id) => {
         const screen = document.getElementById(id);
         if (screen) screen.classList.toggle('active', id === screenId);
