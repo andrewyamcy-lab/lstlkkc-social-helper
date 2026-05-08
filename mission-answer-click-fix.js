@@ -1,7 +1,9 @@
 // /mission-answer-click-fix.js
 // Safe cleanup helper.
 // The old answer-click repair was removed because it interfered with the original answer logic.
-// This file now only cleans stale UI elements left by the question layout when returning to the preview page.
+// This file only cleans stale UI elements when leaving the question page.
+// Important: it must NOT remove #virtueChangeBox during the question page,
+// otherwise the ability-change message flashes and disappears too quickly.
 
 (function () {
   let installed = false;
@@ -13,36 +15,21 @@
     });
   }
 
-  function isIntroMode() {
-    const screen = document.getElementById('gameScreen');
-    return !!screen && screen.classList.contains('active') && screen.classList.contains('mission-intro-mode');
-  }
-
-  function isQuestionMode() {
-    const screen = document.getElementById('gameScreen');
-    return !!screen && screen.classList.contains('active') && screen.classList.contains('mission-question-mode');
-  }
-
   function cleanMissionUiState() {
     const screen = document.getElementById('gameScreen');
     if (!screen) return;
 
-    if (isIntroMode()) {
+    const isIntroMode = screen.classList.contains('active') && screen.classList.contains('mission-intro-mode');
+    const isFinishMode = screen.classList.contains('active') && screen.classList.contains('mission-finish-mode');
+
+    if (isIntroMode) {
       removeNode('#gameScenarioImageBox');
       removeNode('#missionQuestionText');
       removeNode('#virtueChangeBox');
       return;
     }
 
-    if (isQuestionMode()) {
-      const choices = document.getElementById('asdChoices');
-      const oldVirtue = document.getElementById('virtueChangeBox');
-      if (oldVirtue && choices && choices.querySelector('button:not([disabled])')) {
-        oldVirtue.remove();
-      }
-    }
-
-    if (screen.classList.contains('mission-finish-mode')) {
+    if (isFinishMode) {
       removeNode('#gameScenarioImageBox');
       removeNode('#missionQuestionText');
     }
