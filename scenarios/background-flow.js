@@ -1,11 +1,8 @@
 // /scenarios/background-flow.js
-// Standalone stable flow:
-// choose scenario → read background only → click start → answer questions.
-// Updated: after choosing an answer, it automatically goes to the next question.
-// Feedback appears together at the end.
-// Final result uses 3-star rating instead of numeric score.
-// Final page includes a Try Again button.
-// Updated: background start button now says「開始挑戰」with RPG-style UI.
+// Stable mission flow controller.
+// Flow: choose scenario → read background → start challenge → answer questions → final result.
+// Important fix: answer clicks are now handled by event delegation on #asdChoices,
+// so UI layout changes, A/B/C/D labels, or inner spans will not break the next-question action.
 
 (function () {
   let activeScenarioKey = '';
@@ -17,6 +14,33 @@
   let answerReview = [];
 
   window.__backgroundFlowInstalled = true;
+
+  const imageMap = {
+    start: 'images/start-conversation.jpg',
+    refuse: 'images/polite-refusal.jpg',
+    conflict: 'images/stationery-conflict.jpg',
+    respond: 'images/respond-friend.jpg',
+    groupwork: 'images/groupwork.jpg',
+    help: 'images/ask-teacher-help.jpg',
+    lunch: 'images/lunch-join.jpg',
+    homework: 'images/homework-check.jpg',
+    teasing: 'images/teasing.jpg',
+    bumped: 'images/bumped.jpg',
+    disagree: 'images/disagree.jpg',
+    teacherReminder: 'images/teacher-reminder.jpg',
+    queueJump: 'images/queue-jump.jpg',
+    peGrouping: 'images/pe-grouping.jpg',
+    whatsappIgnored: 'images/whatsapp-ignored.jpg',
+    borrowedNoReturn: 'images/borrowed-no-return.jpg',
+    lunchSeat: 'images/lunch-seat.jpg',
+    jokeConfusion: 'images/joke-confusion.jpg',
+    academicOnly: 'images/academic-only.jpg',
+    lostItem: 'images/lost-item.jpg',
+    groupRole: 'images/group-role.jpg',
+    copyHomework: 'images/copy-homework.jpg',
+    quietSpace: 'images/quiet-space.jpg',
+    losingGame: 'images/losing-game.jpg'
+  };
 
   function escapeHtml(value) {
     return String(value || '')
@@ -49,10 +73,7 @@
         font-size: 1.12rem;
         font-weight: 950;
         letter-spacing: 0.04em;
-        box-shadow:
-          0 9px 0 rgba(169, 205, 242, 0.92),
-          0 18px 34px rgba(0, 87, 217, 0.22),
-          inset 0 1px 0 rgba(255,255,255,0.62);
+        box-shadow: 0 9px 0 rgba(169, 205, 242, 0.92), 0 18px 34px rgba(0, 87, 217, 0.22), inset 0 1px 0 rgba(255,255,255,0.62);
         overflow: hidden;
         isolation: isolate;
       }
@@ -76,20 +97,13 @@
       #asdChoices .mission-start-challenge-btn:focus-visible {
         transform: translateY(-4px) scale(1.015);
         filter: brightness(1.04);
-        box-shadow:
-          0 13px 0 rgba(169, 205, 242, 0.95),
-          0 24px 44px rgba(0, 87, 217, 0.28),
-          0 0 0 6px rgba(255, 214, 10, 0.16),
-          inset 0 1px 0 rgba(255,255,255,0.74);
+        box-shadow: 0 13px 0 rgba(169, 205, 242, 0.95), 0 24px 44px rgba(0, 87, 217, 0.28), 0 0 0 6px rgba(255, 214, 10, 0.16), inset 0 1px 0 rgba(255,255,255,0.74);
         outline: none;
       }
 
       #asdChoices .mission-start-challenge-btn:active {
         transform: translateY(4px);
-        box-shadow:
-          0 4px 0 rgba(169, 205, 242, 0.92),
-          0 10px 20px rgba(0, 87, 217, 0.16),
-          inset 0 1px 0 rgba(255,255,255,0.42);
+        box-shadow: 0 4px 0 rgba(169, 205, 242, 0.92), 0 10px 20px rgba(0, 87, 217, 0.16), inset 0 1px 0 rgba(255,255,255,0.42);
       }
 
       #asdChoices .mission-start-challenge-btn .mission-start-icon {
@@ -266,30 +280,7 @@
   }
 
   function buildImageHtml(key) {
-    const srcMap = {
-      start: 'images/start-conversation.jpg',
-      refuse: 'images/polite-refusal.jpg',
-      conflict: 'images/stationery-conflict.jpg',
-      respond: 'images/respond-friend.jpg',
-      groupwork: 'images/groupwork.jpg',
-      help: 'images/ask-teacher-help.jpg',
-      lunch: 'images/lunch-join.jpg',
-      homework: 'images/homework-check.jpg',
-      teasing: 'images/teasing.jpg',
-      bumped: 'images/bumped.jpg',
-      disagree: 'images/disagree.jpg',
-      teacherReminder: 'images/teacher-reminder.jpg',
-      queueJump: 'images/queue-jump.jpg',
-      peGrouping: 'images/pe-grouping.jpg',
-      whatsappIgnored: 'images/whatsapp-ignored.jpg',
-      academicOnly: 'images/academic-only.jpg',
-      lostItem: 'images/lost-item.jpg',
-      copyHomework: 'images/copy-homework.jpg',
-      quietSpace: 'images/quiet-space.jpg',
-      losingGame: 'images/losing-game.jpg'
-    };
-
-    const src = srcMap[key];
+    const src = imageMap[key];
     if (!src) return '';
     return '<div class="game-scenario-image-wrap"><img src="' + escapeHtml(src) + '?v=20260430-final" alt="情境圖" loading="lazy" onerror="this.parentElement.classList.add(\'hidden\')"></div>';
   }
@@ -312,9 +303,15 @@
     clearSupportBoxes();
     setTrackerBackground();
 
+    const screen = document.getElementById('gameScreen');
     const box = document.getElementById('asdBox');
     const choices = document.getElementById('asdChoices');
     const sceneMeta = document.getElementById('sceneMeta');
+
+    if (screen) {
+      screen.classList.remove('mission-question-mode', 'mission-finish-mode');
+      screen.classList.add('mission-intro-mode');
+    }
 
     if (box) {
       box.innerHTML =
@@ -333,6 +330,7 @@
     }
 
     if (choices) {
+      choices.onclick = null;
       choices.innerHTML =
         '<button type="button" class="choice-button start-question-button mission-start-challenge-btn" id="startQuestionAfterBackgroundBtn">' +
           '<span class="mission-start-icon">🎮</span>' +
@@ -350,6 +348,19 @@
     return true;
   }
 
+  function handleChoiceClick(event) {
+    const button = event.target && event.target.closest ? event.target.closest('button[data-option-index]') : null;
+    if (!button) return;
+
+    const choices = document.getElementById('asdChoices');
+    if (!choices || !choices.contains(button)) return;
+
+    event.preventDefault();
+    const optionIndex = Number(button.dataset.optionIndex);
+    if (Number.isNaN(optionIndex)) return;
+    chooseOption(optionIndex);
+  }
+
   function renderQuestion(index) {
     if (!activeGame || !activeSteps[index]) return;
 
@@ -358,10 +369,16 @@
     clearSupportBoxes();
     setTrackerQuestion();
 
+    const screen = document.getElementById('gameScreen');
     const step = activeSteps[index];
     const box = document.getElementById('asdBox');
     const choices = document.getElementById('asdChoices');
     const sceneMeta = document.getElementById('sceneMeta');
+
+    if (screen) {
+      screen.classList.remove('mission-intro-mode', 'mission-finish-mode');
+      screen.classList.add('mission-question-mode');
+    }
 
     if (sceneMeta) sceneMeta.classList.add('hidden');
 
@@ -373,14 +390,15 @@
 
     if (choices) {
       choices.innerHTML = '';
+      choices.onclick = handleChoiceClick;
+
       step.options.forEach(function (option, optionIndex) {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'choice-button';
         button.textContent = option.text;
-        button.addEventListener('click', function () {
-          chooseOption(optionIndex);
-        });
+        button.dataset.optionIndex = String(optionIndex);
+        button.dataset.choiceLetter = ['A', 'B', 'C', 'D'][optionIndex] || '';
         choices.appendChild(button);
       });
     }
@@ -442,11 +460,17 @@
     setTrackerDone();
     clearSupportBoxes();
 
+    const screen = document.getElementById('gameScreen');
     const maxScore = activeSteps.length * 2;
     const percent = maxScore ? Math.round((activeScore / maxScore) * 100) : 0;
     const starCount = getStarRating(percent);
     const box = document.getElementById('asdBox');
     const choices = document.getElementById('asdChoices');
+
+    if (screen) {
+      screen.classList.remove('mission-intro-mode', 'mission-question-mode');
+      screen.classList.add('mission-finish-mode');
+    }
 
     try {
       if (typeof badgeState !== 'undefined' && activeScenarioKey in badgeState) badgeState[activeScenarioKey] = true;
@@ -469,6 +493,7 @@
     }
 
     if (choices) {
+      choices.onclick = null;
       choices.innerHTML =
         '<button type="button" class="choice-button" id="tryAgainCurrentScenarioBtn">重新挑戰這個情境</button>' +
         '<button type="button" class="choice-button secondary" onclick="showSituationScreen()">選擇其他情境</button>' +
@@ -509,6 +534,16 @@
     window.tryAgainCurrentScenario = tryAgainCurrentScenario;
     window.showHint = showHintStandalone;
     window.showCalmMode = showCalmStandalone;
+
+    window.__missionFlowDebug = function () {
+      return {
+        activeScenarioKey: activeScenarioKey,
+        activeQuestionIndex: activeQuestionIndex,
+        answeredCurrentQuestion: answeredCurrentQuestion,
+        activeStepsLength: activeSteps.length,
+        activeScore: activeScore
+      };
+    };
   }
 
   function initBackgroundFlow() {
