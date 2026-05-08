@@ -254,7 +254,7 @@
         </div>
 
         <div class="sims-bottom-grid">
-          <div class="sims-panel"><div class="panel-badge">能力值</div><h3>社交技能 Need Bars</h3><div class="sims-skill-list">${skillsHtml(scores)}</div></div>
+          <div class="sims-panel"><div class="panel-badge">能力值</div><h3>社交能力值</h3><div class="sims-skill-list">${skillsHtml(scores)}</div></div>
           <div class="sims-panel"><div class="panel-badge">性格特質</div><h3>已解鎖 Traits</h3><div class="sims-trait-grid">${traitsHtml(scores)}</div></div>
           <div class="sims-panel"><div class="panel-badge">冒險紀錄</div><h3>最近完成任務</h3><div class="sims-mission-list">${recentHtml(p)}</div></div>
         </div>
