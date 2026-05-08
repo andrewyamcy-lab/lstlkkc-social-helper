@@ -21,26 +21,11 @@
   };
 
   const MISSION_PROFILE = {
-    start: ['courage', 'humanity', 'wisdom'],
-    respond: ['humanity', 'wisdom', 'courage'],
-    refuse: ['temperance', 'courage', 'humanity'],
-    conflict: ['temperance', 'justice', 'courage'],
-    groupwork: ['justice', 'humanity', 'temperance'],
-    help: ['wisdom', 'courage', 'temperance'],
-    lunch: ['humanity', 'courage', 'justice'],
-    homework: ['wisdom', 'courage', 'temperance'],
-    whatsappIgnored: ['temperance', 'humanity', 'wisdom'],
-    academicOnly: ['wisdom', 'temperance', 'courage'],
-    copyHomework: ['justice', 'courage', 'temperance'],
-    quietSpace: ['temperance', 'courage', 'wisdom'],
-    peGrouping: ['justice', 'courage', 'humanity'],
-    disagree: ['justice', 'temperance', 'humanity'],
-    teasing: ['temperance', 'courage', 'humanity'],
-    bumped: ['temperance', 'justice', 'courage'],
-    losingGame: ['temperance', 'justice', 'humanity'],
-    teacherReminder: ['temperance', 'wisdom', 'courage'],
-    queueJump: ['justice', 'temperance', 'courage'],
-    lostItem: ['wisdom', 'courage', 'temperance']
+    start: ['courage', 'humanity', 'wisdom'], respond: ['humanity', 'wisdom', 'courage'], refuse: ['temperance', 'courage', 'humanity'], conflict: ['temperance', 'justice', 'courage'],
+    groupwork: ['justice', 'humanity', 'temperance'], help: ['wisdom', 'courage', 'temperance'], lunch: ['humanity', 'courage', 'justice'], homework: ['wisdom', 'courage', 'temperance'],
+    whatsappIgnored: ['temperance', 'humanity', 'wisdom'], academicOnly: ['wisdom', 'temperance', 'courage'], copyHomework: ['justice', 'courage', 'temperance'], quietSpace: ['temperance', 'courage', 'wisdom'],
+    peGrouping: ['justice', 'courage', 'humanity'], disagree: ['justice', 'temperance', 'humanity'], teasing: ['temperance', 'courage', 'humanity'], bumped: ['temperance', 'justice', 'courage'],
+    losingGame: ['temperance', 'justice', 'humanity'], teacherReminder: ['temperance', 'wisdom', 'courage'], queueJump: ['justice', 'temperance', 'courage'], lostItem: ['wisdom', 'courage', 'temperance']
   };
 
   const CHARACTERS = {
@@ -49,10 +34,8 @@
   };
 
   const LEVELS = [
-    { level: 1, exp: 0, title: '新手冒險者' }, { level: 2, exp: 50, title: '初級溝通者' },
-    { level: 3, exp: 120, title: '校園探索者' }, { level: 4, exp: 210, title: '冷靜練習生' },
-    { level: 5, exp: 320, title: '合作小隊員' }, { level: 6, exp: 460, title: '界線守護者' },
-    { level: 7, exp: 620, title: '解難行動派' }, { level: 8, exp: 800, title: '梁書社交勇者' },
+    { level: 1, exp: 0, title: '新手冒險者' }, { level: 2, exp: 50, title: '初級溝通者' }, { level: 3, exp: 120, title: '校園探索者' }, { level: 4, exp: 210, title: '冷靜練習生' },
+    { level: 5, exp: 320, title: '合作小隊員' }, { level: 6, exp: 460, title: '界線守護者' }, { level: 7, exp: 620, title: '解難行動派' }, { level: 8, exp: 800, title: '梁書社交勇者' },
     { level: 9, exp: 1000, title: '社交任務大師' }, { level: 10, exp: 1250, title: '梁書傳說級勇者' }
   ];
 
@@ -62,7 +45,7 @@
   function getGames() {
     try {
       if (window.asdGames) return window.asdGames;
-      // asdGames is declared as const in script.js; it is still readable by later scripts as a global lexical binding.
+      // asdGames is declared as const in script.js; it is readable by later scripts in this page.
       // eslint-disable-next-line no-undef
       if (typeof asdGames !== 'undefined') return asdGames;
     } catch (error) {}
@@ -89,19 +72,8 @@
     return next;
   }
 
-  function abilityLabel(value) {
-    if (value >= 80) return '能力強項';
-    if (value >= 60) return '表現良好';
-    if (value >= 40) return '基礎穩定';
-    return '需要練習';
-  }
-
-  function strengthStatus(value, index, total) {
-    if (value >= 90) return '已完全解鎖';
-    if (value >= 75 && index < Math.ceil(total * 0.75)) return '已解鎖';
-    if (value >= 60 && index < Math.ceil(total * 0.45)) return '已解鎖';
-    return '未解鎖';
-  }
+  function abilityLabel(value) { if (value >= 80) return '能力強項'; if (value >= 60) return '表現良好'; if (value >= 40) return '基礎穩定'; return '需要練習'; }
+  function strengthStatus(value, index, total) { if (value >= 90) return '已完全解鎖'; if (value >= 75 && index < Math.ceil(total * 0.75)) return '已解鎖'; if (value >= 60 && index < Math.ceil(total * 0.45)) return '已解鎖'; return '未解鎖'; }
 
   function progress() { const p = readJson(RPG_KEY, {}); return { completed: p.completed || {}, stars: p.stars || {}, expAwards: p.expAwards || {} }; }
   function badges() { const b = readJson(BADGE_KEY, {}); const p = b.progress || {}; return { stars: Object.keys(p).reduce((s, k) => s + Math.min(3, Number(p[k] || 0)), 0), unlocked: Object.keys(p).filter((k) => Number(p[k] || 0) >= 3).length }; }
@@ -112,9 +84,7 @@
   function selectedCharacter() { const id = localStorage.getItem(SELECTED_KEY) || 'girl'; return CHARACTERS[id] || CHARACTERS.girl; }
   function missionTitle(key) { const games = getGames(); return games[key] && games[key].title ? games[key].title : key; }
 
-  function expBar(info) {
-    return `<div class="sims-exp-wrap"><div class="sims-exp-info"><strong>Lv. ${info.level}</strong><span>EXP ${info.totalExp}${info.isMax ? ' / MAX' : ' / ' + info.nextExp}</span></div><div class="sims-exp-bar"><div class="sims-exp-fill" style="width:${info.percent}%"></div></div></div>`;
-  }
+  function expBar(info) { return `<div class="sims-exp-wrap"><div class="sims-exp-info"><strong>Lv. ${info.level}</strong><span>EXP ${info.totalExp}${info.isMax ? ' / MAX' : ' / ' + info.nextExp}</span></div><div class="sims-exp-bar"><div class="sims-exp-fill" style="width:${info.percent}%"></div></div></div>`; }
 
   function profilePanel() {
     const p = progress(), info = levelInfo(totalExp(p)), b = badges(), character = selectedCharacter();
@@ -163,6 +133,14 @@
     else if (right) { const actions = right.querySelector('.sims-tab-actions'); if (actions) actions.insertAdjacentHTML('beforebegin', buildPanel(tabId)); }
   }
 
+  function forceCorrectOpenTab() {
+    if (document.querySelector('#characterScreen.active')) {
+      updateTabLabels();
+      const tab = localStorage.getItem(TAB_KEY) || 'profile';
+      setCharacterTab(tab);
+    }
+  }
+
   function getQuestionNumber() { const text = (document.getElementById('questionBadgeBig') || {}).textContent || ''; const m = text.match(/第\s*(\d+)/); return m ? Number(m[1]) : 1; }
   function normalize(value) { return String(value || '').replace(/\s+/g, '').replace(/^[A-D][\.．、]?/i, '').trim(); }
 
@@ -188,16 +166,11 @@
     return { [profile[0]]: -2, [profile[1]]: -1 };
   }
 
-  function applyEffects(effects) {
-    const stats = getVirtueStats();
-    Object.keys(effects).forEach((key) => { stats[key] = clamp(Number(stats[key] || 50) + Number(effects[key] || 0)); });
-    saveVirtueStats(stats);
-  }
+  function applyEffects(effects) { const stats = getVirtueStats(); Object.keys(effects).forEach((key) => { stats[key] = clamp(Number(stats[key] || 50) + Number(effects[key] || 0)); }); saveVirtueStats(stats); }
 
   function showEffects(effects) {
     setTimeout(() => {
-      const old = document.getElementById('virtueChangeBox');
-      if (old) old.remove();
+      const old = document.getElementById('virtueChangeBox'); if (old) old.remove();
       const pills = Object.keys(effects).map((key) => { const v = VIRTUES[key]; const amount = Number(effects[key] || 0); return `<span class="virtue-change-pill ${amount >= 0 ? 'up' : 'down'}">${v.icon} ${v.name} ${amount > 0 ? '+' : ''}${amount}</span>`; }).join('');
       const html = `<div id="virtueChangeBox" class="virtue-change-box animate-in"><strong>能力值變化</strong><div class="virtue-change-list">${pills}</div></div>`;
       const target = document.getElementById('reviewBoxInline') && !document.getElementById('reviewBoxInline').classList.contains('hidden') ? document.getElementById('reviewBoxInline') : document.getElementById('asdBox');
@@ -207,31 +180,20 @@
   }
 
   function handleChoiceClick(event) {
-    const choices = document.getElementById('asdChoices');
-    if (!choices || !choices.contains(event.target)) return;
-    const button = event.target.closest('button');
-    if (!button) return;
-    const missionKey = detectMission();
-    if (!missionKey) return;
-    const q = getQuestionNumber();
-    const key = `${missionKey}:${q}`;
-    if (answeredKeys.has(key)) return;
-    const option = findOption(button, missionKey, q);
-    if (!option) return;
+    const choices = document.getElementById('asdChoices'); if (!choices || !choices.contains(event.target)) return;
+    const button = event.target.closest('button'); if (!button) return;
+    const missionKey = detectMission(); if (!missionKey) return;
+    const q = getQuestionNumber(); const key = `${missionKey}:${q}`; if (answeredKeys.has(key)) return;
+    const option = findOption(button, missionKey, q); if (!option) return;
     answeredKeys.add(key);
     const effects = effectsFromScore(option.score, missionKey);
-    applyEffects(effects);
-    showEffects(effects);
+    applyEffects(effects); showEffects(effects);
   }
 
   function patchStartGame() {
     if (typeof window.startAsdGame === 'function' && !window.startAsdGame.__virtuePatched2) {
       const original = window.startAsdGame;
-      window.startAsdGame = function (missionKey) {
-        currentMissionKey = missionKey;
-        answeredKeys.clear();
-        return original.apply(this, arguments);
-      };
+      window.startAsdGame = function (missionKey) { currentMissionKey = missionKey; answeredKeys.clear(); return original.apply(this, arguments); };
       window.startAsdGame.__virtuePatched2 = true;
     }
   }
@@ -240,23 +202,21 @@
     if (document.getElementById('virtueAbilityStyle')) return;
     const style = document.createElement('style');
     style.id = 'virtueAbilityStyle';
-    style.textContent = `
-      .virtue-list{display:grid;gap:10px}.virtue-row{display:grid;grid-template-columns:110px 1fr 92px;align-items:center;gap:10px;padding:11px 12px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:inset 0 1px 0 rgba(255,255,255,.86)}.virtue-name{display:flex;align-items:center;gap:8px;font-weight:950}.virtue-bar{height:15px;border-radius:999px;overflow:hidden;background:rgba(169,205,242,.4);box-shadow:inset 0 2px 5px rgba(29,53,87,.1)}.virtue-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#39ff14,#00c48c,#64d2ff);box-shadow:inset 0 3px 0 rgba(255,255,255,.38)}.virtue-score{display:grid;text-align:right;line-height:1.15}.virtue-score strong{font-size:1rem;color:var(--primary-dark)}.virtue-score small{color:var(--muted);font-weight:850;font-size:.74rem}.strength-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.strength-group{padding:11px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78)}.strength-heading{display:flex;align-items:center;gap:8px}.strength-heading small{margin-left:auto;color:var(--muted);font-weight:850}.strength-group p{color:var(--muted);margin:6px 0 8px;line-height:1.45;font-size:.86rem}.strength-chip-wrap{display:flex;flex-wrap:wrap;gap:6px}.strength-chip{display:inline-grid;gap:2px;padding:6px 8px;border-radius:999px;font-size:.82rem;font-weight:850;background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.82)}.strength-chip small{font-size:.68rem;color:var(--muted)}.strength-chip.locked{opacity:.56;filter:grayscale(.6)}.virtue-change-box{margin:12px 0;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(240,249,255,.78));border:1px solid rgba(255,255,255,.9);box-shadow:0 12px 26px rgba(29,53,87,.1),inset 0 1px 0 rgba(255,255,255,.96)}.virtue-change-box strong{display:block;margin-bottom:8px;color:var(--primary-dark)}.virtue-change-list{display:flex;flex-wrap:wrap;gap:8px}.virtue-change-pill{padding:7px 10px;border-radius:999px;font-weight:950;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.88)}.virtue-change-pill.up{color:#137300;box-shadow:0 0 0 3px rgba(57,255,20,.1)}.virtue-change-pill.down{color:#b42318;box-shadow:0 0 0 3px rgba(255,59,48,.08)}@media(max-width:760px){.virtue-row{grid-template-columns:1fr}.virtue-score{text-align:left}.strength-grid{grid-template-columns:1fr}}
-    `;
+    style.textContent = `.virtue-list{display:grid;gap:10px}.virtue-row{display:grid;grid-template-columns:110px 1fr 92px;align-items:center;gap:10px;padding:11px 12px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:inset 0 1px 0 rgba(255,255,255,.86)}.virtue-name{display:flex;align-items:center;gap:8px;font-weight:950}.virtue-bar{height:15px;border-radius:999px;overflow:hidden;background:rgba(169,205,242,.4);box-shadow:inset 0 2px 5px rgba(29,53,87,.1)}.virtue-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#39ff14,#00c48c,#64d2ff);box-shadow:inset 0 3px 0 rgba(255,255,255,.38)}.virtue-score{display:grid;text-align:right;line-height:1.15}.virtue-score strong{font-size:1rem;color:var(--primary-dark)}.virtue-score small{color:var(--muted);font-weight:850;font-size:.74rem}.strength-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.strength-group{padding:11px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78)}.strength-heading{display:flex;align-items:center;gap:8px}.strength-heading small{margin-left:auto;color:var(--muted);font-weight:850}.strength-group p{color:var(--muted);margin:6px 0 8px;line-height:1.45;font-size:.86rem}.strength-chip-wrap{display:flex;flex-wrap:wrap;gap:6px}.strength-chip{display:inline-grid;gap:2px;padding:6px 8px;border-radius:999px;font-size:.82rem;font-weight:850;background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.82)}.strength-chip small{font-size:.68rem;color:var(--muted)}.strength-chip.locked{opacity:.56;filter:grayscale(.6)}.virtue-change-box{margin:12px 0;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(240,249,255,.78));border:1px solid rgba(255,255,255,.9);box-shadow:0 12px 26px rgba(29,53,87,.1),inset 0 1px 0 rgba(255,255,255,.96)}.virtue-change-box strong{display:block;margin-bottom:8px;color:var(--primary-dark)}.virtue-change-list{display:flex;flex-wrap:wrap;gap:8px}.virtue-change-pill{padding:7px 10px;border-radius:999px;font-weight:950;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.88)}.virtue-change-pill.up{color:#137300;box-shadow:0 0 0 3px rgba(57,255,20,.1)}.virtue-change-pill.down{color:#b42318;box-shadow:0 0 0 3px rgba(255,59,48,.08)}@media(max-width:760px){.virtue-row{grid-template-columns:1fr}.virtue-score{text-align:left}.strength-grid{grid-template-columns:1fr}}`;
     document.head.appendChild(style);
   }
 
   function install() {
-    getVirtueStats();
-    injectStyles();
-    patchStartGame();
-    updateTabLabels();
+    getVirtueStats(); injectStyles(); patchStartGame(); updateTabLabels();
+    window.__virtueAbilitySystemReady = true;
+    window.__virtueSetCharacterTab = setCharacterTab;
     window.setSimsCharacterTab = setCharacterTab;
     window.getVirtueStats = getVirtueStats;
     window.resetVirtueStats = function () { saveVirtueStats(DEFAULT_STATS); };
+    forceCorrectOpenTab();
   }
 
   document.addEventListener('click', handleChoiceClick, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install); else install();
-  window.addEventListener('load', function () { install(); setTimeout(install, 350); setTimeout(install, 900); setTimeout(install, 1800); });
+  window.addEventListener('load', function () { install(); setTimeout(install, 350); setTimeout(install, 900); setTimeout(install, 1800); setTimeout(forceCorrectOpenTab, 2400); });
 })();
