@@ -1,9 +1,6 @@
 // /mission-result-review-fix.js
 // Stable compact final result panel after each mission.
-// Fixes:
-// - no repeated remove/reinsert flicker
-// - no image on ending page
-// - shorter ending page with compact 5-question feedback
+// Shows: ability change + result summary on top, full-width 逐題回饋 below.
 
 (function () {
   const SESSION_KEY = 'asd_school_mission_review_session_v1';
@@ -67,7 +64,6 @@
 
   function detectMission() {
     if (currentMissionKey) return currentMissionKey;
-
     const games = getGames();
     const text = [
       (document.getElementById('asdBox') || {}).textContent || '',
@@ -106,11 +102,8 @@
 
   function starHtml(stars) {
     let html = '<span class="mission-result-stars" aria-label="' + stars + ' 星">';
-    for (let i = 1; i <= 3; i += 1) {
-      html += '<span class="' + (i <= stars ? 'filled' : 'empty') + '">★</span>';
-    }
-    html += '</span>';
-    return html;
+    for (let i = 1; i <= 3; i += 1) html += '<span class="' + (i <= stars ? 'filled' : 'empty') + '">★</span>';
+    return html + '</span>';
   }
 
   function starMessage(stars) {
@@ -121,9 +114,7 @@
 
   function getBestAnswer(step) {
     if (!step || !Array.isArray(step.options)) return '';
-    const best = step.options
-      .filter(function (option) { return Number(option.score || 0) >= 2; })
-      .map(function (option) { return option.text; });
+    const best = step.options.filter(function (option) { return Number(option.score || 0) >= 2; }).map(function (option) { return option.text; });
     return best[0] || '';
   }
 
@@ -135,12 +126,7 @@
   }
 
   function saveSession() {
-    saveJson(SESSION_KEY, {
-      missionKey: currentMissionKey,
-      score: currentScore,
-      items: reviewItems,
-      savedAt: Date.now()
-    });
+    saveJson(SESSION_KEY, { missionKey: currentMissionKey, score: currentScore, items: reviewItems, savedAt: Date.now() });
   }
 
   function loadSession() {
@@ -201,24 +187,17 @@
 
   function shortenText(text, limit) {
     const value = String(text || '').trim();
-    if (value.length <= limit) return value;
-    return value.slice(0, limit) + '…';
+    return value.length <= limit ? value : value.slice(0, limit) + '…';
   }
 
   function renderReviewRows(items) {
     return items.map(function (item) {
       const label = labelForScore(item.score);
-      const best = item.score >= 2 || !item.bestAnswer ? '' :
-        '<div class="mission-result-best"><strong>建議：</strong>' + esc(shortenText(item.bestAnswer, 34)) + '</div>';
-
+      const best = item.score >= 2 || !item.bestAnswer ? '' : '<div class="mission-result-best"><strong>建議：</strong>' + esc(shortenText(item.bestAnswer, 38)) + '</div>';
       return '<div class="mission-result-row ' + label.className + '">' +
-        '<div class="mission-result-row-head">' +
-          '<strong>第 ' + esc(item.questionNumber) + ' 題｜' + label.icon + ' ' + esc(label.text) + '</strong>' +
-          '<span>' + esc(item.score) + '/2</span>' +
-        '</div>' +
-        '<div class="mission-result-brief"><strong>你選：</strong>' + esc(shortenText(item.selectedText, 42)) + '</div>' +
-        '<div class="mission-result-brief"><strong>回饋：</strong>' + esc(shortenText(item.note, 52)) + '</div>' +
-        best +
+        '<div class="mission-result-row-head"><strong>第 ' + esc(item.questionNumber) + ' 題｜' + label.icon + ' ' + esc(label.text) + '</strong><span>' + esc(item.score) + '/2</span></div>' +
+        '<div class="mission-result-brief"><strong>你選：</strong>' + esc(shortenText(item.selectedText, 46)) + '</div>' +
+        '<div class="mission-result-brief"><strong>回饋：</strong>' + esc(shortenText(item.note, 56)) + '</div>' + best +
       '</div>';
     }).join('');
   }
@@ -245,10 +224,7 @@
     panel.className = 'mission-result-review-box';
     panel.innerHTML =
       '<div class="mission-result-summary-card">' +
-        '<div class="mission-result-summary-left">' +
-          '<div class="panel-badge">任務結果</div>' +
-          '<h3>今次評級：' + starHtml(stars) + '</h3>' +
-        '</div>' +
+        '<div class="mission-result-summary-left"><div class="panel-badge">任務結果</div><h3>今次評級：' + starHtml(stars) + '</h3></div>' +
         '<div class="mission-result-score"><strong>' + score + ' / ' + maxScore + '</strong><span>' + esc(starMessage(stars)) + '</span></div>' +
       '</div>' +
       '<div class="mission-result-review-card">' +
@@ -257,12 +233,7 @@
       '</div>';
 
     const choices = document.getElementById('asdChoices');
-    if (choices && choices.parentNode) {
-      choices.parentNode.insertBefore(panel, choices);
-    } else {
-      const dialogueArea = document.querySelector('#gameScreen.active .dialogue-area.center-column') || document.querySelector('#gameScreen .dialogue-area.center-column');
-      if (dialogueArea) dialogueArea.appendChild(panel);
-    }
+    if (choices && choices.parentNode) choices.parentNode.insertBefore(panel, choices);
   }
 
   function scheduleRender() {
@@ -278,150 +249,114 @@
     const style = document.createElement('style');
     style.id = 'missionResultReviewFixStyle';
     style.textContent = `
-      #gameScreen.active.mission-finish-mode .dialogue-area.center-column {
-        max-width: 980px !important;
-      }
-
+      #gameScreen.active.mission-finish-mode #questionTracker,
+      #gameScreen.active.mission-finish-mode .action-row,
+      #gameScreen.active.mission-finish-mode #asdBox,
+      #gameScreen.active.mission-finish-mode #sceneMeta,
+      #gameScreen.active.mission-finish-mode #hintBox,
+      #gameScreen.active.mission-finish-mode #calmBox,
+      #gameScreen.active.mission-finish-mode #reviewBoxInline,
       #gameScreen.active.mission-finish-mode #gameScenarioImageBox,
-      #gameScreen.active.mission-finish-mode .game-scenario-image-wrap,
-      #gameScreen.active.mission-finish-mode #asdBox .game-scenario-image-wrap {
+      #gameScreen.active.mission-finish-mode .game-scenario-image-wrap {
         display: none !important;
       }
 
-      .mission-result-review-box {
-        width: 100%;
-        box-sizing: border-box;
-        display: grid;
-        gap: 10px;
-        margin: 10px 0 12px;
+      #gameScreen.active.mission-finish-mode .game-layout,
+      #gameScreen.active.mission-finish-mode .dialogue-area.center-column {
+        width: 100% !important;
+        max-width: 1040px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+
+      #gameScreen.active.mission-finish-mode .dialogue-area.center-column {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        grid-template-areas: "ability result" "review review" "choices choices" !important;
+        gap: 12px 14px !important;
+        align-items: start !important;
+      }
+
+      #gameScreen.active.mission-finish-mode #virtueChangeBox {
+        grid-area: ability !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        min-height: 112px !important;
+      }
+
+      #gameScreen.active.mission-finish-mode #missionResultReviewBox { display: contents !important; }
+
+      #gameScreen.active.mission-finish-mode .mission-result-summary-card {
+        grid-area: result !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        min-height: 112px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(180px, 230px) !important;
+        gap: 12px !important;
+        align-items: center !important;
+      }
+
+      #gameScreen.active.mission-finish-mode .mission-result-review-card {
+        grid-area: review !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 16px 18px !important;
       }
 
       .mission-result-summary-card,
       .mission-result-review-card {
-        padding: 13px 15px;
         border-radius: 22px;
         background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(239,248,255,.82));
         border: 1px solid rgba(255,255,255,.9);
         box-shadow: 0 12px 26px rgba(29,53,87,.09), inset 0 1px 0 rgba(255,255,255,.96);
       }
 
-      .mission-result-summary-card {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(180px, 230px);
-        gap: 12px;
-        align-items: center;
-      }
+      .mission-result-summary-card { padding: 13px 15px; }
+      .mission-result-summary-card h3, .mission-result-review-card h3 { margin: 5px 0 0; color: var(--text); }
 
-      .mission-result-summary-card h3,
-      .mission-result-review-card h3 {
-        margin: 5px 0 0;
-        color: var(--text);
-      }
-
-      .mission-result-stars {
-        display: inline-flex;
-        gap: 2px;
-        vertical-align: middle;
-        margin-left: 4px;
-        font-size: 1.25rem;
-        letter-spacing: 1px;
-      }
-
+      .mission-result-stars { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 4px; font-size: 1.25rem; letter-spacing: 1px; }
       .mission-result-stars .filled { color: #ffb000; text-shadow: 0 3px 10px rgba(255,176,0,.22); }
       .mission-result-stars .empty { color: #b8c3d1; }
 
       .mission-result-score {
-        display: grid;
-        gap: 3px;
-        padding: 10px 12px;
-        border-radius: 16px;
-        background: rgba(0,122,255,.08);
-        color: var(--primary-dark);
-        font-weight: 850;
-        text-align: center;
+        display: grid; gap: 3px; padding: 10px 12px; border-radius: 16px;
+        background: rgba(0,122,255,.08); color: var(--primary-dark); font-weight: 850; text-align: center;
       }
-
       .mission-result-score strong { font-size: 1.12rem; }
       .mission-result-score span { color: var(--muted); font-size: .82rem; line-height: 1.3; }
 
-      .mission-result-review-title {
-        display: flex;
-        align-items: end;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 8px;
-      }
+      .mission-result-review-title { display: flex; align-items: end; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+      .mission-result-review-title span { color: var(--muted); font-weight: 800; font-size: .82rem; }
 
-      .mission-result-review-title span {
-        color: var(--muted);
-        font-weight: 800;
-        font-size: .82rem;
-      }
-
-      .mission-result-row-grid {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 8px;
+      #gameScreen.active.mission-finish-mode .mission-result-row-grid {
+        display: grid !important;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        gap: 10px !important;
       }
 
       .mission-result-row {
-        display: grid;
-        gap: 5px;
-        padding: 10px 11px;
-        border-radius: 16px;
-        background: rgba(255,255,255,.74);
-        border: 1px solid rgba(255,255,255,.86);
-        line-height: 1.35;
-        font-weight: 760;
-        min-width: 0;
+        display: grid; gap: 5px; padding: 12px 12px; min-height: 170px;
+        border-radius: 16px; background: rgba(255,255,255,.74); border: 1px solid rgba(255,255,255,.86);
+        line-height: 1.35; font-weight: 760; min-width: 0;
       }
-
-      .mission-result-row-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 7px;
-      }
-
+      .mission-result-row-head { display: flex; justify-content: space-between; align-items: center; gap: 7px; }
       .mission-result-row-head strong { font-size: .82rem; }
-      .mission-result-row-head span {
-        flex: 0 0 auto;
-        padding: 3px 6px;
-        border-radius: 999px;
-        background: rgba(255,255,255,.9);
-        color: var(--primary-dark);
-        font-size: .75rem;
-        font-weight: 950;
-      }
-
-      .mission-result-brief,
-      .mission-result-best {
-        font-size: .76rem;
-        color: var(--muted);
-        overflow-wrap: anywhere;
-      }
-
+      .mission-result-row-head span { flex: 0 0 auto; padding: 3px 6px; border-radius: 999px; background: rgba(255,255,255,.9); color: var(--primary-dark); font-size: .75rem; font-weight: 950; }
+      .mission-result-brief, .mission-result-best { font-size: .82rem; color: var(--muted); overflow-wrap: anywhere; line-height: 1.42; }
       .mission-result-row.good { box-shadow: inset 4px 0 0 rgba(52,199,89,.78); }
       .mission-result-row.ok { box-shadow: inset 4px 0 0 rgba(255,176,0,.78); }
       .mission-result-row.bad { box-shadow: inset 4px 0 0 rgba(255,59,48,.70); }
+      .mission-result-best { padding: 6px 8px; border-radius: 12px; background: rgba(52,199,89,.10); color: #137300; }
 
-      .mission-result-best {
-        padding: 6px 8px;
-        border-radius: 12px;
-        background: rgba(52,199,89,.10);
-        color: #137300;
-      }
+      #gameScreen.active.mission-finish-mode #asdChoices { grid-area: choices !important; width: 100% !important; box-sizing: border-box !important; }
 
-      @media (max-width: 1100px) {
-        .mission-result-row-grid { grid-template-columns: 1fr; }
-        .mission-result-row-head strong { font-size: .92rem; }
-        .mission-result-brief, .mission-result-best { font-size: .86rem; }
-      }
-
-      @media (max-width: 720px) {
-        .mission-result-summary-card { grid-template-columns: 1fr; }
-        .mission-result-score { text-align: left; }
-        .mission-result-review-title { display: grid; }
+      @media (max-width: 980px) {
+        #gameScreen.active.mission-finish-mode .dialogue-area.center-column { grid-template-columns: 1fr !important; grid-template-areas: "ability" "result" "review" "choices" !important; }
+        #gameScreen.active.mission-finish-mode .mission-result-summary-card { grid-template-columns: 1fr !important; }
+        #gameScreen.active.mission-finish-mode .mission-result-row-grid { grid-template-columns: 1fr !important; }
+        .mission-result-row { min-height: 0 !important; }
       }
     `;
     document.head.appendChild(style);
@@ -430,19 +365,12 @@
   function patchStartFunctions() {
     if (typeof window.startAsdGame === 'function' && !window.startAsdGame.__missionResultReviewPatched) {
       const original = window.startAsdGame;
-      window.startAsdGame = function (missionKey) {
-        resetSession(missionKey);
-        return original.apply(this, arguments);
-      };
+      window.startAsdGame = function (missionKey) { resetSession(missionKey); return original.apply(this, arguments); };
       window.startAsdGame.__missionResultReviewPatched = true;
     }
-
     if (typeof window.startRpgMission === 'function' && !window.startRpgMission.__missionResultReviewPatched) {
       const originalRpg = window.startRpgMission;
-      window.startRpgMission = function (missionKey) {
-        resetSession(missionKey);
-        return originalRpg.apply(this, arguments);
-      };
+      window.startRpgMission = function (missionKey) { resetSession(missionKey); return originalRpg.apply(this, arguments); };
       window.startRpgMission.__missionResultReviewPatched = true;
     }
   }
@@ -450,16 +378,10 @@
   function watchFinishScreen() {
     const screen = document.getElementById('gameScreen');
     if (!screen || screen.__missionResultReviewObserver) return;
-
     const observer = new MutationObserver(function (mutations) {
-      const becameFinish = mutations.some(function (mutation) {
-        return mutation.type === 'attributes' && mutation.attributeName === 'class';
-      });
-      if (becameFinish && screen.classList.contains('active') && screen.classList.contains('mission-finish-mode')) {
-        scheduleRender();
-      }
+      const becameFinish = mutations.some(function (mutation) { return mutation.type === 'attributes' && mutation.attributeName === 'class'; });
+      if (becameFinish && screen.classList.contains('active') && screen.classList.contains('mission-finish-mode')) scheduleRender();
     });
-
     observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
     screen.__missionResultReviewObserver = observer;
   }
@@ -473,15 +395,6 @@
   }
 
   document.addEventListener('click', recordAnswer, true);
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', install);
-  } else {
-    install();
-  }
-
-  window.addEventListener('load', function () {
-    install();
-    setTimeout(install, 500);
-  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install); else install();
+  window.addEventListener('load', function () { install(); setTimeout(install, 500); });
 })();
