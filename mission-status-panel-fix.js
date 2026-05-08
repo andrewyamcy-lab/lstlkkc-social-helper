@@ -1,7 +1,7 @@
 // /mission-status-panel-fix.js
 // Shows clearly whether each RPG mission is finished.
 // Adds completion status to the left mission information panel and refreshes map markers from localStorage.
-// Completed mission icons turn grey and map stars are capped to 3 stars.
+// Completed mission icons turn grey, but the earned result stars stay gold.
 // Completed missions can be replayed, but the saved final result keeps the best score.
 // Updated: uses a MutationObserver so the status appears even after the left panel is re-rendered.
 // Updated: unfinished missions do not show a「未完成」status box.
@@ -140,7 +140,7 @@
           0 0 0 5px rgba(168,179,194,.18),
           0 0 0 10px rgba(95,107,122,.10) !important;
         animation: none !important;
-        filter: grayscale(1) saturate(.25) brightness(.96) !important;
+        filter: none !important;
       }
 
       #rpgMapScreen.active .rpg-map-marker.is-completed::before,
@@ -150,20 +150,25 @@
         opacity: .55 !important;
       }
 
+      /* Earned result stars on completed map markers stay gold. */
       #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-text,
       #rpgMapScreen.active .rpg-map-marker.is-three-star .rpg-marker-text {
         display: block !important;
         min-width: 0 !important;
         width: auto !important;
         max-width: none !important;
-        padding: 2px 5px !important;
-        font-size: .78rem !important;
+        padding: 2px 6px !important;
+        font-size: .82rem !important;
         line-height: 1.05 !important;
-        letter-spacing: -0.08em !important;
+        letter-spacing: -0.04em !important;
         white-space: nowrap !important;
         overflow: visible !important;
-        background: #6b7280 !important;
-        color: #ffffff !important;
+        background: linear-gradient(180deg, #fff5c2 0%, #ffb000 100%) !important;
+        color: #6b3f00 !important;
+        border: 1px solid rgba(255,255,255,.80) !important;
+        box-shadow: 0 3px 10px rgba(255,176,0,.34), inset 0 1px 0 rgba(255,255,255,.74) !important;
+        text-shadow: 0 1px 0 rgba(255,255,255,.35) !important;
+        filter: none !important;
       }
 
       #rpgMapScreen.active .rpg-map-marker.is-completed .rpg-marker-text::after,
@@ -218,7 +223,7 @@
     if (!panel || panel.querySelector('.rpg-side-card')) return;
     const empty = panel.querySelector('.rpg-side-empty');
     if (!empty || empty.querySelector('.rpg-side-empty-check-note')) return;
-    empty.insertAdjacentHTML('beforeend', '<p class="rpg-side-empty-check-note">完成後圖示會變成灰色；星星最多 3 粒，★★★ 代表滿分完成。完成後仍可重玩，系統會保留最高分。</p>');
+    empty.insertAdjacentHTML('beforeend', '<p class="rpg-side-empty-check-note">完成後任務圖示會變成灰色；你取得的星星會保留金色，★★★ 代表滿分完成。完成後仍可重玩，系統會保留最高分。</p>');
   }
 
   function updateSidePanelStatus(key) {
