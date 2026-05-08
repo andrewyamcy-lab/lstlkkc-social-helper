@@ -1,6 +1,7 @@
 // /rpg-preview-bigger.js
 // Make the RPG map mission information box larger.
 // Updated: mission preview image keeps its original ratio instead of being cropped.
+// Updated: RPG mission markers are larger and re-centred on the intended classrooms.
 // Also fixes edge popups such as 班群訊息：沒有人回覆 and 文件袋不見了.
 // Also auto-loads RPG progress system.
 
@@ -161,6 +162,68 @@
         border-top: 4px solid rgba(255,176,0,0.76) !important;
       }
 
+      /* Bigger mission markers, applied after rpg-map-fit.js so they stay readable on the full map. */
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker {
+        width: 54px !important;
+        height: 54px !important;
+        border-radius: 18px !important;
+        border-width: 4px !important;
+        transform: translate(-50%, -50%) !important;
+        box-shadow:
+          0 12px 24px rgba(0,87,217,.32),
+          0 0 0 5px rgba(255,176,0,.24),
+          0 0 0 10px rgba(0,122,255,.12) !important;
+      }
+
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker.is-selected,
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker:hover,
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker:focus-visible {
+        transform: translate(-50%, -50%) scale(1.12) !important;
+      }
+
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker::before {
+        inset: -9px !important;
+        border-radius: 24px !important;
+        border-width: 3px !important;
+      }
+
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-marker-icon {
+        font-size: 1.42rem !important;
+        line-height: 1 !important;
+      }
+
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-marker-text,
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-marker-mini-stars {
+        font-size: .58rem !important;
+        line-height: 1.15 !important;
+      }
+
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker .rpg-marker-text::after {
+        font-size: .66rem !important;
+      }
+
+      /* Re-centre all mission markers on their intended rooms/locations. */
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="start"] { --x: 20.7 !important; --y: 54.5 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="conflict"] { --x: 23.6 !important; --y: 54.5 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="respond"] { --x: 26.5 !important; --y: 54.5 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="teacherReminder"] { --x: 20.7 !important; --y: 46.0 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="help"] { --x: 23.6 !important; --y: 46.0 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="homework"] { --x: 20.7 !important; --y: 64.1 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="copyHomework"] { --x: 23.6 !important; --y: 64.1 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="groupwork"] { --x: 20.7 !important; --y: 29.2 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="teasing"] { --x: 23.6 !important; --y: 29.2 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="disagree"] { --x: 26.5 !important; --y: 29.2 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="quietSpace"] { --x: 29.4 !important; --y: 29.2 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="academicOnly"] { --x: 29.4 !important; --y: 22.2 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="lunch"] { --x: 77.0 !important; --y: 54.6 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="queueJump"] { --x: 79.2 !important; --y: 54.6 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="bumped"] { --x: 45.0 !important; --y: 46.0 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="lostItem"] { --x: 58.0 !important; --y: 14.1 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="whatsappIgnored"] { --x: 73.6 !important; --y: 85.0 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="peGrouping"] { --x: 55.0 !important; --y: 80.3 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="losingGame"] { --x: 94.8 !important; --y: 57.8 !important; }
+      #rpgMapScreen.active #rpgRealMapWrap .rpg-map-marker[data-rpg-scenario="refuse"] { --x: 58.8 !important; --y: 64.2 !important; }
+
       @media (max-width: 900px) {
         #rpgRealMapWrap .rpg-floating-preview {
           width: 560px !important;
@@ -232,6 +295,8 @@
     loadRpgProgressSystem();
     setTimeout(injectBiggerPreviewStyle, 300);
     setTimeout(injectBiggerPreviewStyle, 1000);
+    setTimeout(injectBiggerPreviewStyle, 1500);
+    setTimeout(injectBiggerPreviewStyle, 2500);
     setTimeout(loadRpgProgressSystem, 300);
   }
 
