@@ -1,11 +1,11 @@
 // /mission-question-layout.js
 // Layout fix for the REAL mission question page (not the preview page).
-// Goal:
-// - wider layout
-// - reduce scrolling on desktop
-// - left side = 16:9 image
+// Fixes:
+// - wider centered background box
+// - left side = 16:9 mission image
 // - right side = question + answers
-// - add A / B / C / D to answers
+// - A / B / C / D answer labels
+// - skill/save buttons in one line
 
 (function () {
   function injectMissionQuestionStyle() {
@@ -19,12 +19,24 @@
         --mission-question-wide: min(1380px, calc(100vw - 64px));
       }
 
+      @media (min-width: 981px) {
+        body:has(#gameScreen.active.mission-question-mode) .container,
+        body:has(#gameScreen.active.mission-question-mode) .card {
+          width: var(--mission-question-wide) !important;
+          max-width: var(--mission-question-wide) !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+          overflow: visible !important;
+        }
+      }
+
       #gameScreen.active.mission-question-mode {
-        width: var(--mission-question-wide) !important;
-        max-width: var(--mission-question-wide) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
         margin-left: auto !important;
         margin-right: auto !important;
-        padding: 16px 22px !important;
+        padding: 18px 26px !important;
         overflow: visible !important;
       }
 
@@ -38,27 +50,27 @@
       }
 
       #gameScreen.active.mission-question-mode > .tag {
-        margin-bottom: 6px !important;
+        margin-bottom: 5px !important;
       }
 
       #gameScreen.active.mission-question-mode > h2 {
         margin: 0 0 8px 0 !important;
-        font-size: 1.85rem !important;
-        line-height: 1.1 !important;
+        font-size: 1.65rem !important;
+        line-height: 1.08 !important;
       }
 
       #gameScreen.active.mission-question-mode > .welcome-actions {
-        margin-top: 0 !important;
-        margin-bottom: 10px !important;
+        margin: 0 0 10px 0 !important;
         display: flex !important;
         flex-wrap: nowrap !important;
         gap: 8px !important;
+        justify-content: flex-start !important;
       }
 
       #gameScreen.active.mission-question-mode > .welcome-actions button {
-        padding: 9px 12px !important;
+        padding: 8px 12px !important;
         border-radius: 14px !important;
-        font-size: .88rem !important;
+        font-size: .86rem !important;
         white-space: nowrap !important;
       }
 
@@ -67,28 +79,33 @@
         width: 100% !important;
         margin-left: auto !important;
         margin-right: auto !important;
+        overflow: visible !important;
       }
 
       #gameScreen.active.mission-question-mode .dialogue-area.center-column {
         width: 100% !important;
-        max-width: 1240px !important;
+        max-width: 1220px !important;
         margin-left: auto !important;
         margin-right: auto !important;
         display: grid !important;
-        grid-template-columns: minmax(500px, 52%) minmax(430px, 1fr) !important;
+        grid-template-columns: minmax(0, 560px) minmax(0, 560px) !important;
         grid-template-areas:
           "tracker tracker"
-          "left question"
-          "left choices"
-          "left actions" !important;
+          "image question"
+          "image choices"
+          "image actions" !important;
         gap: 12px 18px !important;
+        justify-content: center !important;
         align-items: start !important;
+        overflow: visible !important;
       }
 
       #gameScreen.active.mission-question-mode #questionTracker {
         grid-area: tracker !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
         margin: 0 !important;
-        padding: 12px 15px !important;
+        padding: 11px 14px !important;
         border-radius: 22px !important;
       }
 
@@ -97,92 +114,97 @@
       }
 
       #gameScreen.active.mission-question-mode #questionBadgeBig {
-        padding: 8px 13px !important;
-        font-size: .95rem !important;
+        padding: 7px 12px !important;
+        font-size: .9rem !important;
       }
 
       #gameScreen.active.mission-question-mode #questionTrackerTitle {
-        font-size: .95rem !important;
+        font-size: .92rem !important;
       }
 
       #gameScreen.active.mission-question-mode .question-pills {
-        margin-top: 8px !important;
+        margin-top: 7px !important;
       }
 
       #gameScreen.active.mission-question-mode .question-pill {
-        height: 30px !important;
-        min-width: 30px !important;
+        height: 28px !important;
+        min-width: 28px !important;
       }
 
-      #gameScreen.active.mission-question-mode #asdBox {
-        grid-area: left !important;
+      /* Use the real image box created by scenario-images-light.js */
+      #gameScreen.active.mission-question-mode #gameScenarioImageBox {
+        grid-area: image !important;
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
         margin: 0 !important;
         padding: 14px !important;
         border-radius: 26px !important;
-        min-height: 0 !important;
-        height: auto !important;
+        background: rgba(255,255,255,.78) !important;
+        border: 1px solid rgba(255,255,255,.86) !important;
+        box-shadow: 0 16px 36px rgba(29,53,87,.08), inset 0 1px 0 rgba(255,255,255,.95) !important;
         overflow: hidden !important;
       }
 
-      #gameScreen.active.mission-question-mode #asdBox .scene-badge,
-      #gameScreen.active.mission-question-mode #asdBox h3,
-      #gameScreen.active.mission-question-mode #asdBox h4,
-      #gameScreen.active.mission-question-mode #asdBox p,
-      #gameScreen.active.mission-question-mode #asdBox .mission-question-source-hidden {
-        display: none !important;
+      #gameScreen.active.mission-question-mode #gameScenarioImageBox.hidden {
+        display: block !important;
       }
 
-      #gameScreen.active.mission-question-mode #asdBox .game-scenario-image-wrap {
+      #gameScreen.active.mission-question-mode #gameScenarioImageBox img {
         width: 100% !important;
-        aspect-ratio: 16 / 9 !important;
         height: auto !important;
-        overflow: hidden !important;
-        border-radius: 20px !important;
-        margin: 0 !important;
-      }
-
-      #gameScreen.active.mission-question-mode #asdBox .game-scenario-image-wrap img {
-        width: 100% !important;
-        height: 100% !important;
         aspect-ratio: 16 / 9 !important;
         object-fit: cover !important;
         object-position: center center !important;
         display: block !important;
         border-radius: 20px !important;
+        background: #eef6ff !important;
+      }
+
+      #gameScreen.active.mission-question-mode #gameScenarioImageBox .game-scenario-image-caption {
+        display: none !important;
+      }
+
+      /* Hide the original text box visually; it is still used as the data source for the question panel. */
+      #gameScreen.active.mission-question-mode #asdBox {
+        display: none !important;
       }
 
       #missionQuestionText {
         grid-area: question !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
         padding: 17px 18px !important;
         border-radius: 24px !important;
-        background: rgba(255,255,255,.82) !important;
+        background: rgba(255,255,255,.84) !important;
         border: 1px solid rgba(255,255,255,.90) !important;
         box-shadow: 0 16px 36px rgba(29,53,87,.08), inset 0 1px 0 rgba(255,255,255,.95) !important;
       }
 
       #missionQuestionText .mission-question-badge {
         display: inline-block !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 9px !important;
         padding: 7px 12px !important;
         border-radius: 999px !important;
         background: rgba(0,122,255,.08) !important;
         color: var(--primary-dark) !important;
-        font-size: .86rem !important;
+        font-size: .84rem !important;
         font-weight: 900 !important;
       }
 
       #missionQuestionText .mission-question-title {
         margin: 0 !important;
-        font-size: 1.42rem !important;
+        font-size: 1.34rem !important;
         line-height: 1.35 !important;
         font-weight: 950 !important;
         color: var(--text) !important;
       }
 
       #missionQuestionText .mission-question-body {
-        margin-top: 10px !important;
-        font-size: .96rem !important;
-        line-height: 1.58 !important;
+        margin-top: 8px !important;
+        font-size: .94rem !important;
+        line-height: 1.5 !important;
         color: var(--muted) !important;
       }
 
@@ -192,31 +214,33 @@
         grid-template-columns: 1fr 1fr !important;
         gap: 10px !important;
         margin: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       #gameScreen.active.mission-question-mode #asdChoices button {
-        min-height: 68px !important;
+        min-height: 64px !important;
         display: flex !important;
         align-items: flex-start !important;
-        gap: 11px !important;
+        gap: 10px !important;
         text-align: left !important;
         border-radius: 18px !important;
-        padding: 13px 15px !important;
-        font-size: .96rem !important;
-        line-height: 1.42 !important;
+        padding: 12px 14px !important;
+        font-size: .92rem !important;
+        line-height: 1.38 !important;
       }
 
       #gameScreen.active.mission-question-mode #asdChoices .choice-letter {
-        width: 30px !important;
-        height: 30px !important;
-        min-width: 30px !important;
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
         border-radius: 50% !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
         font-weight: 950 !important;
-        background: rgba(255,255,255,.30) !important;
-        border: 1px solid rgba(255,255,255,.48) !important;
+        background: rgba(255,255,255,.34) !important;
+        border: 1px solid rgba(255,255,255,.52) !important;
         box-shadow: inset 0 1px 0 rgba(255,255,255,.5) !important;
       }
 
@@ -225,19 +249,24 @@
         display: block !important;
       }
 
+      /* Put all skill/save buttons in one line. */
       #gameScreen.active.mission-question-mode .action-row {
         grid-area: actions !important;
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 10px !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 8px !important;
         margin-top: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       #gameScreen.active.mission-question-mode .action-row button {
-        min-height: 48px !important;
-        border-radius: 16px !important;
-        padding: 11px 13px !important;
-        font-size: .9rem !important;
+        min-height: 44px !important;
+        border-radius: 15px !important;
+        padding: 9px 10px !important;
+        font-size: .82rem !important;
+        line-height: 1.2 !important;
+        white-space: normal !important;
       }
 
       @media (max-width: 980px) {
@@ -257,7 +286,7 @@
           grid-template-columns: 1fr !important;
           grid-template-areas:
             "tracker"
-            "left"
+            "image"
             "question"
             "choices"
             "actions" !important;
@@ -268,7 +297,7 @@
         }
 
         #gameScreen.active.mission-question-mode .action-row {
-          grid-template-columns: 1fr !important;
+          grid-template-columns: 1fr 1fr !important;
         }
       }
     `;
@@ -337,6 +366,12 @@
     });
   }
 
+  function ensureImageBoxIsVisible() {
+    const box = document.getElementById('gameScenarioImageBox');
+    if (!box) return;
+    box.classList.remove('hidden');
+  }
+
   function isMissionQuestionMode() {
     const screen = document.getElementById('gameScreen');
     if (!screen || !screen.classList.contains('active')) return false;
@@ -365,6 +400,7 @@
     if (!active && panel) panel.remove();
 
     if (active) {
+      ensureImageBoxIsVisible();
       ensureQuestionTextPanel();
       decorateAnswersABCD();
     }
