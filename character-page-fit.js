@@ -4,12 +4,19 @@
 // The MP4 portrait ratio is preserved with aspect-ratio + object-fit: contain.
 
 (function () {
-  function loadVirtueAbilitySystem() {
-    if (document.querySelector('script[data-virtue-ability-system="true"]')) return;
+  function loadScriptOnce(src, dataName) {
+    if (document.querySelector(`script[data-${dataName}="true"]`)) return;
     const script = document.createElement('script');
-    script.src = 'virtue-ability-system.js?v=20260508-1';
-    script.dataset.virtueAbilitySystem = 'true';
+    script.src = src;
+    script.dataset[dataName.replace(/-([a-z])/g, (_, char) => char.toUpperCase())] = 'true';
     document.body.appendChild(script);
+  }
+
+  function loadVirtueAbilitySystem() {
+    loadScriptOnce('virtue-ability-system.js?v=20260508-2', 'virtue-ability-system');
+    setTimeout(function () {
+      loadScriptOnce('virtue-radar-style.js?v=20260508-1', 'virtue-radar-style');
+    }, 180);
   }
 
   function injectCharacterPageFitStyle() {
