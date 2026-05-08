@@ -170,10 +170,11 @@
 
       #gameScreen.active.mission-intro-mode #asdChoices .mission-start-challenge-btn {
         width: 100% !important;
-        min-height: 88px !important;
+        min-height: 56px !important;
         margin: 0 !important;
-        border-radius: 24px !important;
-        font-size: 1.2rem !important;
+        border-radius: 18px !important;
+        font-size: 1.02rem !important;
+        padding: 14px 18px !important;
       }
 
       /* Navigation buttons must be at the bottom, not the top. */
