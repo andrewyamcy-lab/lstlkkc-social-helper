@@ -1,6 +1,8 @@
 // /rpg-map-fit.js
 // Light RPG map layout for「RPG 校園任務地圖」.
-// Structure: connected left info panel + large right map + compact bottom actions.
+// Fixes:
+// 1. Marker alignment: map image fills the same coordinate box as markers.
+// 2. Mission popup: larger card + larger image so the preview is readable.
 // This affects only #rpgMapScreen.
 
 (function () {
@@ -252,17 +254,22 @@
           box-shadow: 0 14px 32px rgba(29,53,87,.10), inset 0 1px 0 rgba(255,255,255,.94) !important;
         }
 
+        /* Marker fix: markers use the same full coordinate box as the image */
         #rpgMapScreen.active .rpg-real-map-wrap {
+          position: relative !important;
           width: 100% !important;
           min-width: 0 !important;
           height: 100% !important;
           line-height: 0 !important;
+          overflow: hidden !important;
+          border-radius: 20px !important;
         }
 
         #rpgMapScreen.active .rpg-real-map-img {
+          display: block !important;
           width: 100% !important;
           height: 100% !important;
-          object-fit: contain !important;
+          object-fit: fill !important;
           object-position: center center !important;
           border-radius: 20px !important;
           filter: saturate(1.03) contrast(1.02) brightness(1.02) !important;
@@ -273,6 +280,7 @@
           height: 40px !important;
           border-radius: 14px !important;
           border-width: 3px !important;
+          transform: translate(-50%, -50%) !important;
           box-shadow:
             0 8px 18px rgba(0,87,217,.25),
             0 0 0 4px rgba(255,176,0,.20),
@@ -294,41 +302,55 @@
           font-size: .47rem !important;
         }
 
+        /* Bigger mission popup + full preview image */
         #rpgMapScreen.active .rpg-floating-preview {
-          width: 235px !important;
-          max-width: 235px !important;
-          padding: 9px !important;
-          border-radius: 17px !important;
+          width: 380px !important;
+          max-width: 380px !important;
+          padding: 14px !important;
+          border-radius: 22px !important;
+          z-index: 80 !important;
         }
 
         #rpgMapScreen.active .rpg-preview-body {
-          grid-template-columns: 62px 1fr !important;
-          gap: 8px !important;
+          grid-template-columns: 132px 1fr !important;
+          gap: 13px !important;
+          align-items: stretch !important;
         }
 
         #rpgMapScreen.active .rpg-preview-image {
-          width: 62px !important;
-          border-radius: 13px !important;
+          width: 132px !important;
+          height: 168px !important;
+          border-radius: 16px !important;
+          object-fit: cover !important;
+          object-position: center center !important;
+          display: block !important;
         }
 
         #rpgMapScreen.active .rpg-preview-content h3 {
-          font-size: .86rem !important;
-          margin-bottom: 3px !important;
+          font-size: 1.05rem !important;
+          margin-bottom: 6px !important;
+          line-height: 1.25 !important;
         }
 
         #rpgMapScreen.active .rpg-preview-content p {
-          font-size: .74rem !important;
-          line-height: 1.32 !important;
+          font-size: .88rem !important;
+          line-height: 1.48 !important;
+        }
+
+        #rpgMapScreen.active .rpg-preview-difficulty,
+        #rpgMapScreen.active .rpg-preview-meta {
+          font-size: .9rem !important;
         }
 
         #rpgMapScreen.active .rpg-preview-actions {
-          margin-top: 7px !important;
+          margin-top: 12px !important;
+          gap: 8px !important;
         }
 
         #rpgMapScreen.active .rpg-preview-actions button {
-          padding: 7px 9px !important;
-          font-size: .76rem !important;
-          border-radius: 12px !important;
+          padding: 9px 13px !important;
+          font-size: .84rem !important;
+          border-radius: 13px !important;
         }
 
         #rpgMapScreen.active > .hero-card > .welcome-actions {
@@ -353,8 +375,18 @@
           grid-template-columns: 350px minmax(0, 1fr) !important;
         }
 
-        #rpgMapScreen.active .rpg-map-header {
-          width: auto !important;
+        #rpgMapScreen.active .rpg-floating-preview {
+          width: 410px !important;
+          max-width: 410px !important;
+        }
+
+        #rpgMapScreen.active .rpg-preview-body {
+          grid-template-columns: 145px 1fr !important;
+        }
+
+        #rpgMapScreen.active .rpg-preview-image {
+          width: 145px !important;
+          height: 180px !important;
         }
       }
     `;
