@@ -1,6 +1,7 @@
 // /mission-question-final-fix.js
 // Final fix for the REAL mission answering page.
-// Fixes missing image, centered front layout, background coverage, and one-line skill buttons.
+// Fixes missing image, centered front layout, background coverage, one-line skill buttons,
+// and makes skill feedback visible when the 3 skill buttons are pressed.
 
 (function () {
   const IMAGE_VERSION = '2026-04-29-v4';
@@ -78,6 +79,7 @@
             "tracker tracker"
             "image question"
             "image choices"
+            "image feedback"
             "image actions" !important;
           gap: 12px 18px !important;
           justify-content: center !important;
@@ -146,6 +148,30 @@
         margin: 0 !important;
       }
 
+      #gameScreen.active.mission-question-mode #hintBox:not(.hidden),
+      #gameScreen.active.mission-question-mode #calmBox:not(.hidden),
+      #gameScreen.active.mission-question-mode #reviewBoxInline:not(.hidden) {
+        grid-area: feedback !important;
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 13px 15px !important;
+        border-radius: 18px !important;
+        background: rgba(255,255,255,.84) !important;
+        border: 1px solid rgba(0,122,255,.16) !important;
+        box-shadow: 0 12px 28px rgba(29,53,87,.07), inset 0 1px 0 rgba(255,255,255,.92) !important;
+        color: var(--text) !important;
+        font-size: .92rem !important;
+        line-height: 1.5 !important;
+      }
+
+      #gameScreen.active.mission-question-mode #hintBox.hidden,
+      #gameScreen.active.mission-question-mode #calmBox.hidden,
+      #gameScreen.active.mission-question-mode #reviewBoxInline.hidden {
+        display: none !important;
+      }
+
       #gameScreen.active.mission-question-mode .action-row {
         grid-area: actions !important;
         width: 100% !important;
@@ -174,6 +200,7 @@
             "image"
             "question"
             "choices"
+            "feedback"
             "actions" !important;
         }
 
