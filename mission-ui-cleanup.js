@@ -1,6 +1,6 @@
 // /mission-ui-cleanup.js
 // Cleans old temporary mission UI elements when switching between intro, question and result screens.
-// Also adds a saved Mission Result History screen so students can check ending-page results later.
+// Also provides a stable saved Mission Result History screen.
 
 (function () {
   const SESSION_KEY = 'asd_school_mission_review_session_v1';
@@ -50,7 +50,7 @@
 
   function renderStars(stars) {
     let out = '';
-    for (let i = 1; i <= 3; i += 1) out += i <= stars ? '★' : '☆';
+    for (let i = 1; i <= 3; i += 1) out += i <= Number(stars || 0) ? '★' : '☆';
     return out;
   }
 
@@ -111,9 +111,8 @@
 
     const old = history.records[session.missionKey] || null;
     const oldScore = old ? Number(old.score || 0) : -1;
-    const shouldReplace = !old || score >= oldScore;
 
-    if (shouldReplace) {
+    if (!old || score >= oldScore) {
       history.records[session.missionKey] = {
         missionKey: session.missionKey,
         title: missionTitle(session.missionKey),
@@ -162,9 +161,9 @@
 
   function renderHistoryContent() {
     ensureHistoryStyles();
-    const screen = ensureHistoryScreen();
+    ensureHistoryScreen();
     const target = document.getElementById('missionResultHistoryContent');
-    if (!screen || !target) return;
+    if (!target) return;
 
     const history = readJson(HISTORY_KEY, { records: {} });
     const records = Object.keys(history.records || {}).map(function (key) {
@@ -216,42 +215,33 @@
     if (typeof showToast === 'function') showToast('已清除任務結果紀錄', 'success');
   }
 
-  function addHistoryButtons() {
+  function addHomeHistoryButtonOnce() {
     const coverMenu = document.querySelector('#coverScreen .menu-actions');
-    if (coverMenu && !document.getElementById('homeMissionResultHistoryButton')) {
-      const btn = document.createElement('button');
-      btn.id = 'homeMissionResultHistoryButton';
-      btn.type = 'button';
-      btn.className = 'secondary';
-      btn.textContent = '我的任務結果';
-      btn.addEventListener('click', showMissionResultHistory);
-      const settings = Array.from(coverMenu.querySelectorAll('button')).find(function (button) {
-        return (button.textContent || '').includes('設定');
-      });
-      if (settings) settings.insertAdjacentElement('beforebegin', btn);
-      else coverMenu.appendChild(btn);
-    }
+    if (!coverMenu || document.getElementById('homeMissionResultHistoryButton')) return;
 
-    const choices = document.getElementById('asdChoices');
-    const finishMode = document.getElementById('gameScreen') && document.getElementById('gameScreen').classList.contains('mission-finish-mode');
-    if (choices && finishMode && !document.getElementById('finishMissionResultHistoryButton')) {
-      const btn = document.createElement('button');
-      btn.id = 'finishMissionResultHistoryButton';
-      btn.type = 'button';
-      btn.className = 'choice-button secondary';
-      btn.textContent = '查看結果紀錄';
-      btn.addEventListener('click', showMissionResultHistory);
-      choices.appendChild(btn);
-    }
+    const btn = document.createElement('button');
+    btn.id = 'homeMissionResultHistoryButton';
+    btn.type = 'button';
+    btn.className = 'secondary';
+    btn.textContent = '我的任務結果';
+    btn.addEventListener('click', showMissionResultHistory);
+
+    const settings = Array.from(coverMenu.querySelectorAll('button')).find(function (button) {
+      return (button.textContent || '').includes('設定');
+    });
+    if (settings) settings.insertAdjacentElement('beforebegin', btn);
+    else coverMenu.appendChild(btn);
   }
 
   function patchScreenSwitch() {
     if (window.setActiveScreen && !window.setActiveScreen.__historyPatched) {
       const original = window.setActiveScreen;
-      window.setActiveScreen = function () {
+      window.setActiveScreen = function (screenId, stateName) {
         const result = original.apply(this, arguments);
-        const historyScreen = document.getElementById('missionResultHistoryScreen');
-        if (historyScreen) historyScreen.classList.remove('active');
+        if (screenId !== 'missionResultHistoryScreen') {
+          const historyScreen = document.getElementById('missionResultHistoryScreen');
+          if (historyScreen) historyScreen.classList.remove('active');
+        }
         return result;
       };
       window.setActiveScreen.__historyPatched = true;
@@ -295,10 +285,11 @@
   function install() {
     if (installed) return;
     installed = true;
+
     cleanMissionUiState();
     ensureHistoryScreen();
     ensureHistoryStyles();
-    addHistoryButtons();
+    addHomeHistoryButtonOnce();
     saveLatestResultToHistory();
 
     const screen = document.getElementById('gameScreen');
@@ -306,7 +297,6 @@
       const observer = new MutationObserver(function () {
         scheduleClean();
         saveLatestResultToHistory();
-        addHistoryButtons();
       });
       observer.observe(screen, {
         childList: true,
@@ -320,7 +310,6 @@
       setTimeout(scheduleClean, 0);
       setTimeout(scheduleClean, 280);
       setTimeout(saveLatestResultToHistory, 950);
-      setTimeout(addHistoryButtons, 1000);
     }, true);
 
     window.showMissionResultHistory = showMissionResultHistory;
@@ -337,7 +326,7 @@
     install();
     setTimeout(scheduleClean, 500);
     setTimeout(saveLatestResultToHistory, 900);
-    setTimeout(addHistoryButtons, 1000);
+    setTimeout(addHomeHistoryButtonOnce, 1000);
     setTimeout(patchScreenSwitch, 1200);
     setTimeout(patchScreenSwitch, 2200);
   });
