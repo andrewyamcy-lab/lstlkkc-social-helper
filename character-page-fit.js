@@ -72,7 +72,7 @@
         }
 
         #characterScreen.active .sims-main-grid {
-          grid-template-columns: minmax(320px, 0.68fr) minmax(720px, 1.32fr) !important;
+          grid-template-columns: minmax(460px, 0.82fr) minmax(680px, 1.18fr) !important;
           gap: 12px !important;
           align-items: stretch !important;
         }
@@ -94,12 +94,12 @@
         }
 
         #characterScreen.active .sims-video-frame {
-          width: min(100%, 330px) !important;
-          max-width: 330px !important;
+          width: min(100%, 430px) !important;
+          max-width: 430px !important;
           aspect-ratio: 9 / 16 !important;
           height: auto !important;
           min-height: 0 !important;
-          max-height: min(49vh, 470px) !important;
+          max-height: min(68vh, 690px) !important;
           margin: 0 auto !important;
           border-radius: 22px !important;
         }
@@ -116,6 +116,9 @@
         #characterScreen.active .sims-character-switch {
           grid-template-columns: 1fr 1fr !important;
           gap: 8px !important;
+          width: min(100%, 430px) !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
         }
 
         #characterScreen.active .sims-switch-btn {
@@ -244,13 +247,17 @@
 
       @media (min-width: 1500px) {
         #characterScreen.active .sims-main-grid {
-          grid-template-columns: minmax(360px, 0.62fr) minmax(900px, 1.38fr) !important;
+          grid-template-columns: minmax(520px, 0.82fr) minmax(900px, 1.18fr) !important;
         }
 
         #characterScreen.active .sims-video-frame {
-          width: min(100%, 350px) !important;
-          max-width: 350px !important;
-          max-height: min(50vh, 500px) !important;
+          width: min(100%, 500px) !important;
+          max-width: 500px !important;
+          max-height: min(72vh, 760px) !important;
+        }
+
+        #characterScreen.active .sims-character-switch {
+          width: min(100%, 500px) !important;
         }
       }
     `;
