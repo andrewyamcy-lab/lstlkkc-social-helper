@@ -166,18 +166,6 @@
         box-shadow: 0 14px 28px rgba(29,53,87,.12), inset 0 1px 0 rgba(255,255,255,.9);
       }
 
-      .mission-record-summary-row span::after {
-        content: '  點擊查看結果';
-        color: var(--primary-dark);
-        font-size: .78rem;
-        font-weight: 850;
-        opacity: .78;
-      }
-
-      .mission-record-detail-item[open] .mission-record-summary-row span::after {
-        content: '  收起結果';
-      }
-
       .mission-record-detail-box {
         margin: -2px 0 8px;
         padding: 12px;
