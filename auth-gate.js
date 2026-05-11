@@ -1,11 +1,12 @@
 // auth-gate.js
 // Separate loading/login gate from the main cover page.
-// Flow: loading page -> login page if not signed in -> after allowed Google login -> cover page.
+// Flow: loading page -> login page if not signed in -> after allowed Google login -> final cover page.
 
 (function () {
   let installed = false;
   let waitTimer = null;
   let authResolved = false;
+  let coverReadyTimer = null;
 
   function injectStyles() {
     if (document.getElementById('authGateStyle')) return;
@@ -216,15 +217,40 @@
     try { history.replaceState(null, '', '#login'); } catch (error) {}
   }
 
+  function isFinalCoverMenuReady() {
+    const menu = document.querySelector('#coverScreen .menu-actions');
+    const text = String(menu && menu.textContent || '');
+    return text.includes('開始 RPG 冒險') && text.includes('社交技能書') && text.includes('登出');
+  }
+
+  function prepareFinalCoverMenu() {
+    if (typeof window.applyFinalCoverMenu === 'function') {
+      window.applyFinalCoverMenu();
+    }
+    return isFinalCoverMenuReady();
+  }
+
   function showCoverPage() {
     authResolved = true;
+
+    if (!prepareFinalCoverMenu()) {
+      showLoadingPage();
+      clearTimeout(coverReadyTimer);
+      coverReadyTimer = setTimeout(showCoverPage, 120);
+      return;
+    }
+
     document.body.classList.remove('auth-gate-active');
     setOnlyScreen('coverScreen');
     if (window.appState) window.appState.currentScreen = 'cover';
     try { history.replaceState(null, '', '#cover'); } catch (error) {}
-    setTimeout(function () {
-      if (typeof window.showCoverScreen === 'function') window.showCoverScreen();
-    }, 80);
+
+    [0, 100, 350, 900, 1600].forEach(function (delay) {
+      setTimeout(function () {
+        if (typeof window.applyFinalCoverMenu === 'function') window.applyFinalCoverMenu();
+        setOnlyScreen('coverScreen');
+      }, delay);
+    });
   }
 
   function install() {
