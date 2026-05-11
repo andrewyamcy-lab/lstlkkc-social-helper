@@ -20,7 +20,6 @@ const STORAGE_KEYS = {
 let autoSaveTimer = null;
 let isRestoringCloudProgress = false;
 let suppressAutoSaveUntil = 0;
-let forceCoverUntil = 0;
 
 function getFirebaseUser() {
   return window.LSTFirebase && window.LSTFirebase.user
@@ -81,58 +80,11 @@ function collectLocalProgress() {
   return data;
 }
 
-function forceCoverNow() {
-  try {
-    document.querySelectorAll(".screen").forEach(function (screen) {
-      screen.classList.toggle("active", screen.id === "coverScreen");
-    });
-
-    const rpgMap = document.getElementById("rpgMapScreen");
-    if (rpgMap) rpgMap.classList.remove("active");
-
-    if (window.appState) window.appState.currentScreen = "cover";
-    if (typeof appState !== "undefined" && appState) appState.currentScreen = "cover";
-
-    if (window.location.hash !== "#cover") {
-      history.replaceState(null, "", "#cover");
-    }
-
-    window.scrollTo({ top: 0, behavior: "auto" });
-  } catch (error) {
-    console.warn("Could not force cover screen:", error);
-  }
-}
-
-function startCoverGuard() {
-  forceCoverUntil = Date.now() + 3500;
-  [0, 80, 250, 500, 900, 1400, 2200, 3200].forEach(function (delay) {
-    setTimeout(forceCoverNow, delay);
-  });
-}
-
-function installCoverGuard() {
-  if (window.__cloudCoverGuardInstalled) return;
-  window.__cloudCoverGuardInstalled = true;
-
-  const observer = new MutationObserver(function () {
-    if (Date.now() <= forceCoverUntil) {
-      forceCoverNow();
-    }
-  });
-
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["class"]
-  });
-}
-
 function restoreLocalProgress(data) {
   if (!data || typeof data !== "object") return;
 
   isRestoringCloudProgress = true;
-  suppressAutoSaveUntil = Date.now() + 6000;
+  suppressAutoSaveUntil = Date.now() + 3500;
   if (autoSaveTimer) {
     clearTimeout(autoSaveTimer);
     autoSaveTimer = null;
@@ -149,7 +101,7 @@ function restoreLocalProgress(data) {
 
   setTimeout(function () {
     isRestoringCloudProgress = false;
-  }, 2500);
+  }, 1200);
 }
 
 window.saveCloudProgress = async function (options) {
@@ -196,16 +148,13 @@ window.loadCloudProgress = async function () {
 
   if (!user || !db) return false;
 
-  installCoverGuard();
-  startCoverGuard();
-  suppressAutoSaveUntil = Date.now() + 6000;
+  suppressAutoSaveUntil = Date.now() + 3500;
 
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    suppressAutoSaveUntil = Date.now() + 6000;
-    startCoverGuard();
+    suppressAutoSaveUntil = Date.now() + 3500;
     return true;
   }
 
@@ -215,6 +164,7 @@ window.loadCloudProgress = async function () {
   if (progress) {
     restoreLocalProgress(progress);
 
+    // Refresh data-dependent UI only. Do not switch screen here.
     if (typeof loadProgress === "function") loadProgress();
     if (typeof renderBadges === "function") renderBadges();
     if (typeof renderCharacterScreen === "function") renderCharacterScreen();
@@ -225,8 +175,7 @@ window.loadCloudProgress = async function () {
       autoSaveTimer = null;
     }
 
-    suppressAutoSaveUntil = Date.now() + 6000;
-    startCoverGuard();
+    suppressAutoSaveUntil = Date.now() + 3500;
   }
 
   return true;
@@ -278,8 +227,12 @@ window.addEventListener("lstAuthReady", function (event) {
   installAutoSaveHooks();
   if (event.detail && event.detail.user) {
     setTimeout(function () {
-      window.loadCloudProgress();
-    }, 500);
+      window.loadCloudProgress().then(function () {
+        if (typeof window.showAuthenticatedCoverScreen === "function") {
+          window.showAuthenticatedCoverScreen();
+        }
+      });
+    }, 300);
   }
 });
 
