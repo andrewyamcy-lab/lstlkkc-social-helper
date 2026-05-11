@@ -143,112 +143,23 @@
     const style = document.createElement('style');
     style.id = 'missionRecordDetailStyle';
     style.textContent = `
-      .mission-record-detail-item {
-        border-radius: 18px;
-        overflow: hidden;
-      }
-
-      .mission-record-detail-item summary {
-        list-style: none;
-        cursor: pointer;
-      }
-
-      .mission-record-detail-item summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .mission-record-summary-row {
-        transition: transform .18s ease, box-shadow .18s ease;
-      }
-
-      .mission-record-summary-row:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 14px 28px rgba(29,53,87,.12), inset 0 1px 0 rgba(255,255,255,.9);
-      }
-
-      .mission-record-detail-box {
-        margin: -2px 0 8px;
-        padding: 12px;
-        border-radius: 0 0 18px 18px;
-        background: rgba(255,255,255,.52);
-        border: 1px solid rgba(255,255,255,.72);
-        border-top: 0;
-        display: grid;
-        gap: 10px;
-      }
-
-      .mission-record-summary {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        border-radius: 14px;
-        background: rgba(0,122,255,.08);
-        color: var(--muted);
-        font-weight: 850;
-      }
-
-      .mission-record-summary strong {
-        color: var(--primary-dark);
-      }
-
-      .mission-record-question-grid {
-        display: grid;
-        gap: 8px;
-      }
-
-      .mission-record-question {
-        display: grid;
-        gap: 6px;
-        padding: 10px 11px;
-        border-radius: 15px;
-        background: rgba(255,255,255,.72);
-        border: 1px solid rgba(255,255,255,.82);
-        color: var(--muted);
-        font-size: .86rem;
-        font-weight: 760;
-        line-height: 1.45;
-      }
-
-      .mission-record-question-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        align-items: center;
-        color: var(--text);
-      }
-
-      .mission-record-question-head span {
-        flex: 0 0 auto;
-        padding: 3px 7px;
-        border-radius: 999px;
-        color: var(--primary-dark);
-        background: rgba(255,255,255,.9);
-        font-weight: 950;
-      }
-
+      .mission-record-detail-item { border-radius: 18px; overflow: hidden; }
+      .mission-record-detail-item summary { list-style: none; cursor: pointer; }
+      .mission-record-detail-item summary::-webkit-details-marker { display: none; }
+      .mission-record-summary-row { transition: transform .18s ease, box-shadow .18s ease; }
+      .mission-record-summary-row:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(29,53,87,.12), inset 0 1px 0 rgba(255,255,255,.9); }
+      .mission-record-detail-box { margin: -2px 0 8px; padding: 12px; border-radius: 0 0 18px 18px; background: rgba(255,255,255,.52); border: 1px solid rgba(255,255,255,.72); border-top: 0; display: grid; gap: 10px; }
+      .mission-record-summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; background: rgba(0,122,255,.08); color: var(--muted); font-weight: 850; }
+      .mission-record-summary strong { color: var(--primary-dark); }
+      .mission-record-question-grid { display: grid; gap: 8px; }
+      .mission-record-question { display: grid; gap: 6px; padding: 10px 11px; border-radius: 15px; background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.82); color: var(--muted); font-size: .86rem; font-weight: 760; line-height: 1.45; }
+      .mission-record-question-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; color: var(--text); }
+      .mission-record-question-head span { flex: 0 0 auto; padding: 3px 7px; border-radius: 999px; color: var(--primary-dark); background: rgba(255,255,255,.9); font-weight: 950; }
       .mission-record-question.good { box-shadow: inset 4px 0 0 rgba(52,199,89,.78); }
       .mission-record-question.ok { box-shadow: inset 4px 0 0 rgba(255,176,0,.78); }
       .mission-record-question.bad { box-shadow: inset 4px 0 0 rgba(255,59,48,.70); }
-
-      .mission-record-best,
-      .mission-record-empty-detail {
-        padding: 8px 10px;
-        border-radius: 12px;
-        background: rgba(52,199,89,.10);
-        color: #137300;
-        font-weight: 850;
-        line-height: 1.45;
-      }
-
-      @media (max-width: 640px) {
-        .mission-record-summary,
-        .mission-record-question-head {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-      }
+      .mission-record-best, .mission-record-empty-detail { padding: 8px 10px; border-radius: 12px; background: rgba(52,199,89,.10); color: #137300; font-weight: 850; line-height: 1.45; }
+      @media (max-width: 640px) { .mission-record-summary, .mission-record-question-head { align-items: flex-start; flex-direction: column; } }
     `;
     document.head.appendChild(style);
   }
@@ -279,110 +190,5 @@
   window.addEventListener('load', function () {
     install();
     setTimeout(install, 1000);
-  });
-})();
-
-// Firebase login UI bootstrap.
-// This keeps the existing index.html unchanged and injects Google login/cloud-save controls on the cover screen.
-(function () {
-  function injectFirebaseLoginStyles() {
-    if (document.getElementById('firebaseLoginUiStyle')) return;
-    const style = document.createElement('style');
-    style.id = 'firebaseLoginUiStyle';
-    style.textContent = `
-      .login-box {
-        max-width: 480px;
-        margin: 18px auto 4px;
-        padding: 16px;
-        border-radius: 24px;
-        background: rgba(255, 255, 255, 0.58);
-        border: 1px solid rgba(255, 255, 255, 0.72);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 14px 30px rgba(29,53,87,0.08);
-      }
-      .login-box p {
-        margin: 0 0 10px;
-        color: var(--muted);
-        font-weight: 700;
-      }
-      .user-photo {
-        width: 54px;
-        height: 54px;
-        border-radius: 50%;
-        margin: 0 auto 10px;
-        border: 2px solid rgba(255,255,255,0.9);
-        box-shadow: 0 8px 18px rgba(29,53,87,0.12);
-      }
-      .login-actions {
-        display: grid;
-        gap: 10px;
-        margin-top: 12px;
-      }
-      .cloud-sync-note {
-        margin-top: 10px !important;
-        font-size: .86rem;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  function injectFirebaseLoginUi() {
-    injectFirebaseLoginStyles();
-    if (document.getElementById('loginBox') || document.getElementById('userBox')) return;
-
-    const cover = document.getElementById('coverScreen');
-    if (!cover) return;
-    const hero = cover.querySelector('.hero-card');
-    if (!hero) return;
-    const menu = hero.querySelector('.menu-actions');
-    if (!menu) return;
-
-    const wrap = document.createElement('div');
-    wrap.id = 'firebaseLoginUiWrap';
-    wrap.innerHTML = `
-      <div id="loginBox" class="login-box">
-        <p>請使用 Google 登入，以同步你的練習進度。</p>
-        <button type="button" onclick="signInWithGoogle()">使用 Google 登入</button>
-        <p class="small cloud-sync-note">登入後，任務紀錄、徽章、角色進度和校園聲譽會儲存在雲端。</p>
-      </div>
-      <div id="userBox" class="login-box" style="display:none;">
-        <img id="userPhoto" class="user-photo" alt="Google profile photo" style="display:none;" />
-        <p>已登入：</p>
-        <strong id="userName"></strong>
-        <div id="userEmail" class="small"></div>
-        <div class="login-actions">
-          <button type="button" onclick="saveCloudProgress()">立即同步雲端</button>
-          <button type="button" class="secondary" onclick="loadCloudProgress()">載入雲端紀錄</button>
-          <button type="button" class="secondary" onclick="logoutGoogle()">登出</button>
-        </div>
-      </div>
-    `;
-    hero.insertBefore(wrap, menu);
-  }
-
-  function loadFirebaseModules() {
-    if (window.__firebaseCloudModulesLoading) return;
-    window.__firebaseCloudModulesLoading = true;
-
-    import('./firebase-auth-cloud.js')
-      .then(function () { return import('./cloud-save-adapter.js'); })
-      .catch(function (error) {
-        console.error('Firebase cloud modules failed to load:', error);
-      });
-  }
-
-  function install() {
-    injectFirebaseLoginUi();
-    loadFirebaseModules();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', install);
-  } else {
-    install();
-  }
-
-  window.addEventListener('load', function () {
-    install();
-    setTimeout(install, 800);
   });
 })();
