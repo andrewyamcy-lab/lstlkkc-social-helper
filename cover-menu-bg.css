@@ -1,24 +1,24 @@
 /* /cover-menu-bg.css */
 /* Full-page white glass RPG cover menu using the uploaded school photo. */
 
-body:has(#coverScreen.active) {
+body.auth-cover-ready:has(#coverScreen.active) {
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-body:has(#coverScreen.active) > header,
-body:has(#coverScreen.active) > footer {
+body.auth-cover-ready:has(#coverScreen.active) > header,
+body.auth-cover-ready:has(#coverScreen.active) > footer {
   display: none !important;
 }
 
-body:has(#coverScreen.active) .container {
+body.auth-cover-ready:has(#coverScreen.active) .container {
   width: 100%;
   max-width: none;
   margin: 0;
   padding: 0;
 }
 
-.card:has(#coverScreen.active) {
+body.auth-cover-ready .card:has(#coverScreen.active) {
   padding: 0;
   margin: 0;
   width: 100%;
@@ -39,21 +39,21 @@ body:has(#coverScreen.active) .container {
   overflow: hidden !important;
 }
 
-#coverScreen.active {
+body.auth-cover-ready #coverScreen.active {
   position: relative;
   overflow: hidden;
   width: 100%;
   min-height: 100vh;
   border-radius: 0;
   isolation: isolate;
-  padding: 48px 24px;
+  padding: 34px 24px;
   display: flex !important;
   align-items: center;
   justify-content: center;
   background: #eaf6ff;
 }
 
-#coverScreen.active::before {
+body.auth-cover-ready #coverScreen.active::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -66,7 +66,7 @@ body:has(#coverScreen.active) .container {
   filter: saturate(1.06) contrast(1.02) brightness(1.03);
 }
 
-#coverScreen.active::after {
+body.auth-cover-ready #coverScreen.active::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -77,12 +77,12 @@ body:has(#coverScreen.active) .container {
     linear-gradient(180deg, rgba(0, 67, 145, 0.08), rgba(0, 67, 145, 0.14));
 }
 
-#coverScreen.active .hero-card {
+body.auth-cover-ready #coverScreen.active .hero-card {
   position: relative;
   z-index: 2;
   width: min(540px, 92vw);
-  margin: 0;
-  padding: 30px 32px 32px;
+  margin: 0 auto;
+  padding: 28px 32px 28px;
   text-align: center;
   background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,251,255,0.66));
   border: 1px solid rgba(255,255,255,0.86);
@@ -94,20 +94,13 @@ body:has(#coverScreen.active) .container {
   backdrop-filter: blur(14px) saturate(1.18);
 }
 
-#coverScreen.active .hero-card::before,
-#coverScreen.active .hero-card::after {
+body.auth-cover-ready #coverScreen.active .hero-card::before,
+body.auth-cover-ready #coverScreen.active .hero-card::after {
   display: none !important;
   content: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  inset: auto !important;
-  background: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  transform: none !important;
 }
 
-#coverScreen.active .tag {
+body.auth-cover-ready #coverScreen.active .tag {
   background: rgba(255, 214, 10, 0.82);
   border: 1px solid rgba(255,255,255,0.74);
   color: #5b3b00;
@@ -115,14 +108,14 @@ body:has(#coverScreen.active) .container {
   box-shadow: 0 8px 20px rgba(0, 87, 217, 0.12);
 }
 
-#coverScreen.active .tag::after {
+body.auth-cover-ready #coverScreen.active .tag::after {
   content: "｜梁書 RPG 校園社交任務";
 }
 
-#coverScreen.active .hero-avatar {
-  width: 88px;
-  height: 88px;
-  margin: 14px auto 18px;
+body.auth-cover-ready #coverScreen.active .hero-avatar {
+  width: 78px;
+  height: 78px;
+  margin: 12px auto 14px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -138,109 +131,93 @@ body:has(#coverScreen.active) .container {
   animation: coverAvatarFloat 3.6s ease-in-out infinite;
 }
 
-#coverScreen.active .hero-avatar .hero-avatar-icon {
+body.auth-cover-ready #coverScreen.active .hero-avatar .hero-avatar-icon {
   display: block;
   line-height: 1;
-  font-size: 2.25rem;
+  font-size: 2.1rem;
   transform: translateY(1px);
 }
 
-#coverScreen.active h2 {
+body.auth-cover-ready #coverScreen.active h2 {
   color: #13294b;
-  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
   line-height: 1.18;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   text-shadow: 0 1px 0 rgba(255,255,255,0.72);
 }
 
-#coverScreen.active p {
+body.auth-cover-ready #coverScreen.active p {
   color: rgba(29, 53, 87, 0.86);
-  font-size: 0.98rem;
-  line-height: 1.75;
-  margin-bottom: 22px;
+  font-size: 0.96rem;
+  line-height: 1.65;
+  margin-bottom: 18px;
 }
 
-#coverScreen.active .menu-actions {
+body.auth-cover-ready #coverScreen.active .menu-actions {
   display: grid;
-  gap: 11px;
+  gap: 10px;
   max-width: 390px;
   margin-left: auto;
   margin-right: auto;
 }
 
-#coverScreen.active .menu-actions button,
-#coverScreen.active .menu-actions button::before,
-#coverScreen.active .menu-actions button::after {
+body.auth-cover-ready #coverScreen.active .menu-actions button,
+body.auth-cover-ready #coverScreen.active .menu-actions button::before,
+body.auth-cover-ready #coverScreen.active .menu-actions button::after {
   box-sizing: border-box;
 }
 
-#coverScreen.active .menu-actions button::before,
-#coverScreen.active .menu-actions button::after {
+body.auth-cover-ready #coverScreen.active .menu-actions button::before,
+body.auth-cover-ready #coverScreen.active .menu-actions button::after {
   display: none !important;
   content: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  inset: auto !important;
-  background: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  transform: none !important;
-  opacity: 0 !important;
 }
 
-#coverScreen.active .menu-actions button {
+body.auth-cover-ready #coverScreen.active .menu-actions button {
   position: relative;
   width: 100%;
   justify-content: center;
   border-radius: 16px;
-  padding: 13px 18px;
+  padding: 12px 18px;
   font-weight: 950;
   letter-spacing: 0.03em;
   color: #ffffff;
   background: linear-gradient(180deg, #2f8cff, #006be8) !important;
   border: 1px solid rgba(255,255,255,0.58);
   box-shadow:
-    0 6px 0 rgba(169, 205, 242, 0.86),
-    0 14px 28px rgba(0, 87, 217, 0.13),
+    0 5px 0 rgba(169, 205, 242, 0.86),
+    0 12px 24px rgba(0, 87, 217, 0.13),
     inset 0 1px 0 rgba(255,255,255,0.60);
+  transform: translateY(0);
+  transition: filter .16s ease, box-shadow .16s ease, transform .16s ease;
+  pointer-events: auto;
 }
 
-#coverScreen.active .menu-actions button.secondary {
+body.auth-cover-ready #coverScreen.active .menu-actions button.secondary {
   color: #0057d9;
   background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(234,246,255,0.74)) !important;
   border-color: rgba(255,255,255,0.82);
   box-shadow:
-    0 6px 0 rgba(169, 205, 242, 0.86),
-    0 14px 28px rgba(0, 87, 217, 0.13),
+    0 5px 0 rgba(169, 205, 242, 0.86),
+    0 12px 24px rgba(0, 87, 217, 0.13),
     inset 0 1px 0 rgba(255,255,255,0.96);
 }
 
-#coverScreen.active .menu-actions button:hover,
-#coverScreen.active .menu-actions button:focus-visible {
-  transform: translateY(-4px);
+body.auth-cover-ready #coverScreen.active .menu-actions button:hover,
+body.auth-cover-ready #coverScreen.active .menu-actions button:focus-visible,
+body.auth-cover-ready #coverScreen.active .menu-actions button.secondary:hover,
+body.auth-cover-ready #coverScreen.active .menu-actions button.secondary:focus-visible {
+  transform: translateY(0) !important;
   filter: brightness(1.04);
   box-shadow:
-    0 9px 0 rgba(169, 205, 242, 0.90),
-    0 20px 38px rgba(0, 87, 217, 0.18),
+    0 5px 0 rgba(169, 205, 242, 0.90),
+    0 16px 30px rgba(0, 87, 217, 0.17),
     0 0 0 5px rgba(255, 214, 10, 0.14),
     inset 0 1px 0 rgba(255,255,255,0.74);
 }
 
-#coverScreen.active .menu-actions button.secondary:hover,
-#coverScreen.active .menu-actions button.secondary:focus-visible {
-  box-shadow:
-    0 9px 0 rgba(169, 205, 242, 0.90),
-    0 20px 38px rgba(0, 87, 217, 0.18),
-    0 0 0 5px rgba(255, 214, 10, 0.14),
-    inset 0 1px 0 rgba(255,255,255,0.98);
-}
-
-#coverScreen.active .menu-actions button:active {
-  transform: translateY(4px);
-  box-shadow:
-    0 3px 0 rgba(169, 205, 242, 0.86),
-    0 8px 18px rgba(0, 87, 217, 0.12),
-    inset 0 1px 0 rgba(255,255,255,0.54);
+body.auth-cover-ready #coverScreen.active .menu-actions button:active {
+  transform: translateY(2px) !important;
 }
 
 @keyframes schoolCoverCameraMove {
@@ -255,31 +232,30 @@ body:has(#coverScreen.active) .container {
 }
 
 @media (max-width: 640px) {
-  #coverScreen.active {
+  body.auth-cover-ready #coverScreen.active {
     min-height: 100vh;
-    padding: 34px 14px;
+    padding: 28px 14px;
   }
 
-  #coverScreen.active::before { background-position: 42% center; }
+  body.auth-cover-ready #coverScreen.active::before { background-position: 42% center; }
 
-  #coverScreen.active .hero-card {
+  body.auth-cover-ready #coverScreen.active .hero-card {
     width: min(420px, 94vw);
-    padding: 28px 20px 30px;
+    padding: 24px 20px 26px;
   }
 
-  #coverScreen.active .hero-avatar {
-    width: 76px;
-    height: 76px;
+  body.auth-cover-ready #coverScreen.active .hero-avatar {
+    width: 72px;
+    height: 72px;
   }
 
-  #coverScreen.active .hero-avatar .hero-avatar-icon {
-    font-size: 2rem;
-    transform: translateY(1px);
+  body.auth-cover-ready #coverScreen.active .hero-avatar .hero-avatar-icon {
+    font-size: 1.95rem;
   }
 
-  #coverScreen.active p { font-size: 0.92rem; }
+  body.auth-cover-ready #coverScreen.active p { font-size: 0.9rem; }
 
-  #coverScreen.active .tag::after { content: ""; }
+  body.auth-cover-ready #coverScreen.active .tag::after { content: ""; }
 }
 
 body.reduced-motion #coverScreen.active::before,
