@@ -1,6 +1,5 @@
 // firebase-auth-cloud.js
 
-import "./auth-gate.js";
 import "./cover-menu-final.js";
 import "./cloud-save-adapter.js";
 
@@ -63,14 +62,26 @@ async function finishAllowedLogin(user, options) {
   window.LSTFirebase.cloudReady = false;
   updateLoginUI(user);
 
-  if (user) {
-    await saveUserProfile(user);
+  let cloudReady = false;
 
-    if (typeof window.loadCloudProgress === "function") {
-      await window.loadCloudProgress();
+  if (user) {
+    try {
+      await saveUserProfile(user);
+    } catch (error) {
+      console.warn("Could not save user profile:", error);
     }
 
-    window.LSTFirebase.cloudReady = true;
+    try {
+      if (typeof window.loadCloudProgress === "function") {
+        await window.loadCloudProgress();
+      }
+      cloudReady = true;
+    } catch (error) {
+      console.warn("Could not load cloud progress. Continuing to cover page:", error);
+      cloudReady = true;
+    }
+
+    window.LSTFirebase.cloudReady = cloudReady;
   }
 
   window.dispatchEvent(
