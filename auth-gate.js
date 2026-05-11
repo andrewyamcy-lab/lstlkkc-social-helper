@@ -199,6 +199,7 @@
     injectStyles();
     ensureLoadingScreen();
     ensureAuthScreen();
+    document.body.classList.remove('auth-cover-ready');
     document.body.classList.add('auth-gate-active');
     setOnlyScreen('authLoadingScreen');
     if (window.appState) window.appState.currentScreen = 'authLoading';
@@ -211,6 +212,7 @@
     ensureLoadingScreen();
     ensureAuthScreen();
     moveLoginUiToAuthScreen();
+    document.body.classList.remove('auth-cover-ready');
     document.body.classList.add('auth-gate-active');
     setOnlyScreen('authLoginScreen');
     if (window.appState) window.appState.currentScreen = 'authLogin';
@@ -241,6 +243,7 @@
     }
 
     document.body.classList.remove('auth-gate-active');
+    document.body.classList.add('auth-cover-ready');
     setOnlyScreen('coverScreen');
     if (window.appState) window.appState.currentScreen = 'cover';
     try { history.replaceState(null, '', '#cover'); } catch (error) {}
@@ -248,6 +251,7 @@
     [0, 100, 350, 900, 1600].forEach(function (delay) {
       setTimeout(function () {
         if (typeof window.applyFinalCoverMenu === 'function') window.applyFinalCoverMenu();
+        document.body.classList.add('auth-cover-ready');
         setOnlyScreen('coverScreen');
       }, delay);
     });
