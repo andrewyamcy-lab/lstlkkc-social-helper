@@ -1,20 +1,16 @@
 /* /hover-enhance.css */
-/* Early auth preload guard: prevents the old HTML cover page from flashing before Firebase/auth-gate finishes. */
-body:not(.auth-cover-ready) #coverScreen {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+/* Hover/performance helper.
+   The old early cover hide rule was removed because it could leave a blank page when auth scripts load slowly.
+*/
+
+button,
+.choice-button,
+.scenario-card,
+.settings-card {
+  -webkit-tap-highlight-color: transparent;
 }
 
-body.auth-cover-ready.auth-gate-active #coverScreen {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+button:hover,
+.choice-button:hover {
+  transform: translateY(0) !important;
 }
-
-body.auth-cover-ready:not(.auth-gate-active) #coverScreen.active {
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-
-/* Extra UI polish + RPG map marker placement overrides were moved out by the auth preload guard update. */
