@@ -1,9 +1,7 @@
 // /situation-rpg-button.js
 // Add ONE RPG map button to the situation list page.
-// Cover page cleanup: keep only
-// 開始 RPG 冒險 / 社交技能書 / 我的角色 / 查看我的徽章 / 我的設定
+// Cover page cleanup now keeps the final 6-button menu including 登出.
 // UI cleanup: keep only one visible progress bar on the RPG map panel.
-// EXP bar style: Minecraft-inspired white pixel segmented green bar.
 
 (function () {
   let coverObserver = null;
@@ -34,12 +32,19 @@
     });
   }
 
+  window.goToRpgMap = goToRpgMap;
+  window.openRpgMap = goToRpgMap;
+
   function makeCoverButton(text, className, onClick) {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = text;
     if (className) button.className = className;
-    button.addEventListener('click', onClick);
+    button.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof onClick === 'function') onClick();
+    });
     return button;
   }
 
@@ -47,7 +52,21 @@
     const menu = document.querySelector('#coverScreen .menu-actions');
     if (!menu) return;
 
+    const texts = Array.from(menu.querySelectorAll('button')).map(function (button) {
+      return (button.textContent || '').trim();
+    });
+
+    const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定', '登出'];
+    const alreadyFinal = texts.length === expected.length && expected.every(function (text, index) {
+      return texts[index] === text;
+    });
+
+    if (alreadyFinal && menu.dataset.finalCoverMenu === '1') return;
+
     menu.innerHTML = '';
+    menu.dataset.finalCoverMenu = '1';
+    menu.classList.add('final-cover-menu');
+
     menu.appendChild(makeCoverButton('開始 RPG 冒險', '', goToRpgMap));
     menu.appendChild(makeCoverButton('社交技能書', 'secondary', function () {
       if (typeof showPhraseLibraryScreen === 'function') showPhraseLibraryScreen();
@@ -61,6 +80,9 @@
     menu.appendChild(makeCoverButton('我的設定', 'secondary', function () {
       if (typeof showSettingsScreen === 'function') showSettingsScreen();
     }));
+    menu.appendChild(makeCoverButton('登出', 'secondary', function () {
+      if (typeof logoutGoogle === 'function') logoutGoogle();
+    }));
   }
 
   function watchCoverMenu() {
@@ -71,15 +93,12 @@
       const texts = Array.from(menu.querySelectorAll('button')).map(function (button) {
         return (button.textContent || '').trim();
       });
-      const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定'];
-      const hasWrongButton = texts.some(function (text) {
-        return text.includes('RPG 校園地圖') || text.includes('RPG 冒險地圖');
-      });
+      const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定', '登出'];
       const wrongOrderOrCount = texts.length !== expected.length || expected.some(function (text, index) {
         return texts[index] !== text;
       });
 
-      if (hasWrongButton || wrongOrderOrCount) {
+      if (wrongOrderOrCount) {
         coverObserver.disconnect();
         coverObserver = null;
         cleanupCoverMenu();
@@ -87,7 +106,13 @@
       }
     });
 
-    coverObserver.observe(menu, { childList: true, subtree: true, characterData: true });
+    observerObserveSafe(coverObserver, menu);
+  }
+
+  function observerObserveSafe(observer, menu) {
+    try {
+      observer.observe(menu, { childList: true, subtree: true, characterData: true });
+    } catch (error) {}
   }
 
   function injectButtonStyle() {
@@ -122,12 +147,8 @@
 
       .situation-rpg-switch button:hover,
       .situation-rpg-switch button:focus-visible {
-        transform: translateY(-4px);
-        box-shadow:
-          0 11px 0 rgba(169, 205, 242, 0.90),
-          0 22px 42px rgba(0, 87, 217, 0.22),
-          0 0 0 5px rgba(255, 214, 10, 0.14),
-          inset 0 1px 0 rgba(255,255,255,0.74);
+        transform: translateY(0) !important;
+        filter: brightness(1.04);
       }
     `;
     document.head.appendChild(style);
@@ -139,7 +160,6 @@
     const style = document.createElement('style');
     style.id = 'singleRpgProgressBarStyle';
     style.textContent = `
-      /* Hide the second RPG map progress bar. The visible bar is now only EXP / level progress. */
       #rpgProgressPanel > .rpg-progress-bar-wrap {
         display: none !important;
       }
@@ -148,7 +168,6 @@
         margin-bottom: 0 !important;
       }
 
-      /* Minecraft-inspired EXP bar with WHITE pixel track */
       #rpgProgressPanel .rpg-map-level-mini > .rpg-progress-bar-wrap,
       #characterScreen .rpg-exp-panel .rpg-progress-bar-wrap {
         position: relative !important;
@@ -296,9 +315,6 @@
     setTimeout(addRpgButtonToSituationList, 150);
     setTimeout(addRpgButtonToSituationList, 500);
     setTimeout(addRpgButtonToSituationList, 1000);
-    setTimeout(cleanupCoverMenu, 1200);
-    setTimeout(cleanupCoverMenu, 1800);
-    setTimeout(cleanupCoverMenu, 2500);
     setTimeout(cleanupRpgProgressBars, 300);
     setTimeout(cleanupRpgProgressBars, 900);
     setTimeout(cleanupRpgProgressBars, 1600);
