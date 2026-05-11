@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="auth-preload-hide.css?v=20260511-1" />
   <link rel="stylesheet" href="hover-enhance.css?v=20260511-1" />
   <link rel="stylesheet" href="cover-menu-bg.css?v=20260430-1" />
+  <link rel="stylesheet" href="smooth-performance.css?v=20260511-1" />
 </head>
 <body>
   <div class="toast-wrap" id="toastWrap"></div>
@@ -248,7 +249,7 @@
         if (typeof addRpgButtonToSituationList === 'function') setTimeout(addRpgButtonToSituationList, 260);
       }
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 300);
-      window.scrollTo({ top: 0, behavior: document.body.classList.contains('reduced-motion') ? 'auto' : 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
     function showCoverScreen() { setActiveScreen('coverScreen', 'cover'); }
