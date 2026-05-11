@@ -1,6 +1,6 @@
 // auth-gate.js
 // Separate loading/login gate from the main cover page.
-// Flow: loading page -> login page if not signed in -> after allowed Google login -> final cover page.
+// Flow: loading page -> login page if not signed in -> after allowed Google login and cloud load -> final cover page.
 
 (function () {
   let installed = false;
@@ -238,7 +238,7 @@
     if (!prepareFinalCoverMenu()) {
       showLoadingPage();
       clearTimeout(coverReadyTimer);
-      coverReadyTimer = setTimeout(showCoverPage, 120);
+      coverReadyTimer = setTimeout(showCoverPage, 80);
       return;
     }
 
@@ -248,13 +248,11 @@
     if (window.appState) window.appState.currentScreen = 'cover';
     try { history.replaceState(null, '', '#cover'); } catch (error) {}
 
-    [0, 100, 350, 900, 1600].forEach(function (delay) {
-      setTimeout(function () {
-        if (typeof window.applyFinalCoverMenu === 'function') window.applyFinalCoverMenu();
-        document.body.classList.add('auth-cover-ready');
-        setOnlyScreen('coverScreen');
-      }, delay);
-    });
+    setTimeout(function () {
+      if (typeof window.applyFinalCoverMenu === 'function') window.applyFinalCoverMenu();
+      document.body.classList.add('auth-cover-ready');
+      setOnlyScreen('coverScreen');
+    }, 60);
   }
 
   function install() {
@@ -273,7 +271,7 @@
     if (!installed) {
       installed = true;
       window.addEventListener('lstAuthReady', function (event) {
-        if (event.detail && event.detail.user) showCoverPage();
+        if (event.detail && event.detail.user && event.detail.cloudReady) showCoverPage();
         else showLoginPage();
       });
     }
@@ -293,6 +291,5 @@
 
   window.addEventListener('load', function () {
     install();
-    setTimeout(install, 600);
   });
 })();
