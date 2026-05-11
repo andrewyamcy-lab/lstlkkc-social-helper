@@ -1,18 +1,23 @@
 /* auth-preload-hide.css */
-/* Hide the original cover page until auth-gate confirms the final cover is ready. */
-body:not(.auth-cover-ready) #coverScreen {
+/* Safer auth preload guard.
+   Do NOT hide the cover before auth-gate is active, otherwise a slow JS/Firebase load can leave a blank page.
+*/
+
+/* Before auth-gate starts, keep the HTML cover visible as a safe fallback instead of showing an empty card. */
+body:not(.auth-gate-active):not(.auth-cover-ready) #coverScreen {
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Once auth-gate is active, it owns the loading/login screens, so hide the cover. */
+body.auth-gate-active #coverScreen {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
 }
 
-body.auth-cover-ready.auth-gate-active #coverScreen {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* Important: use flex, not block, otherwise the full-page cover card becomes left-aligned. */
+/* Final authenticated cover page. */
 body.auth-cover-ready:not(.auth-gate-active) #coverScreen.active {
   display: flex !important;
   visibility: visible !important;
