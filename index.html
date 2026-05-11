@@ -5,8 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>樂善堂梁銶琚書院｜校園社交練習</title>
+  <style>
+    /* Hide original cover until Firebase auth gate confirms the final cover is ready. */
+    body:not(.auth-cover-ready) #coverScreen {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+  </style>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="hover-enhance.css?v=20260430-1" />
+  <link rel="stylesheet" href="auth-preload-hide.css?v=20260511-1" />
+  <link rel="stylesheet" href="hover-enhance.css?v=20260511-1" />
   <link rel="stylesheet" href="cover-menu-bg.css?v=20260430-1" />
 </head>
 <body>
@@ -19,18 +28,19 @@
 
   <div class="container">
     <section class="card">
-      <div id="coverScreen" class="screen active welcome-screen">
+      <div id="coverScreen" class="screen welcome-screen">
         <div class="hero-card animate-in">
           <div class="tag">梁書學生版</div>
           <div class="hero-avatar"><span class="hero-avatar-icon">🎮</span></div>
           <h2>梁書校園社交練習</h2>
           <p>本工具為樂善堂梁銶琚書院（梁書）校園情境而設，協助學生透過學校生活情境，練習打招呼、禮貌拒絕、處理衝突、回應別人、小組合作、向老師求助、加入同學，以及確認功課。</p>
-          <div class="menu-actions">
-            <button onclick="showSituationScreen()">開始練習</button>
-            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
-            <button class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
-            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務結果</button>
-            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
+          <div class="menu-actions final-cover-menu" data-final-cover-menu="1">
+            <button type="button" onclick="window.openRpgMap ? window.openRpgMap() : (window.showRpgMapScreen && window.showRpgMapScreen())">開始 RPG 冒險</button>
+            <button type="button" class="secondary" onclick="showPhraseLibraryScreen()">社交技能書</button>
+            <button type="button" class="secondary" onclick="window.showCharacterScreen && window.showCharacterScreen()">我的角色</button>
+            <button type="button" class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
+            <button type="button" class="secondary" onclick="showSettingsScreen()">我的設定</button>
+            <button type="button" class="secondary" onclick="logoutGoogle()">登出</button>
           </div>
         </div>
       </div>
@@ -191,6 +201,7 @@
 
   <footer>樂善堂梁銶琚書院（梁書）｜校園社交練習學生版</footer>
 
+  <script type="module" src="firebase-auth-cloud.js?v=20260511-1"></script>
   <script src="script.js"></script>
   <script src="extra-scenarios-light.js?v=20260429-2"></script>
   <script src="extra-scenarios-add3.js?v=20260429-1"></script>
@@ -223,7 +234,7 @@
   <script src="mission-ui-cleanup.js?v=20260508-2"></script>
   <script src="mission-result-review-fix.js?v=20260508-1"></script>
   <script src="reputation-system.js?v=20260509-1"></script>
-  <script src="mission-record-detail.js?v=20260509-1"></script>
+  <script src="mission-record-detail.js?v=20260511-1"></script>
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'characterScreen', 'missionResultHistoryScreen'];
@@ -255,7 +266,6 @@
     function showSituationScreen() { setActiveScreen('situationScreen', 'situation'); }
 
     window.addEventListener('load', function () {
-      showCoverScreen();
       if (typeof initAnswerRandomizer === 'function') setTimeout(initAnswerRandomizer, 400);
       if (typeof initBackgroundFlow === 'function') setTimeout(initBackgroundFlow, 450);
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 700);
