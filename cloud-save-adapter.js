@@ -59,6 +59,19 @@ function safeWriteLocalStorage(key, value) {
   }
 }
 
+function keepMainProgressOnCover(raw) {
+  try {
+    if (!raw) return raw;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") {
+      parsed.currentScreen = "cover";
+    }
+    return JSON.stringify(parsed);
+  } catch (error) {
+    return raw;
+  }
+}
+
 function collectLocalProgress() {
   const data = {};
 
@@ -67,7 +80,31 @@ function collectLocalProgress() {
     data[name] = safeReadLocalStorage(key);
   });
 
+  // Do not save the current active page as game/character/settings etc.
+  // When users reopen the website, they should always land on the cover screen.
+  data.mainProgress = keepMainProgressOnCover(data.mainProgress);
+
   return data;
+}
+
+function showCoverAfterCloudLoad() {
+  setTimeout(function () {
+    try {
+      if (typeof window.showCoverScreen === "function") {
+        window.showCoverScreen();
+      } else if (typeof window.setActiveScreen === "function") {
+        window.setActiveScreen("coverScreen", "cover");
+      } else {
+        document.querySelectorAll(".screen").forEach(function (screen) {
+          screen.classList.toggle("active", screen.id === "coverScreen");
+        });
+      }
+      if (window.appState) window.appState.currentScreen = "cover";
+      window.location.hash = "cover";
+    } catch (error) {
+      console.warn("Could not force cover screen after cloud load:", error);
+    }
+  }, 80);
 }
 
 function restoreLocalProgress(data) {
@@ -78,7 +115,8 @@ function restoreLocalProgress(data) {
     const key = STORAGE_KEYS[name];
 
     if (typeof data[name] !== "undefined" && data[name] !== null) {
-      safeWriteLocalStorage(key, data[name]);
+      const value = name === "mainProgress" ? keepMainProgressOnCover(data[name]) : data[name];
+      safeWriteLocalStorage(key, value);
     }
   });
 
@@ -134,6 +172,7 @@ window.loadCloudProgress = async function () {
 
   if (!snap.exists()) {
     await window.saveCloudProgress();
+    showCoverAfterCloudLoad();
     return true;
   }
 
@@ -147,6 +186,8 @@ window.loadCloudProgress = async function () {
     if (typeof renderBadges === "function") renderBadges();
     if (typeof renderCharacterScreen === "function") renderCharacterScreen();
     if (typeof syncScenarioTotal === "function") syncScenarioTotal();
+
+    showCoverAfterCloudLoad();
 
     if (typeof showToast === "function") {
       showToast("已載入雲端紀錄。", "success");
