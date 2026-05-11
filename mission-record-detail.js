@@ -281,3 +281,108 @@
     setTimeout(install, 1000);
   });
 })();
+
+// Firebase login UI bootstrap.
+// This keeps the existing index.html unchanged and injects Google login/cloud-save controls on the cover screen.
+(function () {
+  function injectFirebaseLoginStyles() {
+    if (document.getElementById('firebaseLoginUiStyle')) return;
+    const style = document.createElement('style');
+    style.id = 'firebaseLoginUiStyle';
+    style.textContent = `
+      .login-box {
+        max-width: 480px;
+        margin: 18px auto 4px;
+        padding: 16px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.58);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 14px 30px rgba(29,53,87,0.08);
+      }
+      .login-box p {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .user-photo {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        border: 2px solid rgba(255,255,255,0.9);
+        box-shadow: 0 8px 18px rgba(29,53,87,0.12);
+      }
+      .login-actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .cloud-sync-note {
+        margin-top: 10px !important;
+        font-size: .86rem;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function injectFirebaseLoginUi() {
+    injectFirebaseLoginStyles();
+    if (document.getElementById('loginBox') || document.getElementById('userBox')) return;
+
+    const cover = document.getElementById('coverScreen');
+    if (!cover) return;
+    const hero = cover.querySelector('.hero-card');
+    if (!hero) return;
+    const menu = hero.querySelector('.menu-actions');
+    if (!menu) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'firebaseLoginUiWrap';
+    wrap.innerHTML = `
+      <div id="loginBox" class="login-box">
+        <p>請使用 Google 登入，以同步你的練習進度。</p>
+        <button type="button" onclick="signInWithGoogle()">使用 Google 登入</button>
+        <p class="small cloud-sync-note">登入後，任務紀錄、徽章、角色進度和校園聲譽會儲存在雲端。</p>
+      </div>
+      <div id="userBox" class="login-box" style="display:none;">
+        <img id="userPhoto" class="user-photo" alt="Google profile photo" style="display:none;" />
+        <p>已登入：</p>
+        <strong id="userName"></strong>
+        <div id="userEmail" class="small"></div>
+        <div class="login-actions">
+          <button type="button" onclick="saveCloudProgress()">立即同步雲端</button>
+          <button type="button" class="secondary" onclick="loadCloudProgress()">載入雲端紀錄</button>
+          <button type="button" class="secondary" onclick="logoutGoogle()">登出</button>
+        </div>
+      </div>
+    `;
+    hero.insertBefore(wrap, menu);
+  }
+
+  function loadFirebaseModules() {
+    if (window.__firebaseCloudModulesLoading) return;
+    window.__firebaseCloudModulesLoading = true;
+
+    import('./firebase-auth-cloud.js')
+      .then(function () { return import('./cloud-save-adapter.js'); })
+      .catch(function (error) {
+        console.error('Firebase cloud modules failed to load:', error);
+      });
+  }
+
+  function install() {
+    injectFirebaseLoginUi();
+    loadFirebaseModules();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install);
+  } else {
+    install();
+  }
+
+  window.addEventListener('load', function () {
+    install();
+    setTimeout(install, 800);
+  });
+})();
