@@ -1,6 +1,6 @@
 // /route-hash-fix.js
 // Keep the browser URL hash in sync with the current single-page-app screen.
-// Example: RPG map should show #rpg-map instead of staying on #cover.
+// Extra safety: if there is no Firebase user, never leave the app on a blank #cover page.
 
 (function () {
   const ROUTES = {
@@ -26,6 +26,43 @@
     }
   }
 
+  function hasFirebaseUser() {
+    return Boolean(window.LSTFirebase && window.LSTFirebase.user);
+  }
+
+  function firebaseHasAnswered() {
+    return Boolean(window.LSTFirebase && window.LSTFirebase.ready);
+  }
+
+  function showLoginFallback() {
+    if (typeof window.showAuthLoginScreen === 'function') {
+      window.showAuthLoginScreen();
+    } else {
+      document.body.classList.add('auth-gate-active');
+      document.body.classList.remove('auth-cover-ready');
+      document.querySelectorAll('.screen').forEach(function (screen) {
+        screen.classList.toggle('active', screen.id === 'authLoginScreen');
+      });
+    }
+    setRoute('#login');
+  }
+
+  function shouldForceLogin() {
+    if (hasFirebaseUser()) return false;
+
+    const hash = window.location.hash || '';
+    const active = getActiveScreenId();
+
+    if (hash === '#cover' || active === 'coverScreen' || !active) return true;
+    if (firebaseHasAnswered() && active !== 'authLoginScreen' && active !== 'authLoadingScreen') return true;
+
+    return false;
+  }
+
+  function enforceAuthRoute() {
+    if (shouldForceLogin()) showLoginFallback();
+  }
+
   function getActiveScreenId() {
     const rpg = document.getElementById('rpgMapScreen');
     if (rpg && rpg.classList.contains('active')) return 'rpgMapScreen';
@@ -35,6 +72,11 @@
   }
 
   function syncRouteFromActiveScreen() {
+    if (shouldForceLogin()) {
+      showLoginFallback();
+      return;
+    }
+
     const id = getActiveScreenId();
     if (id && ROUTES[id]) setRoute(ROUTES[id]);
   }
@@ -47,6 +89,10 @@
     window[name] = function () {
       const result = fn.apply(this, arguments);
       setTimeout(function () {
+        if (routeHash === '#cover' && !hasFirebaseUser()) {
+          showLoginFallback();
+          return;
+        }
         setRoute(routeHash);
         syncRouteFromActiveScreen();
       }, 0);
@@ -85,18 +131,32 @@
     });
   }
 
+  function startAuthWatchdog() {
+    if (window.__authRouteWatchdogStarted) return;
+    window.__authRouteWatchdogStarted = true;
+
+    [100, 500, 1200, 2500, 5000, 8000].forEach(function (delay) {
+      setTimeout(enforceAuthRoute, delay);
+    });
+
+    setInterval(enforceAuthRoute, 1500);
+  }
+
   function install() {
     patchKnownNavigationFunctions();
     observeScreenChanges();
+    startAuthWatchdog();
     setTimeout(patchKnownNavigationFunctions, 200);
     setTimeout(patchKnownNavigationFunctions, 700);
     setTimeout(patchKnownNavigationFunctions, 1500);
     setTimeout(syncRouteFromActiveScreen, 50);
     setTimeout(syncRouteFromActiveScreen, 500);
+    setTimeout(enforceAuthRoute, 900);
   }
 
   window.setAppRouteHash = setRoute;
   window.syncRouteFromActiveScreen = syncRouteFromActiveScreen;
+  window.enforceAuthRoute = enforceAuthRoute;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', install);
