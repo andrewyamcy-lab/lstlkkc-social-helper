@@ -4,7 +4,6 @@
 
 (function () {
   let installed = false;
-  let waitTimer = null;
   let authResolved = false;
   let coverReadyTimer = null;
 
@@ -15,9 +14,7 @@
     style.id = 'authGateStyle';
     style.textContent = `
       #authLoadingScreen,
-      #authLoginScreen {
-        min-height: 68vh;
-      }
+      #authLoginScreen { min-height: 68vh; }
 
       .auth-gate-card {
         max-width: 620px;
@@ -94,20 +91,43 @@
         box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 8px 18px rgba(29,53,87,.06);
       }
 
-      @keyframes authSpin {
-        to { transform: rotate(360deg); }
+      @keyframes authSpin { to { transform: rotate(360deg); } }
+      body.reduced-motion .auth-loading-spinner { animation: none !important; }
+
+      .login-box {
+        max-width: 480px;
+        margin: 18px auto 4px;
+        padding: 16px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.58);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 14px 30px rgba(29,53,87,0.08);
       }
 
-      body.reduced-motion .auth-loading-spinner {
-        animation: none !important;
+      .login-box p {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-weight: 700;
       }
 
-      #authLoginScreen #firebaseLoginUiWrap {
-        margin-top: 18px;
+      .user-photo {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        border: 2px solid rgba(255,255,255,0.9);
+        box-shadow: 0 8px 18px rgba(29,53,87,0.12);
       }
 
-      #authLoginScreen .login-box {
-        margin-top: 0;
+      .login-actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .cloud-sync-note {
+        margin-top: 10px !important;
+        font-size: .86rem;
       }
 
       body.auth-gate-active #coverScreen,
@@ -166,27 +186,34 @@
   }
 
   function ensureAuthScreen() {
-    return createScreen('authLoginScreen', `
+    const screen = createScreen('authLoginScreen', `
       <div class="hero-card animate-in auth-gate-card">
         <div class="auth-gate-badge">梁書學生版｜Google 登入</div>
         <div class="auth-gate-avatar">🔐</div>
         <h2 class="auth-gate-title">登入後開始校園社交練習</h2>
         <p class="auth-gate-text">請先使用學校 Google 帳戶登入。登入後，系統會載入你的雲端紀錄，然後進入主頁。</p>
-        <div id="authGateLoginSlot"></div>
+        <div id="firebaseLoginUiWrap">
+          <div id="loginBox" class="login-box">
+            <p>請使用 Google 登入，以同步你的練習進度。</p>
+            <button type="button" onclick="signInWithGoogle()">使用 Google 登入</button>
+            <p class="small cloud-sync-note">登入後，任務紀錄、徽章、角色進度和校園聲譽會儲存在雲端。</p>
+          </div>
+          <div id="userBox" class="login-box" style="display:none;">
+            <img id="userPhoto" class="user-photo" alt="Google profile photo" style="display:none;" />
+            <p>已登入：</p>
+            <strong id="userName"></strong>
+            <div id="userEmail" class="small"></div>
+            <div class="login-actions">
+              <button type="button" onclick="saveCloudProgress()">立即同步雲端</button>
+              <button type="button" class="secondary" onclick="loadCloudProgress()">載入雲端紀錄</button>
+              <button type="button" class="secondary" onclick="logoutGoogle()">登出</button>
+            </div>
+          </div>
+        </div>
       </div>
     `);
-  }
 
-  function moveLoginUiToAuthScreen() {
-    const screen = ensureAuthScreen();
-    if (!screen) return false;
-
-    const slot = document.getElementById('authGateLoginSlot');
-    const loginWrap = document.getElementById('firebaseLoginUiWrap');
-
-    if (!slot || !loginWrap) return false;
-    if (loginWrap.parentElement !== slot) slot.appendChild(loginWrap);
-    return true;
+    return screen;
   }
 
   function setOnlyScreen(screenId) {
@@ -211,7 +238,6 @@
     injectStyles();
     ensureLoadingScreen();
     ensureAuthScreen();
-    moveLoginUiToAuthScreen();
     document.body.classList.remove('auth-cover-ready');
     document.body.classList.add('auth-gate-active');
     setOnlyScreen('authLoginScreen');
@@ -260,14 +286,6 @@
     ensureLoadingScreen();
     ensureAuthScreen();
 
-    const moved = moveLoginUiToAuthScreen();
-    if (!moved) {
-      showLoadingPage();
-      clearTimeout(waitTimer);
-      waitTimer = setTimeout(install, 120);
-      return;
-    }
-
     if (!installed) {
       installed = true;
       window.addEventListener('lstAuthReady', function (event) {
@@ -289,7 +307,5 @@
     install();
   }
 
-  window.addEventListener('load', function () {
-    install();
-  });
+  window.addEventListener('load', install);
 })();
