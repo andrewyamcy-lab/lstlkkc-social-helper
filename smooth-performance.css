@@ -1,0 +1,66 @@
+/* /smooth-performance.css */
+/* Small performance layer for smoother page changes and less layout jank. */
+
+html {
+  scroll-behavior: auto !important;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.screen {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  will-change: opacity, transform;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.auth-gate-active .screen,
+body.reduced-motion .screen {
+  transition: none !important;
+  transform: none !important;
+}
+
+button,
+.scenario-card,
+.settings-card,
+.sims-panel,
+.sims-profile-card,
+.sims-mood-card,
+.dialogue-box,
+.status-box,
+.hero-card {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+button {
+  touch-action: manipulation;
+}
+
+button:hover,
+button:focus-visible {
+  transform: translateY(0) !important;
+}
+
+body:not(.auth-cover-ready) #coverScreen {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
