@@ -28,6 +28,8 @@ const provider = new GoogleAuthProvider();
 
 const ALLOWED_EMAIL = "andrewyamcy@gmail.com";
 const ALLOWED_DOMAIN = "@lstlkkc.edu.hk";
+const PROFILE_TIMEOUT_MS = 3500;
+const CLOUD_LOAD_TIMEOUT_MS = 5500;
 
 window.LSTFirebase = {
   app,
@@ -47,6 +49,17 @@ function isAllowedUser(user) {
   return email === ALLOWED_EMAIL || email.endsWith(ALLOWED_DOMAIN);
 }
 
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise(function (_, reject) {
+      setTimeout(function () {
+        reject(new Error((label || "Operation") + " timed out after " + ms + "ms"));
+      }, ms);
+    })
+  ]);
+}
+
 function showLoginError(message) {
   if (typeof showToast === "function") {
     showToast(message, "warning");
@@ -62,26 +75,22 @@ async function finishAllowedLogin(user, options) {
   window.LSTFirebase.cloudReady = false;
   updateLoginUI(user);
 
-  let cloudReady = false;
-
   if (user) {
     try {
-      await saveUserProfile(user);
+      await withTimeout(saveUserProfile(user), PROFILE_TIMEOUT_MS, "Save user profile");
     } catch (error) {
-      console.warn("Could not save user profile:", error);
+      console.warn("Could not save user profile. Continuing:", error);
     }
 
     try {
       if (typeof window.loadCloudProgress === "function") {
-        await window.loadCloudProgress();
+        await withTimeout(window.loadCloudProgress(), CLOUD_LOAD_TIMEOUT_MS, "Load cloud progress");
       }
-      cloudReady = true;
     } catch (error) {
-      console.warn("Could not load cloud progress. Continuing to cover page:", error);
-      cloudReady = true;
+      console.warn("Could not load cloud progress in time. Continuing to cover page:", error);
     }
 
-    window.LSTFirebase.cloudReady = cloudReady;
+    window.LSTFirebase.cloudReady = true;
   }
 
   window.dispatchEvent(
