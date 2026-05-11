@@ -21,6 +21,7 @@ const TRACKED_STORAGE_KEYS = Object.values(STORAGE_KEYS);
 
 let autoSaveTimer = null;
 let isRestoringCloudProgress = false;
+let suppressAutoSaveUntil = 0;
 let localStoragePatched = false;
 let originalLocalStorageSetItem = null;
 let originalLocalStorageRemoveItem = null;
@@ -40,6 +41,10 @@ function getFirestoreDb() {
 
 function isTrackedKey(key) {
   return TRACKED_STORAGE_KEYS.includes(String(key || ""));
+}
+
+function shouldSuppressAutoSave() {
+  return isRestoringCloudProgress || Date.now() < suppressAutoSaveUntil;
 }
 
 function safeReadLocalStorage(key) {
@@ -134,7 +139,13 @@ function installCoverGuard() {
 
 function restoreLocalProgress(data) {
   if (!data || typeof data !== "object") return;
+
   isRestoringCloudProgress = true;
+  suppressAutoSaveUntil = Date.now() + 6000;
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = null;
+  }
 
   Object.keys(STORAGE_KEYS).forEach(function (name) {
     const key = STORAGE_KEYS[name];
@@ -147,17 +158,19 @@ function restoreLocalProgress(data) {
 
   setTimeout(function () {
     isRestoringCloudProgress = false;
-  }, 800);
+  }, 2500);
 }
 
-window.saveCloudProgress = async function () {
+window.saveCloudProgress = async function (options) {
+  const opts = options || {};
+  const silent = Boolean(opts.silent);
   const user = getFirebaseUser();
   const db = getFirestoreDb();
 
   if (!user || !db) {
-    if (typeof showToast === "function") {
+    if (!silent && typeof showToast === "function") {
       showToast("請先登入 Google，才可同步雲端。", "warning");
-    } else {
+    } else if (!silent) {
       alert("請先登入 Google，才可同步雲端。");
     }
     return false;
@@ -179,8 +192,8 @@ window.saveCloudProgress = async function () {
 
   window.dispatchEvent(new CustomEvent("cloudProgressSaved", { detail: { uid: user.uid } }));
 
-  if (typeof showToast === "function") {
-    showToast("已自動同步到雲端。", "success");
+  if (!silent && typeof showToast === "function") {
+    showToast("已同步到雲端。", "success");
   }
 
   return true;
@@ -194,12 +207,14 @@ window.loadCloudProgress = async function () {
 
   installCoverGuard();
   startCoverGuard();
+  suppressAutoSaveUntil = Date.now() + 6000;
 
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    await window.saveCloudProgress();
+    await window.saveCloudProgress({ silent: true });
+    suppressAutoSaveUntil = Date.now() + 6000;
     startCoverGuard();
     return true;
   }
@@ -215,27 +230,31 @@ window.loadCloudProgress = async function () {
     if (typeof renderCharacterScreen === "function") renderCharacterScreen();
     if (typeof syncScenarioTotal === "function") syncScenarioTotal();
 
-    startCoverGuard();
-
-    if (typeof showToast === "function") {
-      showToast("已載入雲端紀錄。", "success");
+    if (autoSaveTimer) {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = null;
     }
+
+    suppressAutoSaveUntil = Date.now() + 6000;
+    startCoverGuard();
   }
 
   return true;
 };
 
-window.scheduleCloudSave = function () {
-  if (isRestoringCloudProgress) return;
+window.scheduleCloudSave = function (options) {
+  const opts = options || {};
+  if (!opts.force && shouldSuppressAutoSave()) return;
   if (!getFirebaseUser()) return;
 
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
   autoSaveTimer = setTimeout(function () {
     autoSaveTimer = null;
-    window.saveCloudProgress().catch(function (error) {
+    if (!opts.force && shouldSuppressAutoSave()) return;
+    window.saveCloudProgress({ silent: true }).catch(function (error) {
       console.warn("Auto cloud save failed:", error);
     });
-  }, 1200);
+  }, opts.delay || 1800);
 };
 
 function patchLocalStorageForAutoSave() {
@@ -299,11 +318,15 @@ window.addEventListener("storage", function (event) {
   }
 });
 
-window.addEventListener("reputationUpdated", window.scheduleCloudSave);
-window.addEventListener("cloudSaveRequested", window.scheduleCloudSave);
+window.addEventListener("reputationUpdated", function () {
+  window.scheduleCloudSave();
+});
+window.addEventListener("cloudSaveRequested", function () {
+  window.scheduleCloudSave({ force: true, delay: 300 });
+});
 window.addEventListener("beforeunload", function () {
-  if (getFirebaseUser() && !isRestoringCloudProgress) {
-    window.scheduleCloudSave();
+  if (getFirebaseUser() && !shouldSuppressAutoSave()) {
+    window.scheduleCloudSave({ delay: 0 });
   }
 });
 
