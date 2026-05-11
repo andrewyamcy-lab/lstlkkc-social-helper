@@ -2,12 +2,19 @@
 /* Hide the original cover page until auth-gate confirms the final cover is ready. */
 body:not(.auth-cover-ready) #coverScreen {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 body.auth-cover-ready.auth-gate-active #coverScreen {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
+/* Important: use flex, not block, otherwise the full-page cover card becomes left-aligned. */
 body.auth-cover-ready:not(.auth-gate-active) #coverScreen.active {
-  display: block !important;
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
