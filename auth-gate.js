@@ -17,6 +17,25 @@
       #authLoadingScreen,
       #authLoginScreen { min-height: 68vh; }
 
+      /* Hard guard: when auth-gate owns the page, the active auth screen must stay visible. */
+      body.auth-gate-active #authLoadingScreen.active,
+      body.auth-gate-active #authLoginScreen.active {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+        min-height: 68vh !important;
+      }
+
+      body.auth-gate-active #authLoadingScreen.active .hero-card,
+      body.auth-gate-active #authLoginScreen.active .hero-card {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
       .auth-gate-card {
         max-width: 620px;
         margin: 0 auto;
@@ -187,7 +206,7 @@
   }
 
   function ensureAuthScreen() {
-    const screen = createScreen('authLoginScreen', `
+    return createScreen('authLoginScreen', `
       <div class="hero-card animate-in auth-gate-card">
         <div class="auth-gate-badge">梁書學生版｜Google 登入</div>
         <div class="auth-gate-avatar">🔐</div>
@@ -213,8 +232,6 @@
         </div>
       </div>
     `);
-
-    return screen;
   }
 
   function setOnlyScreen(screenId) {
