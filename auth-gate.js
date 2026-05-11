@@ -6,6 +6,7 @@
   let installed = false;
   let authResolved = false;
   let coverReadyTimer = null;
+  let fallbackTimer = null;
 
   function injectStyles() {
     if (document.getElementById('authGateStyle')) return;
@@ -222,6 +223,22 @@
     });
   }
 
+  function clearFallbackTimer() {
+    if (fallbackTimer) {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
+  }
+
+  function startFallbackTimer() {
+    clearFallbackTimer();
+    fallbackTimer = setTimeout(function () {
+      if (authResolved) return;
+      console.warn('Auth did not respond in time. Showing login screen fallback.');
+      showLoginPage();
+    }, 6500);
+  }
+
   function showLoadingPage() {
     injectStyles();
     ensureLoadingScreen();
@@ -235,6 +252,7 @@
 
   function showLoginPage() {
     authResolved = true;
+    clearFallbackTimer();
     injectStyles();
     ensureLoadingScreen();
     ensureAuthScreen();
@@ -260,6 +278,7 @@
 
   function showCoverPage() {
     authResolved = true;
+    clearFallbackTimer();
 
     if (!prepareFinalCoverMenu()) {
       showLoadingPage();
@@ -294,7 +313,10 @@
       });
     }
 
-    if (!authResolved) showLoadingPage();
+    if (!authResolved) {
+      showLoadingPage();
+      startFallbackTimer();
+    }
   }
 
   window.showAuthLoadingScreen = showLoadingPage;
