@@ -23,6 +23,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
+const ALLOWED_EMAIL = "andrewyamcy@gmail.com";
+const ALLOWED_DOMAIN = "@lstlkkc.edu.hk";
+
 window.LSTFirebase = {
   app,
   auth,
@@ -31,9 +34,36 @@ window.LSTFirebase = {
   ready: false
 };
 
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function isAllowedUser(user) {
+  const email = normalizeEmail(user && user.email);
+  return email === ALLOWED_EMAIL || email.endsWith(ALLOWED_DOMAIN);
+}
+
+function showLoginError(message) {
+  if (typeof showToast === "function") {
+    showToast(message, "warning");
+  } else {
+    alert(message);
+  }
+}
+
 window.signInWithGoogle = async function () {
   try {
     const result = await signInWithPopup(auth, provider);
+
+    if (!isAllowedUser(result.user)) {
+      const email = result.user && result.user.email ? result.user.email : "此帳戶";
+      await signOut(auth);
+      window.LSTFirebase.user = null;
+      updateLoginUI(null);
+      showLoginError("此帳戶未獲授權：" + email + "\n請使用 @lstlkkc.edu.hk 帳戶，或指定管理員帳戶登入。");
+      return;
+    }
+
     await saveUserProfile(result.user);
 
     if (typeof window.loadCloudProgress === "function") {
@@ -66,7 +96,7 @@ window.logoutGoogle = async function () {
 };
 
 async function saveUserProfile(user) {
-  if (!user) return;
+  if (!user || !isAllowedUser(user)) return;
 
   const ref = doc(db, "users", user.uid);
 
@@ -75,7 +105,7 @@ async function saveUserProfile(user) {
     {
       profile: {
         name: user.displayName || "",
-        email: user.email || "",
+        email: normalizeEmail(user.email),
         photoURL: user.photoURL || "",
         lastLoginAt: serverTimestamp()
       }
@@ -85,6 +115,17 @@ async function saveUserProfile(user) {
 }
 
 onAuthStateChanged(auth, async function (user) {
+  if (user && !isAllowedUser(user)) {
+    const email = user.email || "此帳戶";
+    await signOut(auth);
+    window.LSTFirebase.user = null;
+    window.LSTFirebase.ready = true;
+    updateLoginUI(null);
+    showLoginError("此帳戶未獲授權：" + email + "\n請使用 @lstlkkc.edu.hk 帳戶，或指定管理員帳戶登入。");
+    window.dispatchEvent(new CustomEvent("lstAuthReady", { detail: { user: null } }));
+    return;
+  }
+
   window.LSTFirebase.user = user || null;
   window.LSTFirebase.ready = true;
 
@@ -114,7 +155,7 @@ function updateLoginUI(user) {
 
   if (!loginBox || !userBox) return;
 
-  if (user) {
+  if (user && isAllowedUser(user)) {
     loginBox.style.display = "none";
     userBox.style.display = "block";
 
