@@ -17,8 +17,13 @@ const STORAGE_KEYS = {
   mainProgress: "asd_school_rpg_v5"
 };
 
+const TRACKED_STORAGE_KEYS = Object.values(STORAGE_KEYS);
+
 let autoSaveTimer = null;
 let isRestoringCloudProgress = false;
+let localStoragePatched = false;
+let originalLocalStorageSetItem = null;
+let originalLocalStorageRemoveItem = null;
 
 function getFirebaseUser() {
   return window.LSTFirebase && window.LSTFirebase.user
@@ -30,6 +35,10 @@ function getFirestoreDb() {
   return window.LSTFirebase && window.LSTFirebase.db
     ? window.LSTFirebase.db
     : null;
+}
+
+function isTrackedKey(key) {
+  return TRACKED_STORAGE_KEYS.includes(String(key || ""));
 }
 
 function safeReadLocalStorage(key) {
@@ -98,14 +107,17 @@ window.saveCloudProgress = async function () {
     {
       progress: {
         ...collectLocalProgress(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        autoSavedAt: new Date().toISOString()
       }
     },
     { merge: true }
   );
 
+  window.dispatchEvent(new CustomEvent("cloudProgressSaved", { detail: { uid: user.uid } }));
+
   if (typeof showToast === "function") {
-    showToast("已儲存到雲端。", "success");
+    showToast("已自動同步到雲端。", "success");
   }
 
   return true;
@@ -157,18 +169,82 @@ window.scheduleCloudSave = function () {
   }, 1200);
 };
 
+function patchLocalStorageForAutoSave() {
+  if (localStoragePatched) return;
+
+  try {
+    originalLocalStorageSetItem = Storage.prototype.setItem;
+    originalLocalStorageRemoveItem = Storage.prototype.removeItem;
+
+    Storage.prototype.setItem = function (key, value) {
+      const result = originalLocalStorageSetItem.apply(this, arguments);
+      if (this === window.localStorage && isTrackedKey(key)) {
+        setTimeout(function () {
+          window.scheduleCloudSave();
+        }, 0);
+      }
+      return result;
+    };
+
+    Storage.prototype.removeItem = function (key) {
+      const result = originalLocalStorageRemoveItem.apply(this, arguments);
+      if (this === window.localStorage && isTrackedKey(key)) {
+        setTimeout(function () {
+          window.scheduleCloudSave();
+        }, 0);
+      }
+      return result;
+    };
+
+    localStoragePatched = true;
+  } catch (error) {
+    console.warn("Unable to patch localStorage for cloud auto-save:", error);
+  }
+}
+
+function patchSaveProgressForAutoSave() {
+  if (typeof window.saveProgress !== "function" || window.saveProgress.__cloudAutoSavePatched) return;
+
+  const originalSaveProgress = window.saveProgress;
+  window.saveProgress = function () {
+    const result = originalSaveProgress.apply(this, arguments);
+    setTimeout(function () {
+      window.scheduleCloudSave();
+    }, 0);
+    return result;
+  };
+  window.saveProgress.__cloudAutoSavePatched = true;
+}
+
+function installAutoSaveHooks() {
+  patchLocalStorageForAutoSave();
+  patchSaveProgressForAutoSave();
+  setTimeout(patchSaveProgressForAutoSave, 500);
+  setTimeout(patchSaveProgressForAutoSave, 1500);
+}
+
 window.addEventListener("storage", function (event) {
   if (!event || !event.key) return;
-  if (Object.values(STORAGE_KEYS).includes(event.key)) {
+  if (isTrackedKey(event.key)) {
     window.scheduleCloudSave();
   }
 });
 
 window.addEventListener("reputationUpdated", window.scheduleCloudSave);
+window.addEventListener("cloudSaveRequested", window.scheduleCloudSave);
+window.addEventListener("beforeunload", function () {
+  if (getFirebaseUser() && !isRestoringCloudProgress) {
+    window.scheduleCloudSave();
+  }
+});
+
 window.addEventListener("lstAuthReady", function (event) {
+  installAutoSaveHooks();
   if (event.detail && event.detail.user) {
     setTimeout(function () {
       window.loadCloudProgress();
     }, 500);
   }
 });
+
+installAutoSaveHooks();
