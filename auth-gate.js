@@ -1,10 +1,11 @@
 // auth-gate.js
-// Separate login gate from the main cover page.
-// Flow: login page first -> after allowed Google login -> cover page.
+// Separate loading/login gate from the main cover page.
+// Flow: loading page -> login page if not signed in -> after allowed Google login -> cover page.
 
 (function () {
   let installed = false;
   let waitTimer = null;
+  let authResolved = false;
 
   function injectStyles() {
     if (document.getElementById('authGateStyle')) return;
@@ -12,6 +13,7 @@
     const style = document.createElement('style');
     style.id = 'authGateStyle';
     style.textContent = `
+      #authLoadingScreen,
       #authLoginScreen {
         min-height: 68vh;
       }
@@ -63,6 +65,42 @@
         box-shadow: inset 0 1px 0 rgba(255,255,255,.84), 0 18px 34px rgba(29, 53, 87, 0.13);
       }
 
+      .auth-loading-spinner {
+        width: 46px;
+        height: 46px;
+        margin: 18px auto 6px;
+        border-radius: 50%;
+        border: 5px solid rgba(0,122,255,.16);
+        border-top-color: var(--primary);
+        animation: authSpin .9s linear infinite;
+      }
+
+      .auth-loading-steps {
+        display: grid;
+        gap: 8px;
+        max-width: 420px;
+        margin: 18px auto 0;
+        text-align: left;
+      }
+
+      .auth-loading-step {
+        padding: 10px 12px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.48);
+        border: 1px solid rgba(255,255,255,.68);
+        color: var(--muted);
+        font-weight: 800;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 8px 18px rgba(29,53,87,.06);
+      }
+
+      @keyframes authSpin {
+        to { transform: rotate(360deg); }
+      }
+
+      body.reduced-motion .auth-loading-spinner {
+        animation: none !important;
+      }
+
       #authLoginScreen #firebaseLoginUiWrap {
         margin-top: 18px;
       }
@@ -86,17 +124,48 @@
     document.head.appendChild(style);
   }
 
-  function ensureAuthScreen() {
-    const card = document.querySelector('.container .card');
+  function getCardRoot() {
+    return document.querySelector('.container .card');
+  }
+
+  function createScreen(id, html) {
+    const card = getCardRoot();
     if (!card) return null;
 
-    let screen = document.getElementById('authLoginScreen');
+    let screen = document.getElementById(id);
     if (screen) return screen;
 
     screen = document.createElement('div');
-    screen.id = 'authLoginScreen';
-    screen.className = 'screen welcome-screen active';
-    screen.innerHTML = `
+    screen.id = id;
+    screen.className = 'screen welcome-screen';
+    screen.innerHTML = html;
+
+    const cover = document.getElementById('coverScreen');
+    if (cover) card.insertBefore(screen, cover);
+    else card.prepend(screen);
+
+    return screen;
+  }
+
+  function ensureLoadingScreen() {
+    return createScreen('authLoadingScreen', `
+      <div class="hero-card animate-in auth-gate-card">
+        <div class="auth-gate-badge">梁書學生版｜正在載入</div>
+        <div class="auth-gate-avatar">⏳</div>
+        <h2 class="auth-gate-title">正在準備你的練習紀錄</h2>
+        <p class="auth-gate-text">系統正在檢查 Google 登入狀態，並載入雲端練習紀錄。請稍等片刻。</p>
+        <div class="auth-loading-spinner" aria-label="Loading"></div>
+        <div class="auth-loading-steps">
+          <div class="auth-loading-step">✅ 準備校園社交練習介面</div>
+          <div class="auth-loading-step">🔐 檢查 Google 登入狀態</div>
+          <div class="auth-loading-step">☁️ 載入雲端任務紀錄</div>
+        </div>
+      </div>
+    `);
+  }
+
+  function ensureAuthScreen() {
+    return createScreen('authLoginScreen', `
       <div class="hero-card animate-in auth-gate-card">
         <div class="auth-gate-badge">梁書學生版｜Google 登入</div>
         <div class="auth-gate-avatar">🔐</div>
@@ -104,13 +173,7 @@
         <p class="auth-gate-text">請先使用學校 Google 帳戶登入。登入後，系統會載入你的雲端紀錄，然後進入主頁。</p>
         <div id="authGateLoginSlot"></div>
       </div>
-    `;
-
-    const cover = document.getElementById('coverScreen');
-    if (cover) card.insertBefore(screen, cover);
-    else card.prepend(screen);
-
-    return screen;
+    `);
   }
 
   function moveLoginUiToAuthScreen() {
@@ -131,8 +194,20 @@
     });
   }
 
-  function showLoginPage() {
+  function showLoadingPage() {
     injectStyles();
+    ensureLoadingScreen();
+    ensureAuthScreen();
+    document.body.classList.add('auth-gate-active');
+    setOnlyScreen('authLoadingScreen');
+    if (window.appState) window.appState.currentScreen = 'authLoading';
+    try { history.replaceState(null, '', '#loading'); } catch (error) {}
+  }
+
+  function showLoginPage() {
+    authResolved = true;
+    injectStyles();
+    ensureLoadingScreen();
     ensureAuthScreen();
     moveLoginUiToAuthScreen();
     document.body.classList.add('auth-gate-active');
@@ -142,6 +217,7 @@
   }
 
   function showCoverPage() {
+    authResolved = true;
     document.body.classList.remove('auth-gate-active');
     setOnlyScreen('coverScreen');
     if (window.appState) window.appState.currentScreen = 'cover';
@@ -151,16 +227,14 @@
     }, 80);
   }
 
-  function hasAllowedFirebaseUser() {
-    return Boolean(window.LSTFirebase && window.LSTFirebase.user);
-  }
-
   function install() {
     injectStyles();
+    ensureLoadingScreen();
     ensureAuthScreen();
 
     const moved = moveLoginUiToAuthScreen();
     if (!moved) {
+      showLoadingPage();
       clearTimeout(waitTimer);
       waitTimer = setTimeout(install, 120);
       return;
@@ -174,10 +248,10 @@
       });
     }
 
-    if (hasAllowedFirebaseUser()) showCoverPage();
-    else showLoginPage();
+    if (!authResolved) showLoadingPage();
   }
 
+  window.showAuthLoadingScreen = showLoadingPage;
   window.showAuthLoginScreen = showLoginPage;
   window.showAuthenticatedCoverScreen = showCoverPage;
 
