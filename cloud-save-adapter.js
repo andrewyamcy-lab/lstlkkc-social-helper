@@ -24,6 +24,7 @@ let isRestoringCloudProgress = false;
 let localStoragePatched = false;
 let originalLocalStorageSetItem = null;
 let originalLocalStorageRemoveItem = null;
+let forceCoverUntil = 0;
 
 function getFirebaseUser() {
   return window.LSTFirebase && window.LSTFirebase.user
@@ -80,31 +81,55 @@ function collectLocalProgress() {
     data[name] = safeReadLocalStorage(key);
   });
 
-  // Do not save the current active page as game/character/settings etc.
-  // When users reopen the website, they should always land on the cover screen.
   data.mainProgress = keepMainProgressOnCover(data.mainProgress);
-
   return data;
 }
 
-function showCoverAfterCloudLoad() {
-  setTimeout(function () {
-    try {
-      if (typeof window.showCoverScreen === "function") {
-        window.showCoverScreen();
-      } else if (typeof window.setActiveScreen === "function") {
-        window.setActiveScreen("coverScreen", "cover");
-      } else {
-        document.querySelectorAll(".screen").forEach(function (screen) {
-          screen.classList.toggle("active", screen.id === "coverScreen");
-        });
-      }
-      if (window.appState) window.appState.currentScreen = "cover";
-      window.location.hash = "cover";
-    } catch (error) {
-      console.warn("Could not force cover screen after cloud load:", error);
+function forceCoverNow() {
+  try {
+    document.querySelectorAll(".screen").forEach(function (screen) {
+      screen.classList.toggle("active", screen.id === "coverScreen");
+    });
+
+    const rpgMap = document.getElementById("rpgMapScreen");
+    if (rpgMap) rpgMap.classList.remove("active");
+
+    if (window.appState) window.appState.currentScreen = "cover";
+    if (typeof appState !== "undefined" && appState) appState.currentScreen = "cover";
+
+    if (window.location.hash !== "#cover") {
+      history.replaceState(null, "", "#cover");
     }
-  }, 80);
+
+    window.scrollTo({ top: 0, behavior: "auto" });
+  } catch (error) {
+    console.warn("Could not force cover screen:", error);
+  }
+}
+
+function startCoverGuard() {
+  forceCoverUntil = Date.now() + 3500;
+  [0, 80, 250, 500, 900, 1400, 2200, 3200].forEach(function (delay) {
+    setTimeout(forceCoverNow, delay);
+  });
+}
+
+function installCoverGuard() {
+  if (window.__cloudCoverGuardInstalled) return;
+  window.__cloudCoverGuardInstalled = true;
+
+  const observer = new MutationObserver(function () {
+    if (Date.now() <= forceCoverUntil) {
+      forceCoverNow();
+    }
+  });
+
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"]
+  });
 }
 
 function restoreLocalProgress(data) {
@@ -167,12 +192,15 @@ window.loadCloudProgress = async function () {
 
   if (!user || !db) return false;
 
+  installCoverGuard();
+  startCoverGuard();
+
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
     await window.saveCloudProgress();
-    showCoverAfterCloudLoad();
+    startCoverGuard();
     return true;
   }
 
@@ -187,7 +215,7 @@ window.loadCloudProgress = async function () {
     if (typeof renderCharacterScreen === "function") renderCharacterScreen();
     if (typeof syncScenarioTotal === "function") syncScenarioTotal();
 
-    showCoverAfterCloudLoad();
+    startCoverGuard();
 
     if (typeof showToast === "function") {
       showToast("已載入雲端紀錄。", "success");
