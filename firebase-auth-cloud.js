@@ -2,6 +2,7 @@
 
 import "./auth-gate.js";
 import "./cover-menu-final.js";
+import "./cloud-save-adapter.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -34,7 +35,8 @@ window.LSTFirebase = {
   auth,
   db,
   user: null,
-  ready: false
+  ready: false,
+  cloudReady: false
 };
 
 function normalizeEmail(email) {
@@ -54,39 +56,67 @@ function showLoginError(message) {
   }
 }
 
+async function finishAllowedLogin(user, options) {
+  const opts = options || {};
+  window.LSTFirebase.user = user || null;
+  window.LSTFirebase.ready = true;
+  window.LSTFirebase.cloudReady = false;
+  updateLoginUI(user);
+
+  if (user) {
+    await saveUserProfile(user);
+
+    if (typeof window.loadCloudProgress === "function") {
+      await window.loadCloudProgress();
+    }
+
+    window.LSTFirebase.cloudReady = true;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("lstAuthReady", {
+      detail: { user: user || null, cloudReady: Boolean(user), source: opts.source || "auth" }
+    })
+  );
+}
+
 window.signInWithGoogle = async function () {
   try {
+    if (typeof window.showAuthLoadingScreen === "function") window.showAuthLoadingScreen();
+
     const result = await signInWithPopup(auth, provider);
 
     if (!isAllowedUser(result.user)) {
       const email = result.user && result.user.email ? result.user.email : "此帳戶";
       await signOut(auth);
       window.LSTFirebase.user = null;
+      window.LSTFirebase.ready = true;
+      window.LSTFirebase.cloudReady = false;
       updateLoginUI(null);
       showLoginError("此帳戶未獲授權：" + email + "\n請使用 @lstlkkc.edu.hk 帳戶，或指定管理員帳戶登入。");
+      window.dispatchEvent(new CustomEvent("lstAuthReady", { detail: { user: null, cloudReady: false, source: "blocked" } }));
       return;
     }
 
-    await saveUserProfile(result.user);
-
-    if (typeof window.loadCloudProgress === "function") {
-      await window.loadCloudProgress();
-    }
+    await finishAllowedLogin(result.user, { source: "popup" });
 
     if (typeof showToast === "function") {
-      showToast("Google 登入成功，已同步雲端紀錄。", "success");
-    } else {
-      alert("Google 登入成功");
+      showToast("Google 登入成功。", "success");
     }
   } catch (error) {
     console.error("Google login failed:", error);
     alert("Google 登入失敗，請再試一次。\n" + (error && error.message ? error.message : ""));
+    if (typeof window.showAuthLoginScreen === "function") window.showAuthLoginScreen();
   }
 };
 
 window.logoutGoogle = async function () {
   try {
     await signOut(auth);
+    window.LSTFirebase.user = null;
+    window.LSTFirebase.ready = true;
+    window.LSTFirebase.cloudReady = false;
+    updateLoginUI(null);
 
     if (typeof showToast === "function") {
       showToast("已登出 Google 帳戶。", "success");
@@ -118,35 +148,30 @@ async function saveUserProfile(user) {
 }
 
 onAuthStateChanged(auth, async function (user) {
+  if (typeof window.showAuthLoadingScreen === "function") window.showAuthLoadingScreen();
+
   if (user && !isAllowedUser(user)) {
     const email = user.email || "此帳戶";
     await signOut(auth);
     window.LSTFirebase.user = null;
     window.LSTFirebase.ready = true;
+    window.LSTFirebase.cloudReady = false;
     updateLoginUI(null);
     showLoginError("此帳戶未獲授權：" + email + "\n請使用 @lstlkkc.edu.hk 帳戶，或指定管理員帳戶登入。");
-    window.dispatchEvent(new CustomEvent("lstAuthReady", { detail: { user: null } }));
+    window.dispatchEvent(new CustomEvent("lstAuthReady", { detail: { user: null, cloudReady: false, source: "blocked" } }));
     return;
   }
 
-  window.LSTFirebase.user = user || null;
-  window.LSTFirebase.ready = true;
-
-  updateLoginUI(user);
-
-  if (user) {
-    await saveUserProfile(user);
-
-    if (typeof window.loadCloudProgress === "function") {
-      await window.loadCloudProgress();
-    }
+  if (!user) {
+    window.LSTFirebase.user = null;
+    window.LSTFirebase.ready = true;
+    window.LSTFirebase.cloudReady = false;
+    updateLoginUI(null);
+    window.dispatchEvent(new CustomEvent("lstAuthReady", { detail: { user: null, cloudReady: false, source: "signed-out" } }));
+    return;
   }
 
-  window.dispatchEvent(
-    new CustomEvent("lstAuthReady", {
-      detail: { user: user || null }
-    })
-  );
+  await finishAllowedLogin(user, { source: "state" });
 });
 
 function updateLoginUI(user) {
