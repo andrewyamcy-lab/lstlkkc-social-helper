@@ -17,14 +17,9 @@ const STORAGE_KEYS = {
   mainProgress: "asd_school_rpg_v5"
 };
 
-const TRACKED_STORAGE_KEYS = Object.values(STORAGE_KEYS);
-
 let autoSaveTimer = null;
 let isRestoringCloudProgress = false;
 let suppressAutoSaveUntil = 0;
-let localStoragePatched = false;
-let originalLocalStorageSetItem = null;
-let originalLocalStorageRemoveItem = null;
 let forceCoverUntil = 0;
 
 function getFirebaseUser() {
@@ -37,10 +32,6 @@ function getFirestoreDb() {
   return window.LSTFirebase && window.LSTFirebase.db
     ? window.LSTFirebase.db
     : null;
-}
-
-function isTrackedKey(key) {
-  return TRACKED_STORAGE_KEYS.includes(String(key || ""));
 }
 
 function shouldSuppressAutoSave() {
@@ -213,7 +204,6 @@ window.loadCloudProgress = async function () {
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    await window.saveCloudProgress({ silent: true });
     suppressAutoSaveUntil = Date.now() + 6000;
     startCoverGuard();
     return true;
@@ -254,41 +244,8 @@ window.scheduleCloudSave = function (options) {
     window.saveCloudProgress({ silent: true }).catch(function (error) {
       console.warn("Auto cloud save failed:", error);
     });
-  }, opts.delay || 1800);
+  }, opts.delay || 1500);
 };
-
-function patchLocalStorageForAutoSave() {
-  if (localStoragePatched) return;
-
-  try {
-    originalLocalStorageSetItem = Storage.prototype.setItem;
-    originalLocalStorageRemoveItem = Storage.prototype.removeItem;
-
-    Storage.prototype.setItem = function (key, value) {
-      const result = originalLocalStorageSetItem.apply(this, arguments);
-      if (this === window.localStorage && isTrackedKey(key)) {
-        setTimeout(function () {
-          window.scheduleCloudSave();
-        }, 0);
-      }
-      return result;
-    };
-
-    Storage.prototype.removeItem = function (key) {
-      const result = originalLocalStorageRemoveItem.apply(this, arguments);
-      if (this === window.localStorage && isTrackedKey(key)) {
-        setTimeout(function () {
-          window.scheduleCloudSave();
-        }, 0);
-      }
-      return result;
-    };
-
-    localStoragePatched = true;
-  } catch (error) {
-    console.warn("Unable to patch localStorage for cloud auto-save:", error);
-  }
-}
 
 function patchSaveProgressForAutoSave() {
   if (typeof window.saveProgress !== "function" || window.saveProgress.__cloudAutoSavePatched) return;
@@ -305,29 +262,16 @@ function patchSaveProgressForAutoSave() {
 }
 
 function installAutoSaveHooks() {
-  patchLocalStorageForAutoSave();
+  // Do not auto-save merely because the website opens or localStorage changes during startup.
+  // Cloud auto-save is only triggered through saveProgress(), which is called after mission completion/manual progress save.
   patchSaveProgressForAutoSave();
   setTimeout(patchSaveProgressForAutoSave, 500);
   setTimeout(patchSaveProgressForAutoSave, 1500);
+  setTimeout(patchSaveProgressForAutoSave, 3000);
 }
 
-window.addEventListener("storage", function (event) {
-  if (!event || !event.key) return;
-  if (isTrackedKey(event.key)) {
-    window.scheduleCloudSave();
-  }
-});
-
-window.addEventListener("reputationUpdated", function () {
-  window.scheduleCloudSave();
-});
 window.addEventListener("cloudSaveRequested", function () {
   window.scheduleCloudSave({ force: true, delay: 300 });
-});
-window.addEventListener("beforeunload", function () {
-  if (getFirebaseUser() && !shouldSuppressAutoSave()) {
-    window.scheduleCloudSave({ delay: 0 });
-  }
 });
 
 window.addEventListener("lstAuthReady", function (event) {
