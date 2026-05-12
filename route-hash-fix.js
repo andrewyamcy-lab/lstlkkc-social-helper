@@ -37,8 +37,8 @@
   }
 
   function loadUiUpgradeScripts() {
-    loadScriptOnce('character-name-edit.js?v=20260512-1', 'characterNameEditScript');
-    loadScriptOnce('phrase-library-upgrade.js?v=20260512-1', 'phraseLibraryUpgradeScript');
+    loadScriptOnce('character-name-edit.js?v=20260512-5', 'characterNameEditScript');
+    loadScriptOnce('phrase-library-upgrade.js?v=20260512-5', 'phraseLibraryUpgradeScript');
   }
 
   function hasFirebaseUser() {
