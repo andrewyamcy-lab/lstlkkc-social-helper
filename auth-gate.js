@@ -17,7 +17,6 @@
       #authLoadingScreen,
       #authLoginScreen { min-height: 68vh; }
 
-      /* Hard guard: when auth-gate owns the page, the active auth screen must stay visible. */
       body.auth-gate-active #authLoadingScreen.active,
       body.auth-gate-active #authLoginScreen.active {
         display: block !important;
@@ -283,7 +282,8 @@
   function isFinalCoverMenuReady() {
     const menu = document.querySelector('#coverScreen .menu-actions');
     const text = String(menu && menu.textContent || '');
-    return text.includes('開始 RPG 冒險') && text.includes('社交技能書') && text.includes('登出');
+    const hasRpg = text.includes('RPG 校園地圖') || text.includes('開始 RPG 冒險');
+    return hasRpg && text.includes('社交技能書') && text.includes('登出');
   }
 
   function prepareFinalCoverMenu() {
