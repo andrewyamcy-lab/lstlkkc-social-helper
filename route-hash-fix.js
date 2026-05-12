@@ -1,6 +1,7 @@
 // /route-hash-fix.js
 // Keep the browser URL hash in sync with the current single-page-app screen.
 // Extra safety: if there is no Firebase user, never leave the app on a blank #cover page.
+// Also loads small UI upgrade modules that are safe to run after the main app scripts.
 
 (function () {
   const ROUTES = {
@@ -24,6 +25,20 @@
     } catch (error) {
       window.location.hash = hash;
     }
+  }
+
+  function loadScriptOnce(src, id) {
+    if (!src || !id || document.getElementById(id)) return;
+    const script = document.createElement('script');
+    script.id = id;
+    script.src = src;
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+
+  function loadUiUpgradeScripts() {
+    loadScriptOnce('character-name-edit.js?v=20260512-1', 'characterNameEditScript');
+    loadScriptOnce('phrase-library-upgrade.js?v=20260512-1', 'phraseLibraryUpgradeScript');
   }
 
   function hasFirebaseUser() {
@@ -143,9 +158,11 @@
   }
 
   function install() {
+    loadUiUpgradeScripts();
     patchKnownNavigationFunctions();
     observeScreenChanges();
     startAuthWatchdog();
+    setTimeout(loadUiUpgradeScripts, 100);
     setTimeout(patchKnownNavigationFunctions, 200);
     setTimeout(patchKnownNavigationFunctions, 700);
     setTimeout(patchKnownNavigationFunctions, 1500);
@@ -157,6 +174,7 @@
   window.setAppRouteHash = setRoute;
   window.syncRouteFromActiveScreen = syncRouteFromActiveScreen;
   window.enforceAuthRoute = enforceAuthRoute;
+  window.loadUiUpgradeScripts = loadUiUpgradeScripts;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', install);
