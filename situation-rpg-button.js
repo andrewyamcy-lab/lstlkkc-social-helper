@@ -1,11 +1,9 @@
 // /situation-rpg-button.js
 // Add ONE RPG map button to the situation list page.
-// Cover page cleanup now keeps the final 6-button menu including 登出.
+// Important: this file no longer rewrites the cover menu. The cover menu is controlled by index.html + cover-menu-final.js only.
 // UI cleanup: keep only one visible progress bar on the RPG map panel.
 
 (function () {
-  let coverObserver = null;
-
   function goToRpgMap() {
     if (typeof showRpgMapScreen === 'function') {
       showRpgMapScreen();
@@ -34,86 +32,6 @@
 
   window.goToRpgMap = goToRpgMap;
   window.openRpgMap = goToRpgMap;
-
-  function makeCoverButton(text, className, onClick) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = text;
-    if (className) button.className = className;
-    button.addEventListener('click', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof onClick === 'function') onClick();
-    });
-    return button;
-  }
-
-  function cleanupCoverMenu() {
-    const menu = document.querySelector('#coverScreen .menu-actions');
-    if (!menu) return;
-
-    const texts = Array.from(menu.querySelectorAll('button')).map(function (button) {
-      return (button.textContent || '').trim();
-    });
-
-    const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定', '登出'];
-    const alreadyFinal = texts.length === expected.length && expected.every(function (text, index) {
-      return texts[index] === text;
-    });
-
-    if (alreadyFinal && menu.dataset.finalCoverMenu === '1') return;
-
-    menu.innerHTML = '';
-    menu.dataset.finalCoverMenu = '1';
-    menu.classList.add('final-cover-menu');
-
-    menu.appendChild(makeCoverButton('開始 RPG 冒險', '', goToRpgMap));
-    menu.appendChild(makeCoverButton('社交技能書', 'secondary', function () {
-      if (typeof showPhraseLibraryScreen === 'function') showPhraseLibraryScreen();
-    }));
-    menu.appendChild(makeCoverButton('我的角色', 'secondary', function () {
-      if (typeof showCharacterScreen === 'function') showCharacterScreen();
-    }));
-    menu.appendChild(makeCoverButton('查看我的徽章', 'secondary', function () {
-      if (typeof showBadgeScreen === 'function') showBadgeScreen();
-    }));
-    menu.appendChild(makeCoverButton('我的設定', 'secondary', function () {
-      if (typeof showSettingsScreen === 'function') showSettingsScreen();
-    }));
-    menu.appendChild(makeCoverButton('登出', 'secondary', function () {
-      if (typeof logoutGoogle === 'function') logoutGoogle();
-    }));
-  }
-
-  function watchCoverMenu() {
-    const menu = document.querySelector('#coverScreen .menu-actions');
-    if (!menu || coverObserver) return;
-
-    coverObserver = new MutationObserver(function () {
-      const texts = Array.from(menu.querySelectorAll('button')).map(function (button) {
-        return (button.textContent || '').trim();
-      });
-      const expected = ['開始 RPG 冒險', '社交技能書', '我的角色', '查看我的徽章', '我的設定', '登出'];
-      const wrongOrderOrCount = texts.length !== expected.length || expected.some(function (text, index) {
-        return texts[index] !== text;
-      });
-
-      if (wrongOrderOrCount) {
-        coverObserver.disconnect();
-        coverObserver = null;
-        cleanupCoverMenu();
-        setTimeout(watchCoverMenu, 0);
-      }
-    });
-
-    observerObserveSafe(coverObserver, menu);
-  }
-
-  function observerObserveSafe(observer, menu) {
-    try {
-      observer.observe(menu, { childList: true, subtree: true, characterData: true });
-    } catch (error) {}
-  }
 
   function injectButtonStyle() {
     if (document.getElementById('situationRpgButtonStyle')) return;
@@ -277,8 +195,6 @@
   function addRpgButtonToSituationList() {
     injectButtonStyle();
     injectProgressBarCleanupStyle();
-    cleanupCoverMenu();
-    watchCoverMenu();
     cleanupRpgProgressBars();
 
     const situationScreen = document.getElementById('situationScreen');
@@ -309,8 +225,6 @@
 
   function initSituationRpgButton() {
     addRpgButtonToSituationList();
-    cleanupCoverMenu();
-    watchCoverMenu();
     cleanupRpgProgressBars();
     setTimeout(addRpgButtonToSituationList, 150);
     setTimeout(addRpgButtonToSituationList, 500);
@@ -319,6 +233,9 @@
     setTimeout(cleanupRpgProgressBars, 900);
     setTimeout(cleanupRpgProgressBars, 1600);
   }
+
+  // Backward-compatible no-op: older files may call cleanupCoverMenu, but cover menu cleanup must not happen here anymore.
+  function cleanupCoverMenu() {}
 
   window.addRpgButtonToSituationList = addRpgButtonToSituationList;
   window.removeDuplicateRpgButtons = removeDuplicateRpgButtons;
