@@ -1,14 +1,9 @@
 // cover-menu-final.js
 // Final cover menu order and labels.
-// This file is the ONLY final authority for the cover menu.
-// It enforces the exact 7-button menu and removes duplicate/old buttons.
+// Safe version: no full-page MutationObserver, so it will not interfere with Firebase/auth loading.
 // Gemini/Gem pages cannot be embedded in an iframe, so the coach opens in a new tab.
 
 (function () {
-  let observerInstalled = false;
-  let patchTimer = null;
-  let isPatching = false;
-
   const GEMINI_COACH_URL = 'https://gemini.google.com/gem/1CZ8RkoFR82xLilnrtoimh6KsrlBLzBeO?usp=sharing';
   const EXPECTED_MENU = [
     'RPG 校園地圖',
@@ -32,7 +27,6 @@
       #coverScreen .menu-actions.final-cover-menu {
         max-width: 430px;
       }
-
       #coverScreen .menu-actions.final-cover-menu button {
         width: 100%;
       }
@@ -43,30 +37,35 @@
     window.open(GEMINI_COACH_URL, '_blank', 'noopener,noreferrer');
   }
 
-  function openRpgMap() {
-    if (typeof window.openRpgMap === 'function' && window.openRpgMap !== openRpgMap) {
-      window.openRpgMap();
-      return;
-    }
+  function openFinalRpgMap() {
     if (typeof window.goToRpgMap === 'function') {
       window.goToRpgMap();
       return;
     }
     if (typeof window.showRpgMapScreen === 'function') {
       window.showRpgMapScreen();
+      return;
+    }
+    if (typeof window.openRpgMap === 'function' && window.openRpgMap !== openFinalRpgMap) {
+      window.openRpgMap();
     }
   }
 
-  function finalMenuHtml() {
-    return `
-      <button type="button" onclick="window.openFinalRpgMap && window.openFinalRpgMap()">RPG 校園地圖</button>
-      <button type="button" class="secondary" onclick="showPhraseLibraryScreen && showPhraseLibraryScreen()">社交技能書</button>
-      <button type="button" class="secondary" onclick="window.showCharacterScreen && window.showCharacterScreen()">我的角色</button>
-      <button type="button" class="secondary" onclick="showBadgeScreen && showBadgeScreen()">查看我的徽章</button>
-      <button type="button" class="secondary" onclick="window.openGeminiCoach && window.openGeminiCoach()">梁書校園社交教練（謙謙）</button>
-      <button type="button" class="secondary" onclick="showSettingsScreen && showSettingsScreen()">我的設定</button>
-      <button type="button" class="secondary" onclick="logoutGoogle && logoutGoogle()">登出</button>
-    `;
+  function safeCall(name) {
+    if (typeof window[name] === 'function') window[name]();
+  }
+
+  function makeButton(text, className, handler) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = text;
+    if (className) button.className = className;
+    button.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof handler === 'function') handler();
+    });
+    return button;
   }
 
   function getMenuTexts(menu) {
@@ -90,7 +89,6 @@
   }
 
   function replaceCoverMenu() {
-    if (isPatching) return true;
     injectStyles();
     removeGeminiCoachScreen();
 
@@ -102,57 +100,39 @@
 
     if (menu.dataset.finalCoverMenu === '1' && menuIsExact(menu)) return true;
 
-    isPatching = true;
     menu.dataset.finalCoverMenu = '1';
     menu.classList.add('final-cover-menu');
-    menu.innerHTML = finalMenuHtml();
-    isPatching = false;
+    menu.innerHTML = '';
+
+    menu.appendChild(makeButton('RPG 校園地圖', '', openFinalRpgMap));
+    menu.appendChild(makeButton('社交技能書', 'secondary', function () { safeCall('showPhraseLibraryScreen'); }));
+    menu.appendChild(makeButton('我的角色', 'secondary', function () { safeCall('showCharacterScreen'); }));
+    menu.appendChild(makeButton('查看我的徽章', 'secondary', function () { safeCall('showBadgeScreen'); }));
+    menu.appendChild(makeButton('梁書校園社交教練（謙謙）', 'secondary', openGeminiCoach));
+    menu.appendChild(makeButton('我的設定', 'secondary', function () { safeCall('showSettingsScreen'); }));
+    menu.appendChild(makeButton('登出', 'secondary', function () { safeCall('logoutGoogle'); }));
+
     return true;
   }
 
-  function schedulePatch() {
-    if (patchTimer) clearTimeout(patchTimer);
-    patchTimer = setTimeout(function () {
-      patchTimer = null;
-      replaceCoverMenu();
-    }, 20);
-  }
-
-  function installObserver() {
-    if (observerInstalled) return;
-    observerInstalled = true;
-
-    const observer = new MutationObserver(function () {
-      if (!isPatching) schedulePatch();
-    });
-
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
-  }
-
   function install() {
-    replaceCoverMenu();
-    installObserver();
-    [0, 50, 100, 200, 400, 800, 1200, 2000, 3500, 5000].forEach(function (delay) {
+    window.openGeminiCoach = openGeminiCoach;
+    window.openFinalRpgMap = openFinalRpgMap;
+    window.applyFinalCoverMenu = replaceCoverMenu;
+
+    [0, 120, 400, 900, 1800, 3200].forEach(function (delay) {
       setTimeout(replaceCoverMenu, delay);
     });
   }
 
-  window.applyFinalCoverMenu = replaceCoverMenu;
-  window.openGeminiCoach = openGeminiCoach;
-  window.openFinalRpgMap = openRpgMap;
-
   window.addEventListener('lstAuthReady', function () {
-    [0, 50, 150, 300, 600, 1000, 2000].forEach(function (delay) {
+    [0, 150, 500, 1200].forEach(function (delay) {
       setTimeout(replaceCoverMenu, delay);
     });
   });
 
   window.addEventListener('hashchange', function () {
-    setTimeout(replaceCoverMenu, 50);
+    setTimeout(replaceCoverMenu, 120);
   });
 
   if (document.readyState === 'loading') {
