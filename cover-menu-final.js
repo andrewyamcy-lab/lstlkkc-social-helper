@@ -12,7 +12,7 @@
     style.id = 'coverMenuFinalStyle';
     style.textContent = `
       #coverScreen .menu-actions.final-cover-menu {
-        max-width: 380px;
+        max-width: 430px;
       }
 
       #coverScreen .menu-actions.final-cover-menu button {
@@ -28,6 +28,7 @@
       <button type="button" class="secondary" onclick="showPhraseLibraryScreen()">社交技能書</button>
       <button type="button" class="secondary" onclick="window.showCharacterScreen && window.showCharacterScreen()">我的角色</button>
       <button type="button" class="secondary" onclick="showBadgeScreen()">查看我的徽章</button>
+      <button type="button" class="secondary" onclick="window.open('https://gemini.google.com/gem/1CZ8RkoFR82xLilnrtoimh6KsrlBLzBeO?usp=sharing', '_blank', 'noopener,noreferrer')">梁書校園社交教練（謙謙）</button>
       <button type="button" class="secondary" onclick="showSettingsScreen()">我的設定</button>
       <button type="button" class="secondary" onclick="logoutGoogle()">登出</button>
     `;
@@ -36,7 +37,7 @@
   function menuNeedsPatch(menu) {
     if (!menu) return false;
     const text = String(menu.textContent || '');
-    return !text.includes('登出') || !text.includes('開始 RPG 冒險') || !text.includes('社交技能書');
+    return !text.includes('登出') || !text.includes('開始 RPG 冒險') || !text.includes('社交技能書') || !text.includes('梁書校園社交教練（謙謙）');
   }
 
   function replaceCoverMenu() {
