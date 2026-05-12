@@ -1,9 +1,15 @@
 // /phrase-library-upgrade.js
 // ASD-focused 社交技能書 — 6 larger cards, no large top bar, closer to 我的角色 page.
+// Fixes:
+// 1. Hide global top header only on 社交技能書 page
+// 2. 6 cards per page
+// 3. Bigger text
+// 4. Bottom buttons visible
+// 5. Star button centered
 
 (function () {
   const FAV_KEY = 'asd_school_phrase_favourites_v1';
-  const STATE_KEY = 'asd_school_phrase_library_state_v5';
+  const STATE_KEY = 'asd_school_phrase_library_state_v6';
   const PAGE_SIZE = 6;
 
   const CATEGORIES = [
@@ -259,6 +265,7 @@
 
   function getState() {
     const state = safeJson(STATE_KEY);
+
     return {
       category: CATEGORIES.some((item) => item.id === state.category) ? state.category : 'all',
       page: Math.max(0, Number(state.page || 0)),
@@ -321,7 +328,10 @@
             </button>
           `;
         }).join('')}
-        <button type="button" class="phrase-sims-tab phrase-mode-tab" data-phrase-mode="short">
+
+        <button type="button"
+          class="phrase-sims-tab phrase-mode-tab"
+          data-phrase-mode="short">
           ${state.showShort ? '短句版：開' : '短句版：關'}
         </button>
       </div>
@@ -601,6 +611,10 @@
     }
 
     style.textContent = `
+      body.phrase-library-wide-mode header {
+        display: none !important;
+      }
+
       body.phrase-library-wide-mode .container {
         max-width: min(1640px, 96vw) !important;
         width: 96vw !important;
@@ -690,13 +704,18 @@
         border: 0;
         width: 38px;
         height: 34px;
+        padding: 0 !important;
         border-radius: 999px;
         font-size: 1rem;
         font-weight: 950;
+        line-height: 1;
         color: var(--primary-dark);
         background: rgba(255,255,255,.78);
         box-shadow: inset 0 1px 0 rgba(255,255,255,.92), 0 6px 12px rgba(29,53,87,.08);
         cursor: pointer;
+        display: grid;
+        place-items: center;
+        text-align: center;
       }
 
       .phrase-fav-btn.active {
