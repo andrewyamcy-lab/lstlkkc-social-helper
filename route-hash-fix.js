@@ -3,6 +3,7 @@
 // Extra safety: if there is no Firebase user, never leave the app on a blank #cover page.
 // Also loads small UI upgrade modules that are safe to run after the main app scripts.
 // Adds completion badges to the 情境選擇 page.
+// Star colour rule: 3 stars = green, 2 stars = yellow, 1 star = red.
 
 (function () {
   const ROUTES = {
@@ -212,6 +213,102 @@
     return {};
   }
 
+  function normaliseStars(value, record) {
+    let stars = Number(value);
+
+    if (!stars || Number.isNaN(stars)) {
+      const possibleScore = Number(
+        record && (
+          record.score ??
+          record.totalScore ??
+          record.finalScore ??
+          record.points ??
+          record.correctScore
+        )
+      );
+
+      if (possibleScore || possibleScore === 0) {
+        const possibleMax = Number(record && (record.maxScore || record.totalPossible || record.fullScore || 10));
+        const ratio = possibleMax ? possibleScore / possibleMax : possibleScore / 10;
+        if (ratio >= 0.8) stars = 3;
+        else if (ratio >= 0.5) stars = 2;
+        else if (possibleScore > 0) stars = 1;
+      }
+    }
+
+    stars = Math.round(Number(stars || 0));
+    if (stars >= 3) return 3;
+    if (stars === 2) return 2;
+    if (stars === 1) return 1;
+    return 0;
+  }
+
+  function collectStarsFromRecord(record, map) {
+    if (!record || typeof record !== 'object') return;
+
+    const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
+    if (!id || !SCENARIO_LABELS[id]) return;
+
+    const stars = normaliseStars(
+      record.stars ?? record.starCount ?? record.rating ?? record.resultStars ?? record.earnedStars ?? record.badgeStars,
+      record
+    );
+
+    if (!stars) return;
+    map[id] = Math.max(Number(map[id] || 0), stars);
+  }
+
+  function getScenarioStarMap() {
+    const map = {};
+
+    try {
+      const progress = readStoredProgress();
+      const savedAppState = progress.appState || progress.state || progress;
+      const history = Array.isArray(savedAppState.reviewHistory) ? savedAppState.reviewHistory : [];
+      history.forEach(function (record) {
+        collectStarsFromRecord(record, map);
+      });
+
+      const missionResults = Array.isArray(savedAppState.missionResults) ? savedAppState.missionResults : [];
+      missionResults.forEach(function (record) {
+        collectStarsFromRecord(record, map);
+      });
+
+      const scenarioScores = savedAppState.scenarioScores || progress.scenarioScores || progress.stars || progress.starRatings || {};
+      Object.keys(scenarioScores).forEach(function (id) {
+        if (SCENARIO_LABELS[id]) {
+          const value = typeof scenarioScores[id] === 'object'
+            ? (scenarioScores[id].stars ?? scenarioScores[id].starCount ?? scenarioScores[id].rating ?? scenarioScores[id].score)
+            : scenarioScores[id];
+          const stars = normaliseStars(value, typeof scenarioScores[id] === 'object' ? scenarioScores[id] : null);
+          if (stars) map[id] = Math.max(Number(map[id] || 0), stars);
+        }
+      });
+    } catch (error) {}
+
+    try {
+      const history = window.appState && Array.isArray(window.appState.reviewHistory)
+        ? window.appState.reviewHistory
+        : [];
+      history.forEach(function (record) {
+        collectStarsFromRecord(record, map);
+      });
+    } catch (error) {}
+
+    return map;
+  }
+
+  function starText(stars) {
+    const count = Math.max(1, Math.min(3, Number(stars || 1)));
+    return '⭐'.repeat(count) + '☆'.repeat(3 - count);
+  }
+
+  function starClass(stars) {
+    if (Number(stars) >= 3) return 'stars-3';
+    if (Number(stars) === 2) return 'stars-2';
+    return 'stars-1';
+  }
+
   function getCompletedScenarioIds() {
     const completed = new Set();
 
@@ -232,7 +329,7 @@
       const savedAppState = progress.appState || progress.state || progress;
       const history = Array.isArray(savedAppState.reviewHistory) ? savedAppState.reviewHistory : [];
       history.forEach(function (record) {
-        const id = record.scenarioId || record.gameId || record.id || record.type || record.key;
+        const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
         if (id && SCENARIO_LABELS[id]) completed.add(id);
       });
     } catch (error) {}
@@ -242,7 +339,7 @@
         ? window.appState.reviewHistory
         : [];
       history.forEach(function (record) {
-        const id = record.scenarioId || record.gameId || record.id || record.type || record.key;
+        const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
         if (id && SCENARIO_LABELS[id]) completed.add(id);
       });
     } catch (error) {}
@@ -256,6 +353,7 @@
 
     injectSituationCompletionStyles();
     const completed = getCompletedScenarioIds();
+    const starMap = getScenarioStarMap();
 
     screen.querySelectorAll('.scenario-card').forEach(function (card) {
       const button = card.querySelector('button[onclick*="startAsdGame"]');
@@ -267,7 +365,12 @@
 
       const scenarioId = match[1];
       const isDone = completed.has(scenarioId);
+      const stars = starMap[scenarioId] || 3;
+      const colourClass = starClass(stars);
+
       card.classList.toggle('scenario-card-completed', isDone);
+      card.classList.remove('scenario-stars-1', 'scenario-stars-2', 'scenario-stars-3');
+      if (isDone) card.classList.add('scenario-' + colourClass);
 
       let badge = card.querySelector('.scenario-completion-badge');
       if (!badge) {
@@ -276,8 +379,11 @@
         card.insertBefore(badge, button);
       }
 
+      badge.classList.remove('stars-1', 'stars-2', 'stars-3');
+
       if (isDone) {
-        badge.innerHTML = '<span class="completion-main">✅ 已完成</span><span class="completion-sub">' + (SCENARIO_BADGES[scenarioId] || '已取得徽章') + '</span>';
+        badge.classList.add(colourClass);
+        badge.innerHTML = '<span class="completion-main">✅ 已完成｜' + starText(stars) + '</span><span class="completion-sub">' + (SCENARIO_BADGES[scenarioId] || '已取得徽章') + '</span>';
         button.textContent = '再練習一次';
       } else {
         badge.innerHTML = '<span class="completion-main">⭕ 未完成</span><span class="completion-sub">完成後會在這裡顯示</span>';
@@ -287,10 +393,13 @@
   }
 
   function injectSituationCompletionStyles() {
-    if (document.getElementById('situationCompletionStyle')) return;
+    let style = document.getElementById('situationCompletionStyle');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'situationCompletionStyle';
+      document.head.appendChild(style);
+    }
 
-    const style = document.createElement('style');
-    style.id = 'situationCompletionStyle';
     style.textContent = `
       .scenario-completion-badge {
         display: grid;
@@ -316,21 +425,40 @@
         color: var(--muted);
         line-height: 1.15;
       }
-      .scenario-card-completed {
+      .scenario-card-completed.scenario-stars-3 {
         background: linear-gradient(145deg, rgba(57,255,20,.16), rgba(255,255,255,.58)) !important;
         border-color: rgba(57,255,20,.32) !important;
         box-shadow: 0 0 0 3px rgba(57,255,20,.08), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important;
       }
-      .scenario-card-completed .scenario-completion-badge {
+      .scenario-card-completed.scenario-stars-2 {
+        background: linear-gradient(145deg, rgba(255,214,10,.20), rgba(255,255,255,.58)) !important;
+        border-color: rgba(255,214,10,.45) !important;
+        box-shadow: 0 0 0 3px rgba(255,214,10,.12), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important;
+      }
+      .scenario-card-completed.scenario-stars-1 {
+        background: linear-gradient(145deg, rgba(255,69,58,.15), rgba(255,255,255,.58)) !important;
+        border-color: rgba(255,69,58,.36) !important;
+        box-shadow: 0 0 0 3px rgba(255,69,58,.10), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important;
+      }
+      .scenario-completion-badge.stars-3 {
         color: #083b00;
         background: linear-gradient(180deg, rgba(57,255,20,.34), rgba(255,255,255,.82));
         box-shadow: 0 0 0 3px rgba(57,255,20,.12), inset 0 1px 0 rgba(255,255,255,.92);
       }
-      .scenario-card-completed .scenario-completion-badge .completion-sub {
-        color: #1f6f00;
+      .scenario-completion-badge.stars-2 {
+        color: #6b4300;
+        background: linear-gradient(180deg, rgba(255,214,10,.40), rgba(255,255,255,.84));
+        box-shadow: 0 0 0 3px rgba(255,214,10,.14), inset 0 1px 0 rgba(255,255,255,.92);
       }
+      .scenario-completion-badge.stars-1 {
+        color: #7a1212;
+        background: linear-gradient(180deg, rgba(255,69,58,.22), rgba(255,255,255,.84));
+        box-shadow: 0 0 0 3px rgba(255,69,58,.12), inset 0 1px 0 rgba(255,255,255,.92);
+      }
+      .scenario-completion-badge.stars-3 .completion-sub { color: #1f6f00; }
+      .scenario-completion-badge.stars-2 .completion-sub { color: #8a6500; }
+      .scenario-completion-badge.stars-1 .completion-sub { color: #9b1c15; }
     `;
-    document.head.appendChild(style);
   }
 
   function install() {
