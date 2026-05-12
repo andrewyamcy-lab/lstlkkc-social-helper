@@ -1,9 +1,6 @@
 // /route-hash-fix.js
-// Keep the browser URL hash in sync with the current single-page-app screen.
-// Extra safety: if there is no Firebase user, never leave the app on a blank #cover page.
-// Also loads small UI upgrade modules that are safe to run after the main app scripts.
-// Adds completion badges to the 情境選擇 page.
-// Star colour rule: 3 stars = green, 2 stars = yellow, 1 star = red.
+// Route hash sync + auth safety + UI upgrade loader.
+// Also connects 情境選擇 completion badges to the same RPG progress used by the RPG map.
 
 (function () {
   const ROUTES = {
@@ -19,6 +16,8 @@
     missionResultHistoryScreen: '#mission-history',
     rpgMapScreen: '#rpg-map'
   };
+
+  const RPG_PROGRESS_KEY = 'asd_school_rpg_progress_v1';
 
   const SCENARIO_LABELS = {
     start: '課室：發起對話',
@@ -42,13 +41,45 @@
     homework: '📚 確認達人'
   };
 
+  function safeJsonParse(value, fallback) {
+    try { return JSON.parse(value || ''); } catch (error) { return fallback; }
+  }
+
+  function readLocalJson(key) {
+    return safeJsonParse(localStorage.getItem(key), null);
+  }
+
+  function getRpgProgress() {
+    const main = readLocalJson(RPG_PROGRESS_KEY);
+    if (main && typeof main === 'object') return main;
+
+    const oldKeys = [
+      'asd_school_rpg_v5',
+      'asd_school_rpg_v4',
+      'asd_school_rpg_v3',
+      'asd_school_rpg_v2',
+      'asd_school_rpg'
+    ];
+
+    for (const key of oldKeys) {
+      const value = readLocalJson(key);
+      if (value && typeof value === 'object') return value;
+    }
+
+    return {};
+  }
+
+  function hasFirebaseUser() {
+    return Boolean(window.LSTFirebase && window.LSTFirebase.user);
+  }
+
+  function firebaseHasAnswered() {
+    return Boolean(window.LSTFirebase && window.LSTFirebase.ready);
+  }
+
   function setRoute(hash) {
     if (!hash || window.location.hash === hash) return;
-    try {
-      history.replaceState(null, '', hash);
-    } catch (error) {
-      window.location.hash = hash;
-    }
+    try { history.replaceState(null, '', hash); } catch (error) { window.location.hash = hash; }
   }
 
   function loadScriptOnce(src, id) {
@@ -65,14 +96,6 @@
     loadScriptOnce('phrase-library-upgrade.js?v=20260512-9', 'phraseLibraryUpgradeScript');
   }
 
-  function hasFirebaseUser() {
-    return Boolean(window.LSTFirebase && window.LSTFirebase.user);
-  }
-
-  function firebaseHasAnswered() {
-    return Boolean(window.LSTFirebase && window.LSTFirebase.ready);
-  }
-
   function showLoginFallback() {
     if (typeof window.showAuthLoginScreen === 'function') {
       window.showAuthLoginScreen();
@@ -86,28 +109,24 @@
     setRoute('#login');
   }
 
+  function getActiveScreenId() {
+    const rpg = document.getElementById('rpgMapScreen');
+    if (rpg && rpg.classList.contains('active')) return 'rpgMapScreen';
+    const active = document.querySelector('.screen.active');
+    return active ? active.id : '';
+  }
+
   function shouldForceLogin() {
     if (hasFirebaseUser()) return false;
-
     const hash = window.location.hash || '';
     const active = getActiveScreenId();
-
     if (hash === '#cover' || active === 'coverScreen' || !active) return true;
     if (firebaseHasAnswered() && active !== 'authLoginScreen' && active !== 'authLoadingScreen') return true;
-
     return false;
   }
 
   function enforceAuthRoute() {
     if (shouldForceLogin()) showLoginFallback();
-  }
-
-  function getActiveScreenId() {
-    const rpg = document.getElementById('rpgMapScreen');
-    if (rpg && rpg.classList.contains('active')) return 'rpgMapScreen';
-
-    const active = document.querySelector('.screen.active');
-    return active ? active.id : '';
   }
 
   function syncRouteFromActiveScreen() {
@@ -179,60 +198,23 @@
   function startAuthWatchdog() {
     if (window.__authRouteWatchdogStarted) return;
     window.__authRouteWatchdogStarted = true;
-
     [100, 500, 1200, 2500, 5000, 8000].forEach(function (delay) {
       setTimeout(enforceAuthRoute, delay);
     });
-
     setInterval(enforceAuthRoute, 1500);
-  }
-
-  function safeJsonParse(value, fallback) {
-    try {
-      return JSON.parse(value || '');
-    } catch (error) {
-      return fallback;
-    }
-  }
-
-  function readStoredProgress() {
-    const keys = [
-      'asd_school_rpg_v5',
-      'asd_school_rpg_v4',
-      'asd_school_rpg_v3',
-      'asd_school_rpg_v2',
-      'asd_school_rpg'
-    ];
-
-    for (const key of keys) {
-      const raw = localStorage.getItem(key);
-      const parsed = safeJsonParse(raw, null);
-      if (parsed && typeof parsed === 'object') return parsed;
-    }
-
-    return {};
   }
 
   function normaliseStars(value, record) {
     let stars = Number(value);
 
     if (!stars || Number.isNaN(stars)) {
-      const possibleScore = Number(
-        record && (
-          record.score ??
-          record.totalScore ??
-          record.finalScore ??
-          record.points ??
-          record.correctScore
-        )
-      );
-
-      if (possibleScore || possibleScore === 0) {
-        const possibleMax = Number(record && (record.maxScore || record.totalPossible || record.fullScore || 10));
-        const ratio = possibleMax ? possibleScore / possibleMax : possibleScore / 10;
+      const score = Number(record && (record.score ?? record.totalScore ?? record.finalScore ?? record.points ?? record.correctScore));
+      if (score || score === 0) {
+        const max = Number(record && (record.maxScore || record.totalPossible || record.fullScore || 10));
+        const ratio = max ? score / max : score / 10;
         if (ratio >= 0.8) stars = 3;
         else if (ratio >= 0.5) stars = 2;
-        else if (possibleScore > 0) stars = 1;
+        else if (score > 0) stars = 1;
       }
     }
 
@@ -245,57 +227,102 @@
 
   function collectStarsFromRecord(record, map) {
     if (!record || typeof record !== 'object') return;
-
     const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
     if (!id || !SCENARIO_LABELS[id]) return;
-
-    const stars = normaliseStars(
-      record.stars ?? record.starCount ?? record.rating ?? record.resultStars ?? record.earnedStars ?? record.badgeStars,
-      record
-    );
-
-    if (!stars) return;
-    map[id] = Math.max(Number(map[id] || 0), stars);
+    const stars = normaliseStars(record.stars ?? record.starCount ?? record.rating ?? record.resultStars ?? record.earnedStars ?? record.badgeStars, record);
+    if (stars) map[id] = Math.max(Number(map[id] || 0), stars);
   }
 
   function getScenarioStarMap() {
     const map = {};
+    const progress = getRpgProgress();
 
     try {
-      const progress = readStoredProgress();
-      const savedAppState = progress.appState || progress.state || progress;
-      const history = Array.isArray(savedAppState.reviewHistory) ? savedAppState.reviewHistory : [];
-      history.forEach(function (record) {
-        collectStarsFromRecord(record, map);
-      });
-
-      const missionResults = Array.isArray(savedAppState.missionResults) ? savedAppState.missionResults : [];
-      missionResults.forEach(function (record) {
-        collectStarsFromRecord(record, map);
-      });
-
-      const scenarioScores = savedAppState.scenarioScores || progress.scenarioScores || progress.stars || progress.starRatings || {};
-      Object.keys(scenarioScores).forEach(function (id) {
+      const rpgStars = progress.stars || {};
+      Object.keys(rpgStars).forEach(function (id) {
         if (SCENARIO_LABELS[id]) {
-          const value = typeof scenarioScores[id] === 'object'
-            ? (scenarioScores[id].stars ?? scenarioScores[id].starCount ?? scenarioScores[id].rating ?? scenarioScores[id].score)
-            : scenarioScores[id];
-          const stars = normaliseStars(value, typeof scenarioScores[id] === 'object' ? scenarioScores[id] : null);
+          const stars = normaliseStars(rpgStars[id], null);
           if (stars) map[id] = Math.max(Number(map[id] || 0), stars);
         }
       });
     } catch (error) {}
 
     try {
-      const history = window.appState && Array.isArray(window.appState.reviewHistory)
-        ? window.appState.reviewHistory
-        : [];
-      history.forEach(function (record) {
-        collectStarsFromRecord(record, map);
+      const rpgScores = progress.scores || {};
+      Object.keys(rpgScores).forEach(function (id) {
+        if (SCENARIO_LABELS[id] && !map[id]) {
+          const stars = normaliseStars(null, { score: rpgScores[id], maxScore: 10 });
+          if (stars) map[id] = stars;
+        }
       });
     } catch (error) {}
 
+    try {
+      const savedAppState = progress.appState || progress.state || progress;
+      const history = Array.isArray(savedAppState.reviewHistory) ? savedAppState.reviewHistory : [];
+      history.forEach(function (record) { collectStarsFromRecord(record, map); });
+      const missionResults = Array.isArray(savedAppState.missionResults) ? savedAppState.missionResults : [];
+      missionResults.forEach(function (record) { collectStarsFromRecord(record, map); });
+    } catch (error) {}
+
+    try {
+      const history = window.appState && Array.isArray(window.appState.reviewHistory) ? window.appState.reviewHistory : [];
+      history.forEach(function (record) { collectStarsFromRecord(record, map); });
+    } catch (error) {}
+
     return map;
+  }
+
+  function getCompletedScenarioIds() {
+    const completed = new Set();
+    const progress = getRpgProgress();
+
+    try {
+      const rpgCompleted = progress.completed || {};
+      Object.keys(rpgCompleted).forEach(function (id) {
+        if (rpgCompleted[id] && SCENARIO_LABELS[id]) completed.add(id);
+      });
+    } catch (error) {}
+
+    try {
+      const rpgStars = progress.stars || {};
+      Object.keys(rpgStars).forEach(function (id) {
+        if (Number(rpgStars[id] || 0) > 0 && SCENARIO_LABELS[id]) completed.add(id);
+      });
+    } catch (error) {}
+
+    try {
+      const rpgScores = progress.scores || {};
+      Object.keys(rpgScores).forEach(function (id) {
+        if ((Number(rpgScores[id] || 0) > 0 || progress.completed?.[id]) && SCENARIO_LABELS[id]) completed.add(id);
+      });
+    } catch (error) {}
+
+    try {
+      const savedBadges = progress.badgeState || progress.badges || window.badgeState || {};
+      Object.keys(savedBadges).forEach(function (id) {
+        if (savedBadges[id] && SCENARIO_LABELS[id]) completed.add(id);
+      });
+    } catch (error) {}
+
+    try {
+      const savedAppState = progress.appState || progress.state || progress;
+      const history = Array.isArray(savedAppState.reviewHistory) ? savedAppState.reviewHistory : [];
+      history.forEach(function (record) {
+        const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
+        if (id && SCENARIO_LABELS[id]) completed.add(id);
+      });
+    } catch (error) {}
+
+    try {
+      const history = window.appState && Array.isArray(window.appState.reviewHistory) ? window.appState.reviewHistory : [];
+      history.forEach(function (record) {
+        const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
+        if (id && SCENARIO_LABELS[id]) completed.add(id);
+      });
+    } catch (error) {}
+
+    return completed;
   }
 
   function starText(stars) {
@@ -307,44 +334,6 @@
     if (Number(stars) >= 3) return 'stars-3';
     if (Number(stars) === 2) return 'stars-2';
     return 'stars-1';
-  }
-
-  function getCompletedScenarioIds() {
-    const completed = new Set();
-
-    try {
-      const globalBadges = window.badgeState || {};
-      Object.keys(globalBadges).forEach(function (id) {
-        if (globalBadges[id]) completed.add(id);
-      });
-    } catch (error) {}
-
-    try {
-      const progress = readStoredProgress();
-      const savedBadges = progress.badgeState || progress.badges || {};
-      Object.keys(savedBadges).forEach(function (id) {
-        if (savedBadges[id]) completed.add(id);
-      });
-
-      const savedAppState = progress.appState || progress.state || progress;
-      const history = Array.isArray(savedAppState.reviewHistory) ? savedAppState.reviewHistory : [];
-      history.forEach(function (record) {
-        const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
-        if (id && SCENARIO_LABELS[id]) completed.add(id);
-      });
-    } catch (error) {}
-
-    try {
-      const history = window.appState && Array.isArray(window.appState.reviewHistory)
-        ? window.appState.reviewHistory
-        : [];
-      history.forEach(function (record) {
-        const id = record.scenarioId || record.gameId || record.missionId || record.id || record.type || record.key;
-        if (id && SCENARIO_LABELS[id]) completed.add(id);
-      });
-    } catch (error) {}
-
-    return completed;
   }
 
   function updateSituationCompletionBadges() {
@@ -401,63 +390,18 @@
     }
 
     style.textContent = `
-      .scenario-completion-badge {
-        display: grid;
-        gap: 2px;
-        width: fit-content;
-        max-width: 100%;
-        margin: 8px 0 6px;
-        padding: 7px 11px;
-        border-radius: 999px;
-        color: #6b7280;
-        background: rgba(255,255,255,.70);
-        border: 1px solid rgba(255,255,255,.74);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.92), 0 6px 14px rgba(29,53,87,.06);
-      }
-      .scenario-completion-badge .completion-main {
-        font-size: .84rem;
-        font-weight: 950;
-        line-height: 1.1;
-      }
-      .scenario-completion-badge .completion-sub {
-        font-size: .72rem;
-        font-weight: 850;
-        color: var(--muted);
-        line-height: 1.15;
-      }
-      .scenario-card-completed.scenario-stars-3 {
-        background: linear-gradient(145deg, rgba(57,255,20,.16), rgba(255,255,255,.58)) !important;
-        border-color: rgba(57,255,20,.32) !important;
-        box-shadow: 0 0 0 3px rgba(57,255,20,.08), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important;
-      }
-      .scenario-card-completed.scenario-stars-2 {
-        background: linear-gradient(145deg, rgba(255,214,10,.20), rgba(255,255,255,.58)) !important;
-        border-color: rgba(255,214,10,.45) !important;
-        box-shadow: 0 0 0 3px rgba(255,214,10,.12), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important;
-      }
-      .scenario-card-completed.scenario-stars-1 {
-        background: linear-gradient(145deg, rgba(255,69,58,.15), rgba(255,255,255,.58)) !important;
-        border-color: rgba(255,69,58,.36) !important;
-        box-shadow: 0 0 0 3px rgba(255,69,58,.10), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important;
-      }
-      .scenario-completion-badge.stars-3 {
-        color: #083b00;
-        background: linear-gradient(180deg, rgba(57,255,20,.34), rgba(255,255,255,.82));
-        box-shadow: 0 0 0 3px rgba(57,255,20,.12), inset 0 1px 0 rgba(255,255,255,.92);
-      }
-      .scenario-completion-badge.stars-2 {
-        color: #6b4300;
-        background: linear-gradient(180deg, rgba(255,214,10,.40), rgba(255,255,255,.84));
-        box-shadow: 0 0 0 3px rgba(255,214,10,.14), inset 0 1px 0 rgba(255,255,255,.92);
-      }
-      .scenario-completion-badge.stars-1 {
-        color: #7a1212;
-        background: linear-gradient(180deg, rgba(255,69,58,.22), rgba(255,255,255,.84));
-        box-shadow: 0 0 0 3px rgba(255,69,58,.12), inset 0 1px 0 rgba(255,255,255,.92);
-      }
-      .scenario-completion-badge.stars-3 .completion-sub { color: #1f6f00; }
-      .scenario-completion-badge.stars-2 .completion-sub { color: #8a6500; }
-      .scenario-completion-badge.stars-1 .completion-sub { color: #9b1c15; }
+      .scenario-completion-badge { display:grid; gap:2px; width:fit-content; max-width:100%; margin:8px 0 6px; padding:7px 11px; border-radius:999px; color:#6b7280; background:rgba(255,255,255,.70); border:1px solid rgba(255,255,255,.74); box-shadow:inset 0 1px 0 rgba(255,255,255,.92), 0 6px 14px rgba(29,53,87,.06); }
+      .scenario-completion-badge .completion-main { font-size:.84rem; font-weight:950; line-height:1.1; }
+      .scenario-completion-badge .completion-sub { font-size:.72rem; font-weight:850; color:var(--muted); line-height:1.15; }
+      .scenario-card-completed.scenario-stars-3 { background:linear-gradient(145deg, rgba(57,255,20,.16), rgba(255,255,255,.58)) !important; border-color:rgba(57,255,20,.32) !important; box-shadow:0 0 0 3px rgba(57,255,20,.08), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important; }
+      .scenario-card-completed.scenario-stars-2 { background:linear-gradient(145deg, rgba(255,214,10,.20), rgba(255,255,255,.58)) !important; border-color:rgba(255,214,10,.45) !important; box-shadow:0 0 0 3px rgba(255,214,10,.12), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important; }
+      .scenario-card-completed.scenario-stars-1 { background:linear-gradient(145deg, rgba(255,69,58,.15), rgba(255,255,255,.58)) !important; border-color:rgba(255,69,58,.36) !important; box-shadow:0 0 0 3px rgba(255,69,58,.10), var(--soft-shadow), inset 0 1px 0 rgba(255,255,255,.82) !important; }
+      .scenario-completion-badge.stars-3 { color:#083b00; background:linear-gradient(180deg, rgba(57,255,20,.34), rgba(255,255,255,.82)); box-shadow:0 0 0 3px rgba(57,255,20,.12), inset 0 1px 0 rgba(255,255,255,.92); }
+      .scenario-completion-badge.stars-2 { color:#6b4300; background:linear-gradient(180deg, rgba(255,214,10,.40), rgba(255,255,255,.84)); box-shadow:0 0 0 3px rgba(255,214,10,.14), inset 0 1px 0 rgba(255,255,255,.92); }
+      .scenario-completion-badge.stars-1 { color:#7a1212; background:linear-gradient(180deg, rgba(255,69,58,.22), rgba(255,255,255,.84)); box-shadow:0 0 0 3px rgba(255,69,58,.12), inset 0 1px 0 rgba(255,255,255,.92); }
+      .scenario-completion-badge.stars-3 .completion-sub { color:#1f6f00; }
+      .scenario-completion-badge.stars-2 .completion-sub { color:#8a6500; }
+      .scenario-completion-badge.stars-1 .completion-sub { color:#9b1c15; }
     `;
   }
 
@@ -483,11 +427,8 @@
   window.loadUiUpgradeScripts = loadUiUpgradeScripts;
   window.updateSituationCompletionBadges = updateSituationCompletionBadges;
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', install);
-  } else {
-    install();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
+  else install();
 
   window.addEventListener('load', install);
   window.addEventListener('storage', updateSituationCompletionBadges);
