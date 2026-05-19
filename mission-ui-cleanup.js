@@ -1,6 +1,6 @@
 // /mission-ui-cleanup.js
 // Cleans old temporary mission UI elements when switching between intro, question and result screens.
-// Also provides a stable saved Mission Result History screen.
+// Also provides a stable saved Mission Record History screen.
 
 (function () {
   const SESSION_KEY = 'asd_school_mission_review_session_v1';
@@ -154,7 +154,7 @@
     screen = document.createElement('div');
     screen.id = 'missionResultHistoryScreen';
     screen.className = 'screen welcome-screen';
-    screen.innerHTML = '<div class="hero-card animate-in"><div class="tag">任務結果紀錄</div><div class="hero-avatar">📊</div><h2>我的任務結果</h2><p>這裡會保存每個任務的最佳結果，包括星數、分數和逐題回饋。</p><div id="missionResultHistoryContent"></div><div class="welcome-actions"><button class="secondary" onclick="showCoverScreen && showCoverScreen()">返回開始頁</button><button onclick="showSituationScreen && showSituationScreen()">繼續任務</button><button class="secondary" onclick="window.clearMissionResultHistory && window.clearMissionResultHistory()">清除結果紀錄</button></div></div>';
+    screen.innerHTML = '<div class="hero-card animate-in"><div class="tag">任務紀錄</div><div class="hero-avatar">📊</div><h2>我的任務紀錄</h2><p>這裡會保存每個任務的最佳紀錄，包括星數、分數和逐題回饋。</p><div id="missionResultHistoryContent"></div><div class="welcome-actions"><button class="secondary" onclick="showCoverScreen && showCoverScreen()">返回開始頁</button><button onclick="showSituationScreen && showSituationScreen()">繼續任務</button><button class="secondary" onclick="window.clearMissionResultHistory && window.clearMissionResultHistory()">清除任務紀錄</button></div></div>';
     card.appendChild(screen);
     return screen;
   }
@@ -173,7 +173,7 @@
     });
 
     if (!records.length) {
-      target.innerHTML = '<div class="history-empty-card">未有任務結果。完成一個任務後，這裡會自動保存結果。</div>';
+      target.innerHTML = '<div class="history-empty-card">未有任務紀錄。完成一個任務後，這裡會自動保存紀錄。</div>';
       return;
     }
 
@@ -212,18 +212,24 @@
   function clearMissionResultHistory() {
     saveJson(HISTORY_KEY, { records: {} });
     renderHistoryContent();
-    if (typeof showToast === 'function') showToast('已清除任務結果紀錄', 'success');
+    if (typeof showToast === 'function') showToast('已清除任務紀錄', 'success');
   }
 
   function addHomeHistoryButtonOnce() {
     const coverMenu = document.querySelector('#coverScreen .menu-actions');
     if (!coverMenu || document.getElementById('homeMissionResultHistoryButton')) return;
 
+    const hasMissionRecordButton = Array.from(coverMenu.querySelectorAll('button')).some(function (button) {
+      const text = String(button.textContent || '').trim();
+      return text === '我的任務紀錄' || text === '我的任務結果';
+    });
+    if (hasMissionRecordButton) return;
+
     const btn = document.createElement('button');
     btn.id = 'homeMissionResultHistoryButton';
     btn.type = 'button';
     btn.className = 'secondary';
-    btn.textContent = '我的任務結果';
+    btn.textContent = '我的任務紀錄';
     btn.addEventListener('click', showMissionResultHistory);
 
     const settings = Array.from(coverMenu.querySelectorAll('button')).find(function (button) {
