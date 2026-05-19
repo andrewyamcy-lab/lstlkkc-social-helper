@@ -3,7 +3,7 @@
 // Existing file only: no new files are required.
 
 (function () {
-  const VERSION = '20260519-cinematic2';
+  const VERSION = '20260519-cinematic3';
   const missionScripts = [
     'mission-completion-fix.js',
     'mission-status-panel-fix.js',
@@ -35,11 +35,8 @@
   if (window.__missionUiLoaderStarted) return;
   window.__missionUiLoaderStarted = true;
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { loadScriptSequentially(0); });
-  } else {
-    loadScriptSequentially(0);
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { loadScriptSequentially(0); });
+  else loadScriptSequentially(0);
 })();
 
 (function () {
@@ -50,6 +47,12 @@
   let lastCompleteKey = '';
   let lastBadgeCount = 0;
   let finishWatchTimer = null;
+  let overlayLockedUntil = 0;
+  let lastOverlayKind = '';
+  let lastOverlayAt = 0;
+  let badgeIntervalStarted = false;
+
+  function now() { return Date.now(); }
 
   function readJson(key, fallback) {
     try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (error) { return fallback; }
@@ -93,13 +96,28 @@
   }
 
   function removeExistingOverlay() {
-    document.querySelectorAll('.mission-cinematic-overlay').forEach(function (node) { if (node && node.parentNode) node.parentNode.removeChild(node); });
+    document.querySelectorAll('.mission-cinematic-overlay').forEach(function (node) {
+      if (node && node.parentNode) node.parentNode.removeChild(node);
+    });
+  }
+
+  function canShowOverlay(kind, wait) {
+    const t = now();
+    if (document.querySelector('.mission-cinematic-overlay') && t < overlayLockedUntil) return false;
+    if (kind === lastOverlayKind && (t - lastOverlayAt) < 900) return false;
+    lastOverlayKind = kind;
+    lastOverlayAt = t;
+    overlayLockedUntil = t + Number(wait || 900) + 360;
+    return true;
   }
 
   function showOverlay(kind, data, duration) {
     injectStyles();
-    removeExistingOverlay();
     const reduced = document.body.classList.contains('reduced-motion');
+    const wait = reduced ? 260 : Number(duration || 900);
+    if (!canShowOverlay(kind, wait)) return;
+
+    removeExistingOverlay();
     const overlay = document.createElement('div');
     overlay.className = 'mission-cinematic-overlay';
     if (kind === 'map') overlay.classList.add('is-map');
@@ -116,7 +134,6 @@
     }
 
     document.body.appendChild(overlay);
-    const wait = reduced ? 260 : Number(duration || 900);
     setTimeout(function () {
       overlay.classList.add('is-leaving');
       setTimeout(function () { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay); }, reduced ? 30 : 280);
@@ -154,7 +171,7 @@
 
   function wrapMapOpeners() {
     if (mapWrapped) return;
-    ['openFinalRpgMap', 'goToRpgMap', 'showRpgMapScreen', 'openRpgMap'].forEach(function (name) {
+    ['openFinalRpgMap'].forEach(function (name) {
       if (typeof window[name] !== 'function') return;
       const original = window[name];
       if (original.__cinematicMapWrapped) return;
@@ -224,7 +241,10 @@
     wrapMapOpeners();
     wrapScreenSwitch();
     installFinishWatcher();
-    setInterval(checkBadgeProgress, 1800);
+    if (!badgeIntervalStarted) {
+      badgeIntervalStarted = true;
+      setInterval(checkBadgeProgress, 1800);
+    }
     [300, 900, 1800, 3200].forEach(function (delay) {
       setTimeout(wrapStartAsdGame, delay);
       setTimeout(wrapMapOpeners, delay);
