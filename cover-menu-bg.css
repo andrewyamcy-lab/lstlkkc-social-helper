@@ -109,7 +109,7 @@ body.auth-cover-ready #coverScreen.active .tag {
 }
 
 body.auth-cover-ready #coverScreen.active .tag::after {
-  content: "｜梁書 RPG 校園社交任務";
+  content: "";
 }
 
 body.auth-cover-ready #coverScreen.active .hero-avatar {
