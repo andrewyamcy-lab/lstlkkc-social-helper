@@ -6,28 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>樂善堂梁銶琚書院｜校園社交練習</title>
   <style>
-    /* Hide original cover until Firebase auth gate confirms the final cover is ready. */
     body:not(.auth-cover-ready) #coverScreen {
       display: none !important;
       visibility: hidden !important;
       pointer-events: none !important;
     }
-
-    /* Critical cover styles to prevent old/new cover flashing before JS loads. */
-    #coverScreen .menu-actions.final-cover-menu {
-      max-width: 430px;
-    }
-
-    #coverScreen .menu-actions.final-cover-menu button {
-      width: 100%;
-    }
-
+    #coverScreen .menu-actions.final-cover-menu { max-width: 430px; }
+    #coverScreen .menu-actions.final-cover-menu button { width: 100%; }
     #coverScreen .cover-game-logo-wrap {
       width: min(820px, 96%);
       margin: 0 auto 14px;
       display: block;
     }
-
     #coverScreen .cover-game-logo-img {
       width: 100%;
       max-height: 250px;
@@ -35,20 +25,11 @@
       display: block;
       filter: drop-shadow(0 18px 28px rgba(0, 78, 180, 0.22));
     }
-
     #coverScreen.cover-logo-active .hero-avatar,
-    #coverScreen.cover-logo-active .hero-card > h2 {
-      display: none !important;
-    }
-
+    #coverScreen.cover-logo-active .hero-card > h2 { display: none !important; }
     @media (max-width: 720px) {
-      #coverScreen .cover-game-logo-wrap {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      #coverScreen .cover-game-logo-img {
-        max-height: 180px;
-      }
+      #coverScreen .cover-game-logo-wrap { width: 100%; margin-bottom: 10px; }
+      #coverScreen .cover-game-logo-img { max-height: 180px; }
     }
   </style>
   <link rel="stylesheet" href="style.css" />
@@ -71,13 +52,7 @@
         <div class="hero-card animate-in">
           <div class="tag">梁書學生版｜梁書 RPG 校園社交任務</div>
           <div class="cover-game-logo-wrap">
-            <img
-              class="cover-game-logo-img"
-              src="images/lkk-social-adventure-logo.png?v=20260519-2"
-              alt="梁書校園社交大冒險｜LKK Campus Social Adventure"
-              loading="eager"
-              decoding="async"
-            />
+            <img class="cover-game-logo-img" src="images/lkk-social-adventure-logo.png?v=20260519-2" alt="梁書校園社交大冒險｜LKK Campus Social Adventure" loading="eager" decoding="async" />
           </div>
           <div class="menu-actions final-cover-menu" data-final-cover-menu="1">
             <button type="button" onclick="window.openFinalRpgMap ? window.openFinalRpgMap() : (window.goToRpgMap ? window.goToRpgMap() : (window.showRpgMapScreen && window.showRpgMapScreen()))">RPG 校園地圖</button>
@@ -94,74 +69,27 @@
 
       <div id="badgeScreen" class="screen welcome-screen">
         <div class="hero-card animate-in">
-          <div class="tag">我的徽章</div>
-          <div class="hero-avatar">🏅</div>
-          <h2>我的徽章</h2>
-          <p>完成不同校園情境後，你會得到對應徽章。</p>
-          <div class="settings-grid">
-            <div class="settings-card" style="grid-column: 1 / -1;">
-              <div class="panel-badge">已得到的徽章</div>
-              <h3>我的練習成果</h3>
-              <p class="small">完成任務並取得 3 星表現，可以為相關徽章增加 1 星。徽章累積到 3 星後便會解鎖。</p>
-              <div class="badge-grid" id="badgeGrid"></div>
-            </div>
-          </div>
-          <div class="welcome-actions">
-            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
-            <button onclick="showSituationScreen()">前往情境選擇</button>
-            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
-            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button>
-            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
-          </div>
+          <div class="tag">我的徽章</div><div class="hero-avatar">🏅</div><h2>我的徽章</h2><p>完成不同校園情境後，你會得到對應徽章。</p>
+          <div class="settings-grid"><div class="settings-card" style="grid-column: 1 / -1;"><div class="panel-badge">已得到的徽章</div><h3>我的練習成果</h3><p class="small">完成任務並取得 3 星表現，可以為相關徽章增加 1 星。徽章累積到 3 星後便會解鎖。</p><div class="badge-grid" id="badgeGrid"></div></div></div>
+          <div class="welcome-actions"><button class="secondary" onclick="showCoverScreen()">返回開始頁</button><button onclick="showSituationScreen()">前往情境選擇</button><button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button><button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button><button class="secondary" onclick="showSettingsScreen()">我的設定</button></div>
         </div>
       </div>
 
       <div id="settingsScreen" class="screen welcome-screen">
         <div class="hero-card animate-in">
-          <div class="tag">我的設定</div>
-          <div class="hero-avatar">⚙️</div>
-          <h2>我的設定</h2>
-          <p>你可以在這裡調整字體、語音和畫面顯示。</p>
+          <div class="tag">我的設定</div><div class="hero-avatar">⚙️</div><h2>我的設定</h2><p>你可以在這裡調整字體、語音和畫面顯示。</p>
           <div class="settings-grid">
-            <div class="settings-card">
-              <h3>輔助功能</h3>
-              <div class="toggle-row"><span>朗讀題目</span><input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" /></div>
-              <div class="toggle-row"><span>高對比畫面</span><input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" /></div>
-              <div class="toggle-row"><span>減少動畫</span><input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" /></div>
-            </div>
-            <div class="settings-card">
-              <h3>顯示設定</h3>
-              <p class="small">按按鈕調整字體大小，讓你看得更舒服。</p>
-              <div class="settings-buttons">
-                <button class="secondary" onclick="cycleFontSize()">調整字體大小</button>
-                <button class="secondary" onclick="toggleSpeech()">開關朗讀</button>
-              </div>
-            </div>
-            <div class="settings-card">
-              <h3>資料管理</h3>
-              <p class="small">你可以儲存目前進度，或重新開始。</p>
-              <div class="settings-buttons">
-                <button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
-                <button class="secondary" onclick="resetAllData()">重新開始</button>
-              </div>
-            </div>
+            <div class="settings-card"><h3>輔助功能</h3><div class="toggle-row"><span>朗讀題目</span><input type="checkbox" id="speechToggle" onchange="handleSpeechToggle()" /></div><div class="toggle-row"><span>高對比畫面</span><input type="checkbox" id="contrastToggle" onchange="handleContrastToggle()" /></div><div class="toggle-row"><span>減少動畫</span><input type="checkbox" id="motionToggle" onchange="handleMotionToggle()" /></div></div>
+            <div class="settings-card"><h3>顯示設定</h3><p class="small">按按鈕調整字體大小，讓你看得更舒服。</p><div class="settings-buttons"><button class="secondary" onclick="cycleFontSize()">調整字體大小</button><button class="secondary" onclick="toggleSpeech()">開關朗讀</button></div></div>
+            <div class="settings-card"><h3>資料管理</h3><p class="small">你可以儲存目前進度，或重新開始。</p><div class="settings-buttons"><button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button><button class="secondary" onclick="resetAllData()">重新開始</button></div></div>
           </div>
-          <div class="welcome-actions">
-            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
-            <button onclick="showSituationScreen()">前往情境選擇</button>
-            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
-            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button>
-          </div>
+          <div class="welcome-actions"><button class="secondary" onclick="showCoverScreen()">返回開始頁</button><button onclick="showSituationScreen()">前往情境選擇</button><button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button><button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button></div>
         </div>
       </div>
 
       <div id="phraseLibraryScreen" class="screen welcome-screen">
         <div class="hero-card animate-in">
-          <div class="tag">社交句式庫</div>
-          <div class="hero-avatar">💬</div>
-          <h2>社交句式庫</h2>
-          <p>這裡是一些梁書校園生活常用句式。學生可以先讀熟，再在情境練習中使用。</p>
-
+          <div class="tag">社交句式庫</div><div class="hero-avatar">💬</div><h2>社交句式庫</h2><p>這裡是一些梁書校園生活常用句式。學生可以先讀熟，再在情境練習中使用。</p>
           <div class="settings-grid">
             <div class="settings-card"><h3>🗣️ 打招呼 / 開始對話</h3><p>早晨，我想同你打個招呼。</p><p>你好，我可以坐喺附近嗎？</p><p>你今日上邊一課呀？</p><p>我想問下你啱啱老師講咗咩？</p></div>
             <div class="settings-card"><h3>🙅 禮貌拒絕</h3><p>多謝你邀請我，但我而家想休息一陣。</p><p>我今日未必參加到，下次再一齊可以嗎？</p><p>我而家想自己安靜一陣，多謝你明白。</p><p>我唔係唔鍾意你哋，只係而家有少少攰。</p></div>
@@ -170,22 +98,13 @@
             <div class="settings-card"><h3>🤝 小組合作 / 接受不同意見</h3><p>我有一個簡單想法，想分享一下。</p><p>我明白你嘅意思，我哋可唔可以比較兩個方法？</p><p>你覺得邊一部分需要改？</p><p>咁我負責呢部分，可以嗎？</p></div>
             <div class="settings-card"><h3>🌱 道歉 / 修補關係</h3><p>對不起，我剛才語氣太急。</p><p>我頭先太緊張，所以講得唔清楚。</p><p>我想重新講一次，可以嗎？</p><p>多謝你提醒我，我下次會留意。</p></div>
           </div>
-
-          <div class="welcome-actions">
-            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
-            <button onclick="showSituationScreen()">前往情境選擇</button>
-            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button>
-            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
-          </div>
+          <div class="welcome-actions"><button class="secondary" onclick="showCoverScreen()">返回開始頁</button><button onclick="showSituationScreen()">前往情境選擇</button><button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button><button class="secondary" onclick="showSettingsScreen()">我的設定</button></div>
         </div>
       </div>
 
       <div id="situationScreen" class="screen welcome-screen">
         <div class="hero-card animate-in">
-          <div class="tag">情境選擇</div>
-          <div class="hero-avatar">🏫</div>
-          <h2>選擇你想練習的情境</h2>
-          <p>每個情境有 5 題，每題有 4 個選項。完成後可以看到結果和鼓勵。</p>
+          <div class="tag">情境選擇</div><div class="hero-avatar">🏫</div><h2>選擇你想練習的情境</h2><p>每個情境有 5 題，每題有 4 個選項。完成後可以看到結果和鼓勵。</p>
           <div class="scenario-select-grid">
             <div class="scenario-card"><div class="emoji">🗣️</div><strong>課室：發起對話</strong><div class="small">主動和同學打招呼，開始簡單對話。</div><button onclick="startAsdGame('start')">開始這個情境</button></div>
             <div class="scenario-card"><div class="emoji">🙅</div><strong>小息：禮貌拒絕</strong><div class="small">被同學邀請玩遊戲時，清楚而友善地拒絕。</div><button onclick="startAsdGame('refuse')">開始這個情境</button></div>
@@ -196,52 +115,15 @@
             <div class="scenario-card"><div class="emoji">🍱</div><strong>午飯時間：加入同學</strong><div class="small">想加入同學一起吃飯時，學習自然地開口。</div><button onclick="startAsdGame('lunch')">開始這個情境</button></div>
             <div class="scenario-card"><div class="emoji">📚</div><strong>放學後：確認功課</strong><div class="small">不確定功課內容時，學習向同學清楚確認。</div><button onclick="startAsdGame('homework')">開始這個情境</button></div>
           </div>
-          <div class="welcome-actions">
-            <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
-            <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
-            <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
-            <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button>
-            <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
-          </div>
+          <div class="welcome-actions"><button class="secondary" onclick="showCoverScreen()">返回開始頁</button><button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button><button class="secondary" onclick="showBadgeScreen()">我的徽章</button><button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button><button class="secondary" onclick="showSettingsScreen()">我的設定</button></div>
         </div>
       </div>
 
       <div id="gameScreen" class="screen">
-        <div class="tag">梁書社交練習</div>
-        <h2>正在練習</h2>
-        <p>完成這個情境後，你可以再選另一個情境繼續練習。</p>
-        <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;">
-          <button onclick="showSituationScreen()">選擇其他情境</button>
-          <button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button>
-          <button class="secondary" onclick="showBadgeScreen()">我的徽章</button>
-          <button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button>
-          <button class="secondary" onclick="showSettingsScreen()">我的設定</button>
-          <button class="secondary" onclick="showCoverScreen()">返回開始頁</button>
-        </div>
-        <div class="top-status">
-          <div class="status-box"><div class="status-title">目前進度</div><div id="asdProgressText" class="small">請先選擇一個情境開始練習。</div><div class="progress-wrap"><div class="progress-bar" id="asdProgressBar"></div></div></div>
-          <div class="status-box"><div class="status-title">我的表現</div><div id="gameStatusText" class="small">正在計算情境數量｜使用提示：0 次｜使用冷靜模式：0 次</div><div class="achievement-row" id="achievementRow"><div class="achievement-pill">我的練習模式</div></div></div>
-        </div>
-        <div class="game-layout" style="grid-template-columns: 1fr; max-width: 780px; margin-left:auto; margin-right:auto;">
-          <div class="dialogue-area center-column">
-            <div class="question-tracker" id="questionTracker" aria-live="polite">
-              <div class="question-tracker-main"><span class="question-badge-big" id="questionBadgeBig">第 1 / 5 題</span><span class="question-tracker-title" id="questionTrackerTitle">請閱讀題目，然後選擇最合適的回應</span></div>
-              <div class="question-pills" aria-label="題目進度"><span class="question-pill" data-q="1">1</span><span class="question-pill" data-q="2">2</span><span class="question-pill" data-q="3">3</span><span class="question-pill" data-q="4">4</span><span class="question-pill" data-q="5">5</span></div>
-            </div>
-            <div class="dialogue-box animate-in" id="asdBox">這裡會顯示情境故事、問題和結果。</div>
-            <div id="sceneMeta" class="scene-meta hidden"></div>
-            <div id="hintBox" class="hint-box hidden"></div>
-            <div id="calmBox" class="calm-box hidden"></div>
-            <div id="reviewBoxInline" class="review-box hidden"></div>
-            <div class="choice-grid" id="asdChoices"></div>
-            <div class="action-row">
-              <button class="secondary" onclick="showHint()">看看提示</button>
-              <button class="secondary" onclick="showCalmMode()">先冷靜一下</button>
-              <button class="secondary" onclick="repeatCurrentText()">再讀一次題目</button>
-              <button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button>
-            </div>
-          </div>
-        </div>
+        <div class="tag">梁書社交練習</div><h2>正在練習</h2><p>完成這個情境後，你可以再選另一個情境繼續練習。</p>
+        <div class="welcome-actions" style="justify-content:flex-start; margin-top:0; margin-bottom:16px;"><button onclick="showSituationScreen()">選擇其他情境</button><button class="secondary" onclick="showPhraseLibraryScreen()">社交句式庫</button><button class="secondary" onclick="showBadgeScreen()">我的徽章</button><button class="secondary" onclick="window.showMissionResultHistory && window.showMissionResultHistory()">我的任務紀錄</button><button class="secondary" onclick="showSettingsScreen()">我的設定</button><button class="secondary" onclick="showCoverScreen()">返回開始頁</button></div>
+        <div class="top-status"><div class="status-box"><div class="status-title">目前進度</div><div id="asdProgressText" class="small">請先選擇一個情境開始練習。</div><div class="progress-wrap"><div class="progress-bar" id="asdProgressBar"></div></div></div><div class="status-box"><div class="status-title">我的表現</div><div id="gameStatusText" class="small">正在計算情境數量｜使用提示：0 次｜使用冷靜模式：0 次</div><div class="achievement-row" id="achievementRow"><div class="achievement-pill">我的練習模式</div></div></div></div>
+        <div class="game-layout" style="grid-template-columns: 1fr; max-width: 780px; margin-left:auto; margin-right:auto;"><div class="dialogue-area center-column"><div class="question-tracker" id="questionTracker" aria-live="polite"><div class="question-tracker-main"><span class="question-badge-big" id="questionBadgeBig">第 1 / 5 題</span><span class="question-tracker-title" id="questionTrackerTitle">請閱讀題目，然後選擇最合適的回應</span></div><div class="question-pills" aria-label="題目進度"><span class="question-pill" data-q="1">1</span><span class="question-pill" data-q="2">2</span><span class="question-pill" data-q="3">3</span><span class="question-pill" data-q="4">4</span><span class="question-pill" data-q="5">5</span></div></div><div class="dialogue-box animate-in" id="asdBox">這裡會顯示情境故事、問題和結果。</div><div id="sceneMeta" class="scene-meta hidden"></div><div id="hintBox" class="hint-box hidden"></div><div id="calmBox" class="calm-box hidden"></div><div id="reviewBoxInline" class="review-box hidden"></div><div class="choice-grid" id="asdChoices"></div><div class="action-row"><button class="secondary" onclick="showHint()">看看提示</button><button class="secondary" onclick="showCalmMode()">先冷靜一下</button><button class="secondary" onclick="repeatCurrentText()">再讀一次題目</button><button onclick="saveProgress(); showToast('已儲存進度', 'success');">儲存進度</button></div></div></div>
       </div>
     </section>
   </div>
@@ -273,7 +155,7 @@
   <script src="rpg-preview-ratio-fix.js?v=20260508-1"></script>
   <script src="ability-change-fix.js?v=20260508-1"></script>
   <script src="rpg-map-title-cleanup.js?v=20260508-1"></script>
-  <script src="mission-ui.js?v=20260511-1"></script>
+  <script src="mission-ui.js?v=20260519-cinematic2"></script>
   <script src="reputation-system.js?v=20260509-1"></script>
   <script src="mission-record-detail.js?v=20260511-1"></script>
   <script src="phrase-library-upgrade.js?v=20260512-9"></script>
@@ -282,10 +164,7 @@
   <script>
     function setActiveScreen(screenId, stateName) {
       const screenIds = ['coverScreen', 'badgeScreen', 'settingsScreen', 'phraseLibraryScreen', 'situationScreen', 'gameScreen', 'characterScreen', 'missionResultHistoryScreen'];
-      screenIds.forEach((id) => {
-        const screen = document.getElementById(id);
-        if (screen) screen.classList.toggle('active', id === screenId);
-      });
+      screenIds.forEach((id) => { const screen = document.getElementById(id); if (screen) screen.classList.toggle('active', id === screenId); });
       const rpgScreen = document.getElementById('rpgMapScreen');
       if (rpgScreen && screenId !== 'rpgMapScreen') rpgScreen.classList.remove('active');
       if (typeof appState !== 'undefined' && appState) appState.currentScreen = stateName;
@@ -302,13 +181,11 @@
       if (typeof syncScenarioTotal === 'function') setTimeout(syncScenarioTotal, 300);
       window.scrollTo({ top: 0, behavior: 'auto' });
     }
-
     function showCoverScreen() { setActiveScreen('coverScreen', 'cover'); }
     function showBadgeScreen() { if (typeof renderBadges === 'function') renderBadges(); setActiveScreen('badgeScreen', 'badge'); }
     function showSettingsScreen() { setActiveScreen('settingsScreen', 'settings'); }
     function showPhraseLibraryScreen() { setActiveScreen('phraseLibraryScreen', 'phraseLibrary'); }
     function showSituationScreen() { setActiveScreen('situationScreen', 'situation'); }
-
     window.addEventListener('load', function () {
       if (typeof initAnswerRandomizer === 'function') setTimeout(initAnswerRandomizer, 400);
       if (typeof initBackgroundFlow === 'function') setTimeout(initBackgroundFlow, 450);
