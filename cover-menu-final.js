@@ -14,6 +14,7 @@
     '我的角色',
     '查看我的徽章',
     '梁書校園社交教練（謙謙）',
+    '我的任務紀錄',
     '我的設定',
     '登出'
   ];
@@ -150,6 +151,22 @@
     if (typeof window[name] === 'function') window[name]();
   }
 
+  function openMissionRecord() {
+    if (typeof window.showMissionResultHistory === 'function') {
+      window.showMissionResultHistory();
+      return;
+    }
+
+    const screen = document.getElementById('missionResultHistoryScreen');
+    if (screen) {
+      document.querySelectorAll('.screen').forEach(function (item) {
+        item.classList.toggle('active', item.id === 'missionResultHistoryScreen');
+      });
+      if (window.appState) window.appState.currentScreen = 'missionResultHistory';
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }
+
   function makeButton(text, className, handler) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -205,6 +222,7 @@
     menu.appendChild(makeButton('我的角色', 'secondary', function () { safeCall('showCharacterScreen'); }));
     menu.appendChild(makeButton('查看我的徽章', 'secondary', function () { safeCall('showBadgeScreen'); }));
     menu.appendChild(makeButton('梁書校園社交教練（謙謙）', 'secondary', openGeminiCoach));
+    menu.appendChild(makeButton('我的任務紀錄', 'secondary', openMissionRecord));
     menu.appendChild(makeButton('我的設定', 'secondary', function () { safeCall('showSettingsScreen'); }));
     menu.appendChild(makeButton('登出', 'secondary', function () { safeCall('logoutGoogle'); }));
 
@@ -214,6 +232,7 @@
   function install() {
     window.openGeminiCoach = openGeminiCoach;
     window.openFinalRpgMap = openFinalRpgMap;
+    window.openMissionRecord = openMissionRecord;
     window.applyFinalCoverMenu = replaceCoverMenu;
     window.ensureCoverLogo = ensureCoverLogo;
 
