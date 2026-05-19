@@ -3,7 +3,7 @@
 // Existing file only: no new files are required.
 
 (function () {
-  const VERSION = '20260519-cinematic3';
+  const VERSION = '20260519-cinematic4';
   const missionScripts = [
     'mission-completion-fix.js',
     'mission-status-panel-fix.js',
@@ -171,10 +171,11 @@
 
   function wrapMapOpeners() {
     if (mapWrapped) return;
+    let didWrap = false;
     ['openFinalRpgMap'].forEach(function (name) {
       if (typeof window[name] !== 'function') return;
       const original = window[name];
-      if (original.__cinematicMapWrapped) return;
+      if (original.__cinematicMapWrapped) { didWrap = true; return; }
       window[name] = function () {
         const args = arguments;
         const reduced = document.body.classList.contains('reduced-motion');
@@ -182,8 +183,9 @@
         setTimeout(function () { original.apply(window, args); setTimeout(animateActiveScreen, 80); }, reduced ? 0 : 170);
       };
       window[name].__cinematicMapWrapped = true;
+      didWrap = true;
     });
-    mapWrapped = true;
+    if (didWrap) mapWrapped = true;
   }
 
   function wrapScreenSwitch() {
@@ -245,7 +247,7 @@
       badgeIntervalStarted = true;
       setInterval(checkBadgeProgress, 1800);
     }
-    [300, 900, 1800, 3200].forEach(function (delay) {
+    [300, 900, 1800, 3200, 5000].forEach(function (delay) {
       setTimeout(wrapStartAsdGame, delay);
       setTimeout(wrapMapOpeners, delay);
       setTimeout(wrapScreenSwitch, delay);
