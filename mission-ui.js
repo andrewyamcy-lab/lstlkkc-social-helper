@@ -5,7 +5,7 @@
 // Keep the original files in the repo until all testing is complete.
 
 (function () {
-  const VERSION = '20260511-1';
+  const VERSION = '20260519-missionrecord3';
 
   const missionScripts = [
     'mission-completion-fix.js',
